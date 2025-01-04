@@ -1,5 +1,5 @@
 ---
-date: 2024-08-02
+date: 2025-01-04
 title: 'Sampling a categorical PMF'
 subtitle: "There's more than meets the eye"
 tags:
