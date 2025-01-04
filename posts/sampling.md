@@ -516,6 +516,10 @@ fn main() {
 }
 ```
 
+The Rust implementations of all 4 of the sampling methods can be found
+[here](https://github.com/InCogNiTo124/personal-blog/blob/ba24a3f/posts/sampling/rustsampler/src/main.rs#L18-L91),
+but they're also pretty straightforward.
+
 There are the graphs for `cargo run` timings:
 
 ![Rust reimplementations timings with respect to a chosen dimensionality of a discrete variable. Now, not only that the "direct" gumbels method is slow, the "original" gumbel is too slow as well. Both of gumbel methods are vastly inferior to a simple linear or lg2 search](/images/rust1.png)
