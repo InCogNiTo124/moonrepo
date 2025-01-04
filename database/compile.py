@@ -15,14 +15,18 @@ import markdown_katex
 # monkey patching xml.etree.ElementTree
 # https://stackoverflow.com/a/8915039
 ET._original_serialize_xml = ET._serialize_xml
+
+
 def _serialize_xml(write, elem, qnames, namespaces, short_empty_elements, **kwargs):
-    if elem.tag == '![CDATA[':
-        write("\n<%s%s]]>\n" % (
-                elem.tag, elem.text))
+    if elem.tag == "![CDATA[":
+        write("\n<%s%s]]>\n" % (elem.tag, elem.text))
         return
     return ET._original_serialize_xml(
-        write, elem, qnames, namespaces, short_empty_elements=short_empty_elements)
-ET._serialize_xml = ET._serialize['xml'] = _serialize_xml
+        write, elem, qnames, namespaces, short_empty_elements=short_empty_elements
+    )
+
+
+ET._serialize_xml = ET._serialize["xml"] = _serialize_xml
 
 
 LINK = "https://blog.msmetko.xyz/posts/{}"
@@ -72,7 +76,7 @@ def subelement(parent, tag, text):
 
 def CDATA(parent, tag, text):
     child = subelement(parent, tag, None)
-    return subelement(child, '![CDATA[', text)
+    return subelement(child, "![CDATA[", text)
 
 
 class RssBuilder:
@@ -98,7 +102,9 @@ class RssBuilder:
         language = subelement(self.channel, "language", "en-us")
         generator = subelement(self.channel, "generator", "msmetko")
         docs = subelement(self.channel, "docs", "https://www.rssboard.org/rss-2-0-11")
-        managing_editor = subelement(self.channel, "managingEditor", "msmetko@msmetko.xyz")
+        managing_editor = subelement(
+            self.channel, "managingEditor", "msmetko@msmetko.xyz"
+        )
         atom_link = ET.SubElement(
             self.channel,
             "atom:link",
@@ -117,7 +123,9 @@ class RssBuilder:
     def write(self, filename):
         subelement(self.channel, "pubDate", self.build_date)
         subelement(self.channel, "lastBuildDate", self.build_date)
-        ET.ElementTree(self.root).write(filename, encoding="UTF-8", xml_declaration=True)
+        ET.ElementTree(self.root).write(
+            filename, encoding="UTF-8", xml_declaration=True
+        )
         return
 
     def add_post(self, post: Post):
@@ -129,7 +137,11 @@ class RssBuilder:
             author = subelement(item, "author", "msmetko@msmetko.xyz")
             for tag in post.tags:
                 CDATA(item, "category", tag)
-            pub_date = subelement(item, "pubDate", formatdate(time.mktime(post.date.timetuple())).replace('-', '+'))
+            pub_date = subelement(
+                item,
+                "pubDate",
+                formatdate(time.mktime(post.date.timetuple())).replace("-", "+"),
+            )
             dc_creator = subelement(item, "dc:creator", "Marijan Smetko")
         return
 
@@ -149,7 +161,9 @@ class Database:
 
     def update_tags(self, tag_list):
         assert all(isinstance(t, str) for t in tag_list)
-        cursor = self.db_con.executemany("INSERT OR IGNORE INTO tags(tag_name) VALUES (?)", ((t,) for t in tag_list))
+        cursor = self.db_con.executemany(
+            "INSERT OR IGNORE INTO tags(tag_name) VALUES (?)", ((t,) for t in tag_list)
+        )
         id_list = cursor.execute(
             f'SELECT id FROM tags WHERE tag_name IN ({", ".join("?" for _ in tag_list)})',
             tag_list,
@@ -199,7 +213,8 @@ def process_markdown(file: Path):
             "pymdownx.emoji",
             "toc",
             "codehilite",
-            "markdown_captions"
+            "markdown_captions",
+            "attr_list",
         ],
         extension_configs=dict(
             codehilite={"css_class": "codehilite", "lineno": True},
@@ -212,17 +227,19 @@ def process_markdown(file: Path):
     # html = htmlmin.minify(html)
     metadata = md.Meta
     post = Post(html, metadata)
-    #assert post.id is not None
+    # assert post.id is not None
     return post
+
 
 def main(file_list):
     db_con = ensure_database()
-    post_list = sorted((process_markdown(file) for file in file_list),
-                       key=lambda post: post.date)
+    post_list = sorted(
+        (process_markdown(file) for file in file_list), key=lambda post: post.date
+    )
     with db_con:
         for post in post_list:
             db_con.insert_post(post)
-    assert all(getattr(post, 'id', None) is not None for post in post_list)
+    assert all(getattr(post, "id", None) is not None for post in post_list)
     rss_builder = RssBuilder(post_list)
     rss_builder.write("feed.rss")
     return
