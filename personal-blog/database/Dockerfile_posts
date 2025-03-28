@@ -1,0 +1,16 @@
+FROM python:3.13.0 AS sqlite
+COPY database/compile.py database/schema.sql ./posts ./
+RUN python3 -m pip install -qqq\
+        markdown\
+        htmlmin2\
+        pygments\
+        markdown-katex\
+        markdown-full-yaml-metadata\
+        pymdown-extensions\
+        mdx-breakless-lists\
+        pygments\
+        markdown-captions
+RUN bash -c "python3 compile.py *.md"  # creates db.sqlite3 and feed.rss
+
+FROM ghcr.io/incognito124/personal-blog-server:latest
+COPY --from=sqlite /db.sqlite3 /feed.rss ./

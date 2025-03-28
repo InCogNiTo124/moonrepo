@@ -1,0 +1,20 @@
+services:
+  msmetko:
+    image: ghcr.io/incognito124/personal-website:latest
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.msmetko.rule=Host(`msmetko.xyz`)'
+      - 'traefik.http.routers.msmetko.entrypoints=websecure'
+      - 'traefik.http.routers.msmetko.tls=true'
+      - 'traefik.http.routers.msmetko.tls.certresolver=le'
+      - 'traefik.http.services.msmetko.loadbalancer.server.scheme=http'
+      - 'traefik.http.services.msmetko.loadbalancer.server.port=80'
+      - 'traefik.docker.network=traefik_default'
+    expose:
+      - '80'
+    networks:
+      - traefik_default
+
+networks:
+  traefik_default:
+    external: true

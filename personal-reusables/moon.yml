@@ -1,0 +1,8 @@
+# Inherit tasks from the `sveltekit` preset
+# https://github.com/moonrepo/moon-configs
+tags: ['sveltekit']
+type: library
+
+tasks:
+  prepack:
+    command: yarn run prepack

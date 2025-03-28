@@ -1,0 +1,9 @@
+services:
+  blog:
+    container_name: personal-blog
+    restart: always
+    environment:
+      BLOG_DB: "blog-db:80"
+  blog-db:
+    container_name: blog-db
+    restart: always

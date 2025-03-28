@@ -1,0 +1,22 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+
+type: application
+language: rust
+
+fileGroups:
+  posts:
+    - "posts/*.md"
+
+project:
+  name: personal-blog-database
+  description: "The server for the personal blog database."
+
+tasks:
+  build:
+    command: 'cargo build --release'
+    outputs:
+      - 'target/release/database'
+  compile:
+    command: 'uv run compile.py @files(posts)'
+    inputs:
+      - '@files(posts)'

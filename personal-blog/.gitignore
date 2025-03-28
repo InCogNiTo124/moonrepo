@@ -1,0 +1,10 @@
+.DS_Store
+node_modules
+/build
+/.svelte-kit
+/package
+.env
+*.xml
+*.rss
+db.sqlite3
+database/target

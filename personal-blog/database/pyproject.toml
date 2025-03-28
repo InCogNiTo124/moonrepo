@@ -1,0 +1,16 @@
+[project]
+name = "compile"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "htmlmin2>=0.1.13",
+    "markdown>=3.7",
+    "markdown-captions>=2.1.2",
+    "markdown-full-yaml-metadata>=2.2.1",
+    "markdown-katex>=202406.1035",
+    "mdx-breakless-lists>=1.0.1",
+    "pygments>=2.19.1",
+    "pymdown-extensions>=10.14.3",
+]

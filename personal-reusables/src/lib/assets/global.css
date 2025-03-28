@@ -1,0 +1,71 @@
+.dark-theme {
+  --text-color: rgb(217, 217, 217);
+  --background-color: #181818;
+
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+a:hover {
+  color: var(--main-red);
+}
+
+p {
+  padding-top: 5px;
+}
+
+hr {
+  margin: 15px 0;
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(
+    to right,
+    var(--main-red-01),
+    var(--main-red),
+    var(--main-red-01)
+  );
+}
+
+.post hr {
+  margin: 15px 0;
+  border-top: 1px solid var(--main-red);
+  background-image: none;
+}
+
+.button {
+  padding: 5px 10px;
+}
+
+a.inline-link,
+.post-content a {
+  color: var(--main-red);
+  text-decoration: underline;
+}
+
+@media screen and (min-width: 650px) {
+  body {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.emojione {
+  height: 1.5rem;
+}
