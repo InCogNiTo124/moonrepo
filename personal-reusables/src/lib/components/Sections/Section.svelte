@@ -14,7 +14,6 @@
 
 	let props: Props = $props();
 	let { url = '', urlTarget = BLANK, title, body } = props;
-	console.log(props);
 
 	let themeValue = $state(LIGHT);
 

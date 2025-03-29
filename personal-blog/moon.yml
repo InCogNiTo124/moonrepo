@@ -1,19 +1,22 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+
 # Inherit tasks from the `sveltekit` preset
 # https://github.com/moonrepo/moon-configs
 tags: ['sveltekit']
 
 type: application
 
+project:
+  name: personal-blog
+  description: "Terra Incognita, personal blog"
+
 tasks:
   build:
     deps:
       - personal-reusables:build
       - personal-reusables:prepack
-  echo:
-    command: '/usr/bin/echo'
-    args:
-      - "@files(posts)"
-
-fileGroups:
-  posts:
-    - posts/*.md 
+  docker:
+    command: 'docker buildx build --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
+    # command: 'docker buildx build --push --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
+    options:
+      runFromWorkspaceRoot: true

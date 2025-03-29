@@ -20,3 +20,8 @@ tasks:
     command: 'uv run compile.py @files(posts)'
     inputs:
       - '@files(posts)'
+  docker:
+    command: 'docker buildx build --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
+    # command: 'docker buildx build --push --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
+    options:
+      runFromWorkspaceRoot: true

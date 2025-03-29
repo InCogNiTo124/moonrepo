@@ -19,3 +19,9 @@ projects:
   sources:
     personal-blog-database: "./personal-blog/database"
 
+vcs:
+  defaultBranch: main
+
+docker:
+  prune:
+    installToolchainDeps: true

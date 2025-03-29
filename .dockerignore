@@ -1,1 +1,3 @@
 .moon/cache
+.moon/docker
+.git

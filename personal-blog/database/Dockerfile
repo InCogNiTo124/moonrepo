@@ -20,9 +20,11 @@ RUN /root/.proto/bin/moon docker scaffold personal-blog-database
 RUN /root/.proto/bin/moon run personal-blog-database:compile  # creates db.sqlite3 and feed.rss
 
 FROM scratch
+LABEL org.opencontainers.image.source=https://github.com/incognito124/moonrepo
 COPY --from=build /personal-blog/database/target/release/database ./
 COPY --from=sqlite /personal-blog/database/db.sqlite3 /personal-blog/database/feed.rss ./
 ENV ROCKET_PORT=80
 ENV ROCKET_ADDRESS=0.0.0.0
+ENV ROCKET_LOG_LEVEL=normal
 EXPOSE 80
 CMD [ "./database" ]
