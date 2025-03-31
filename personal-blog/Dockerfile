@@ -1,5 +1,5 @@
 #### BASE
-FROM node:22.2.0-alpine3.20 AS base
+FROM node:22.14.0-alpine3.20 AS base
 ENV MOON_TOOLCHAIN_FORCE_GLOBALS=true
 WORKDIR /app
 
@@ -44,7 +44,7 @@ CMD ["node", "/app/personal-blog/build/"]
 #### PROD STAGE
 #### Runs the project.
 
-FROM node:22.2.0-alpine3.20 AS prod
+FROM node:22.14.0-alpine3.20 AS prod
 LABEL org.opencontainers.image.source=https://github.com/incognito124/moonrepo
 WORKDIR /app
 # Copy built sources
