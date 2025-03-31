@@ -12,5 +12,12 @@ jobs:
       - uses: "actions/checkout@main"
         with:
           fetch-depth: 0
+
       - uses: "moonrepo/setup-toolchain@v0"
+
       - run: "moon ci :build :test"
+
+      - uses: moonrepo/run-report-action@v1
+        if: success() || failure()
+        with:
+          access-token: ${{ secrets.GITHUB_TOKEN }}
