@@ -16,12 +16,18 @@ tasks:
     command: 'cargo build --release'
     outputs:
       - 'target/release/database'
+
   compile:
     command: 'uv run compile.py @files(posts)'
     inputs:
       - '@files(posts)'
+
   docker:
     command: 'docker buildx build --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
-    # command: 'docker buildx build --push --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
+    options:
+      runFromWorkspaceRoot: true
+
+  docker-push:
+    command: 'docker buildx build --push --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
     options:
       runFromWorkspaceRoot: true
