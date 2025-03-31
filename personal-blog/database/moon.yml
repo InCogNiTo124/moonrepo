@@ -29,5 +29,12 @@ tasks:
 
   docker-push:
     command: 'docker buildx build --push --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
+    inputs:
+      - Cargo.toml
+      - Cargo.lock
+      - compile.py
+      - "posts/*.md"
+      - pyproject.toml
+      - uv.lock
     options:
       runFromWorkspaceRoot: true
