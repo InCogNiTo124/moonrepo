@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@sveltejs/kit": "2.8.0",
-    "@types/better-sqlite3": "7.6.11",
+    "@types/better-sqlite3": "7.6.12",
     "@types/js-cookie": "3.0.6",
     "@types/katex": "0.16.7",
     "@typescript-eslint/eslint-plugin": "8.13.0",
