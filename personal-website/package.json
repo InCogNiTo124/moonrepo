@@ -34,7 +34,7 @@
   "dependencies": {
     "@sveltejs/adapter-static": "3.0.6",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
-    "axios": "1.7.7",
+    "axios": "1.8.4",
     "dayjs": "1.11.13",
     "js-cookie": "3.0.5",
     "personal-reusables": "link:../personal-reusables"
