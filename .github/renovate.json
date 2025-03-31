@@ -1,0 +1,11 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:recommended"
+    ],
+    "timezone": "Europe/Zagreb",
+    "lockFileMaintenance": {
+        "enabled": true
+    },
+    "separateMajorMinor": true
+}
