@@ -33,7 +33,7 @@
   "type": "module",
   "dependencies": {
     "@sveltejs/adapter-static": "3.0.8",
-    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "axios": "1.8.4",
     "dayjs": "1.11.13",
     "js-cookie": "3.0.5",
