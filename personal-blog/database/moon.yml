@@ -18,9 +18,7 @@ tasks:
       - 'target/release/database'
 
   compile:
-    command: 'uv run compile.py @files(posts)'
-    inputs:
-      - '@files(posts)'
+    command: 'uv run compile.py @files(posts)' 
 
   docker:
     command: 'docker buildx build --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'

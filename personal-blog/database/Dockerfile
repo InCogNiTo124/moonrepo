@@ -2,7 +2,7 @@
 # compile my blog which has Katex in the same environment.
 
 #### Build phase
-FROM rust:1.74.1-alpine3.17 AS build
+FROM rust:1.85.1-alpine3.20 AS build
 RUN apk add --no-cache musl-dev bash curl xz git
 RUN rustup target add x86_64-unknown-linux-musl
 # this is so painful I can't believe I have to do this
