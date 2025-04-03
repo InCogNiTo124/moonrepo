@@ -542,12 +542,10 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
-package-manager-detector@^0.2.9:
-  version "0.2.11"
-  resolved "https://registry.yarnpkg.com/package-manager-detector/-/package-manager-detector-0.2.11.tgz#3af0b34f99d86d24af0a0620603d2e1180d05c9c"
-  integrity sha512-BEnLolu+yuz22S56CU1SUKq3XC3PkwD5wv4ikR4MfGvnRVcmzXR9DwSlW2fEamyTPyXHomBJRzgapeuBvRNzJQ==
-  dependencies:
-    quansync "^0.2.7"
+package-manager-detector@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/package-manager-detector/-/package-manager-detector-1.1.0.tgz#2c9f19adb9835d0b9e9baaab484a020d4ee07b87"
+  integrity sha512-Y8f9qUlBzW8qauJjd/eu6jlpJZsuPJm2ZAV0cDVd420o4EdpH5RPdoCv+60/TdJflGatr4sDfpAL6ArWZbM5tA==
 
 pascal-case@^3.1.1:
   version "3.1.2"
@@ -592,19 +590,14 @@ prismjs@^1.17.1:
   integrity sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==
 
 publint@^0.3.2:
-  version "0.3.9"
-  resolved "https://registry.yarnpkg.com/publint/-/publint-0.3.9.tgz#4d0bea2fa6caf6b20f6940a121111287c7264868"
-  integrity sha512-irTwfRfYW38vomkxxoiZQtFtUOQKpz5m0p9Z60z4xpXrl1KmvSrX1OMARvnnolB5usOXeNfvLj6d/W3rwXKfBQ==
+  version "0.3.10"
+  resolved "https://registry.yarnpkg.com/publint/-/publint-0.3.10.tgz#28dfeab8df94a9c57fd7bc26f113f07e8e435300"
+  integrity sha512-xl9X9x0iyOURsAD7IPQJAQ5TgGpozs5K8KUtqzQBSxJqtKH74ReeCpjr2jw9MFOsY9q/EbXSJNkSFM2mgyu38g==
   dependencies:
     "@publint/pack" "^0.1.2"
-    package-manager-detector "^0.2.9"
+    package-manager-detector "^1.1.0"
     picocolors "^1.1.1"
     sade "^1.8.1"
-
-quansync@^0.2.7:
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/quansync/-/quansync-0.2.10.tgz#32053cf166fa36511aae95fc49796116f2dc20e1"
-  integrity sha512-t41VRkMYbkHyCYmOvx/6URnN80H7k4X0lLdBMGsz+maAwrJQYB1djpV6vHrQIBE0WBSGqhtEHrK9U3DWWH8v7A==
 
 readdirp@^4.0.1:
   version "4.1.2"
