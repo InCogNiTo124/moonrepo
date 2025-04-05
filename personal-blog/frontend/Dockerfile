@@ -13,7 +13,7 @@ FROM base AS skeleton
 
 # Copy entire repository and scaffold
 COPY . .
-RUN moon docker scaffold personal-blog
+RUN moon docker scaffold personal-blog-frontend
 
 #### BUILD STAGE
 #### Builds the project.
@@ -33,13 +33,13 @@ COPY --from=skeleton /app/.moon/docker/sources .
 # Build the project
 # Prune extraneous dependencies
 # prune breaks the build so I'm doing it myself until I figure out how to utilize it
-RUN moon run personal-blog:build
+RUN moon run personal-blog-frontend:build
 # && rm -rf /app/personal-website /app/personal-blog/database
 
-RUN yarn install --prod --cwd /app/personal-reusables && yarn install --prod --cwd /app/personal-blog
+RUN yarn install --prod --cwd /app/personal-reusables && yarn install --prod --cwd /app/personal-blog/frontend
 # RUN [ "rm", "-rf", "/app/.moon", "/app/personal-website", "/app/personal-blog/database", "/usr/local/share/.cache" ]
 
-CMD ["node", "/app/personal-blog/build/"]
+# CMD ["node", "/app/personal-blog/build/"]
 
 #### PROD STAGE
 #### Runs the project.
@@ -48,12 +48,12 @@ FROM node:22.14.0-alpine3.20 AS prod
 LABEL org.opencontainers.image.source=https://github.com/incognito124/moonrepo
 WORKDIR /app
 # Copy built sources
-COPY --from=build /app/personal-blog/build build/
-COPY --from=build /app/personal-blog/package.json .
-COPY --from=build /app/personal-blog/node_modules node_modules/
+COPY --from=build /app/personal-blog/frontend/build build/
+COPY --from=build /app/personal-blog/frontend/package.json .
+COPY --from=build /app/personal-blog/frontend/node_modules node_modules/
 COPY --from=build /app/personal-reusables /personal-reusables
 
 # Run node 
 EXPOSE 3000
-CMD node /app/build
+CMD ["node", "/app/build"]
 

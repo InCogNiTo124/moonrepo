@@ -18,6 +18,7 @@ projects:
     - 'personal-blog'
   sources:
     personal-blog-database: "./personal-blog/database"
+    personal-blog-frontend: "./personal-blog/frontend"
 
 vcs:
   defaultBranch: main
