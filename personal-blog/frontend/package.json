@@ -13,8 +13,8 @@
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. ."
   },
   "devDependencies": {
-    "@sveltejs/kit": "2.20.2",
-    "@types/better-sqlite3": "7.6.12",
+    "@sveltejs/kit": "2.20.4",
+    "@types/better-sqlite3": "7.6.13",
     "@types/js-cookie": "3.0.6",
     "@types/katex": "0.16.7",
     "@typescript-eslint/eslint-plugin": "8.29.0",
