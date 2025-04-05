@@ -7,7 +7,7 @@ tags: ['sveltekit']
 type: application
 
 project:
-  name: personal-blog
+  name: personal-blog-frontend
   description: "Terra Incognita, personal blog"
 
 tasks:
