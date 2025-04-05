@@ -532,10 +532,10 @@
     "@rollup/plugin-node-resolve" "^16.0.0"
     rollup "^4.9.5"
 
-"@sveltejs/kit@2.20.2":
-  version "2.20.2"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-2.20.2.tgz#ec1e431083fdb924dd583d5520b94b94f003e67e"
-  integrity sha512-Dv8TOAZC9vyfcAB9TMsvUEJsRbklRTeNfcYBPaeH6KnABJ99i3CvCB2eNx8fiiliIqe+9GIchBg4RodRH5p1BQ==
+"@sveltejs/kit@2.20.4":
+  version "2.20.4"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-2.20.4.tgz#84d665a770ed38c43d8bda27a86ac3220f9a277d"
+  integrity sha512-B3Y1mb1Qjt57zXLVch5tfqsK/ebHe6uYTcFSnGFNwRpId3+fplLgQK6Z2zhDVBezSsPuhDq6Pry+9PA88ocN6Q==
   dependencies:
     "@types/cookie" "^0.6.0"
     cookie "^0.6.0"
@@ -1393,8 +1393,10 @@ path-parse@^1.0.7:
   integrity sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==
 
 "personal-reusables@link:../../personal-reusables":
-  version "0.0.0"
-  uid ""
+  version "0.0.1"
+  dependencies:
+    "@types/js-cookie" "^3.0.6"
+    js-cookie "^3.0.5"
 
 picocolors@^1.0.0, picocolors@^1.1.1:
   version "1.1.1"
