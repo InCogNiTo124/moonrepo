@@ -568,10 +568,10 @@
     magic-string "^0.30.15"
     vitefu "^1.0.4"
 
-"@types/better-sqlite3@7.6.12":
-  version "7.6.12"
-  resolved "https://registry.yarnpkg.com/@types/better-sqlite3/-/better-sqlite3-7.6.12.tgz#e5712d46d71097dcc2775c0b068072eadc15deb7"
-  integrity sha512-fnQmj8lELIj7BSrZQAdBMHEHX8OZLYIHXqAKT1O7tDfLxaINzf00PMjw22r3N/xXh0w/sGHlO6SVaCQ2mj78lg==
+"@types/better-sqlite3@7.6.13":
+  version "7.6.13"
+  resolved "https://registry.yarnpkg.com/@types/better-sqlite3/-/better-sqlite3-7.6.13.tgz#a72387f00d2f53cab699e63f2e2c05453cf953f0"
+  integrity sha512-NMv9ASNARoKksWtsq/SHakpYAYnhBrQgGD8zkLYk/jaK8jUGn08CfEdTRgYhMypUQAfzSP8W6gNLe0q19/t4VA==
   dependencies:
     "@types/node" "*"
 
@@ -1393,8 +1393,10 @@ path-parse@^1.0.7:
   integrity sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==
 
 "personal-reusables@link:../../personal-reusables":
-  version "0.0.0"
-  uid ""
+  version "0.0.1"
+  dependencies:
+    "@types/js-cookie" "^3.0.6"
+    js-cookie "^3.0.5"
 
 picocolors@^1.0.0, picocolors@^1.1.1:
   version "1.1.1"
