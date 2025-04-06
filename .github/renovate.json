@@ -7,5 +7,25 @@
     "lockFileMaintenance": {
         "enabled": true
     },
-    "separateMajorMinor": true
+    "separateMajorMinor": true,
+    "packageRules": [
+        {
+            "matchFileNames": [
+                "personal-website/**"
+            ],
+            "groupName": "personal-website"
+        },
+        {
+            "matchFileNames": [
+                "personal-blog/frontend/**"
+            ],
+            "groupName": "personal-blog-frontend"
+        },
+        {
+            "matchFileNames": [
+                "personal-blog/database/**"
+            ],
+            "groupName": "personal-blog-database"
+        }
+    ]
 }
