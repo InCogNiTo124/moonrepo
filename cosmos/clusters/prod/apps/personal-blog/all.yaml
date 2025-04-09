@@ -8,7 +8,6 @@ kind: Service
 metadata:
   namespace: personal-blog
   name: personal-blog
-
 spec:
   ports:
     - protocol: TCP
@@ -25,7 +24,6 @@ metadata:
   name: personal-blog
   labels:
     app: personal-blog
-
 spec:
   replicas: 1
   selector:
@@ -38,7 +36,7 @@ spec:
     spec:
       containers:
         - name: blog
-          image: ghcr.io/incognito124/personal-blog-frontend:1743892793  # {"$imagepolicy": "flux-system:incognito124-personal-blog-frontend-policy"}
+          image: ghcr.io/incognito124/personal-blog-frontend:1743971549 # {"$imagepolicy": "flux-system:incognito124-personal-blog-frontend-policy"}
           ports:
             - name: web
               containerPort: 3000
@@ -46,11 +44,10 @@ spec:
             - name: BLOG_DB
               value: "localhost:80"
         - name: blog-db
-          image: ghcr.io/incognito124/personal-blog-database:1743377586  # {"$imagepolicy": "flux-system:incognito124-personal-blog-database-policy"}
+          image: ghcr.io/incognito124/personal-blog-database:1743971549 # {"$imagepolicy": "flux-system:incognito124-personal-blog-database-policy"}
           ports:
             - name: web
               containerPort: 80
-
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -61,11 +58,11 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - match: Host(`terra-incognita.blog`)
-    kind: Rule
-    services:
-    - name: personal-blog
-      port: 80
+    - match: Host(`terra-incognita.blog`)
+      kind: Rule
+      services:
+        - name: personal-blog
+          port: 80
   tls:
     certResolver: letsencrypt
 ---
