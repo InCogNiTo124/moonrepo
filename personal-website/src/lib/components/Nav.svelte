@@ -29,7 +29,7 @@
     >
   </div>
   <hr />
-  <a class="button" href="https://blog.msmetko.xyz" target={BLANK}>Blog</a>
+  <a class="button" href="https://terra-incognita.blog" target={BLANK}>Blog</a>
   <hr />
   <a class="button" href="Marijan-Smetko-CV.pdf" target={BLANK}>My CV</a>
 </div>
