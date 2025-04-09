@@ -1,0 +1,11 @@
+name: cosmos
+runtime:
+  name: python
+  options:
+    virtualenv: .venv
+    toolchain: uv  # omg pulumi supports uv <3
+description: A production universe of @InCogNiTo124 (powered by Hetzner and Pulumi)
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: ""
