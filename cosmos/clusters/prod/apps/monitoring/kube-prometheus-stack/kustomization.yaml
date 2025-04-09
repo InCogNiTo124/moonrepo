@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./release.yaml
+  - ./repository.yaml
+  - ./namespace.yaml
+  - ./grafana_ingress.yaml
+configMapGenerator:
+  - name: flux-kube-state-metrics-config
+    namespace: flux-system
+    files:
+      - kube-state-metrics=./kube-state-metrics.yaml
+    options:
+      labels:
+        app.kubernetes.io/part-of: flux
+        app.kubernetes.io/component: monitoring
+      # Reconciler error could not resolve ConfigMap chart values reference 'flux-system/flux-kube-state-metrics-config' with key 'kube-state-metrics': configmaps "flux-kube-state-metrics-config" not found
+      disableNameSuffixHash: true
+

@@ -1,0 +1,10 @@
+[project]
+name = "cosmos"
+version = "0.1.0"
+description = "Production universe of @InCogNiTo124 (powered by Hetzner and Pulumi)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pulumi>=3.157.0",
+    "pulumi-hcloud>=1.22.0",
+]

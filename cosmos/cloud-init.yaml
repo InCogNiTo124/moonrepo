@@ -1,0 +1,93 @@
+#cloud-config
+
+# this file is actually a yaml template that gets formatted in Python
+
+write_files:
+  # prod traefik configuration (test one has a different caserver)
+  - path: /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+    content: |-
+      apiVersion: helm.cattle.io/v1
+      kind: HelmChartConfig
+      metadata:
+        name: traefik
+        namespace: kube-system
+      spec:
+        valuesContent: |-
+          additionalArguments:
+            - --entrypoints.web.http.redirections.entrypoint.to=:443
+            - --entrypoints.web.http.redirections.entrypoint.permanent=true
+            - --entrypoints.web.http.redirections.entrypoint.scheme=https
+          certResolvers:
+            letsencrypt:
+              email: msmetko@msmetko.xyz
+              storage: /data/acme.json
+              tlschallenge: true
+          logs:
+            access:
+              enabled: true
+          deployment:
+            initContainers:
+              - name: volume-permission
+                image: busybox:latest
+                command:
+                  - sh
+                  - -c
+                  - touch /data/acme.json; chmod -v 600 /data/acme.json
+                volumeMounts:
+                  - mountPath: /data
+                    name: data
+  # this allows me to run kubectl commands without specifying --kubeconfig all the time
+  - path: /etc/environment
+    content: |-
+      KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+packages:
+  - jq
+runcmd:
+  # add a static IP
+  # TODO maybe there's a better way of doing this with cloud-init or pulumi
+  - ip addr add 49.12.115.123 dev eth0
+
+  # 1 setup k3s (TODO version updater)
+  - >
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.30.6+k3s1 sh -s - server
+    --cluster-init
+    --disable-cloud-controller
+    --node-name="$(hostname -f)"
+    --kubelet-arg="cloud-provider=external"
+    --secrets-encryption
+    --debug
+
+  # 2 setup helm
+  - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+  # 3 install Hetzner Cloud Controller Manager
+  #   a) setup the api token (propagated from env)
+  - kubectl -n kube-system create secret generic hcloud --from-literal=token='{hcloud_token}'
+
+  #   b) install hccm via helm
+  # TODO provision kubeconfig configuration through a file in ~/.config/helm
+  - >
+    helm repo add hcloud https://charts.hetzner.cloud &&
+    helm repo update hcloud &&
+    helm --kubeconfig /etc/rancher/k3s/k3s.yaml install hccm hcloud/hcloud-cloud-controller-manager -n kube-system
+  # 4 install fluxcd (pat propagated from env)
+  - >
+    curl -s https://fluxcd.io/install.sh | sudo bash &&
+    until flux --kubeconfig=/etc/rancher/k3s/k3s.yaml check --pre; do sleep 5s; done &&
+    echo '{gh_pat}' | flux --kubeconfig=/etc/rancher/k3s/k3s.yaml bootstrap github
+    --token-auth
+    --owner=InCogNiTo124
+    --repository=moonrepo
+    --branch=main
+    --path=cosmos/clusters/prod
+    --read-write-key
+    --personal
+    --components-extra=image-reflector-controller,image-automation-controller
+  # 4 install longhorn via helm (NOT USED ATM, I DO A LOT OF SHIT I DONT NEED BUT THIS I MOST DEFINITELY DONT NEED (YET))
+  # - >
+  #   helm repo add longhorn https://charts.longhorn.io &&
+  #   helm repo update longhorn &&
+  #   helm --kubeconfig /etc/rancher/k3s/k3s.yaml install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace
