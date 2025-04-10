@@ -590,9 +590,9 @@ prismjs@^1.17.1:
   integrity sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==
 
 publint@^0.3.2:
-  version "0.3.10"
-  resolved "https://registry.yarnpkg.com/publint/-/publint-0.3.10.tgz#28dfeab8df94a9c57fd7bc26f113f07e8e435300"
-  integrity sha512-xl9X9x0iyOURsAD7IPQJAQ5TgGpozs5K8KUtqzQBSxJqtKH74ReeCpjr2jw9MFOsY9q/EbXSJNkSFM2mgyu38g==
+  version "0.3.11"
+  resolved "https://registry.yarnpkg.com/publint/-/publint-0.3.11.tgz#b48fbc93edab48d1c5d7b3b132e6d8658b499141"
+  integrity sha512-snArkBXO8Sl1Nlnqr3Y3DCT9CzNw8QxzlFXZ6nRkyEPEUGPRg25lM4IjNQyIyp3vRwpsZ24EEexmKSIZdVMizA==
   dependencies:
     "@publint/pack" "^0.1.2"
     package-manager-detector "^1.1.0"
