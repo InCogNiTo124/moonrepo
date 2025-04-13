@@ -17,11 +17,12 @@ write_files:
             - --entrypoints.web.http.redirections.entrypoint.to=:443
             - --entrypoints.web.http.redirections.entrypoint.permanent=true
             - --entrypoints.web.http.redirections.entrypoint.scheme=https
-          certResolvers:
+          certificatesResolvers:
             letsencrypt:
-              email: msmetko@msmetko.xyz
-              storage: /data/acme.json
-              tlschallenge: true
+              acme:
+                email: msmetko@msmetko.xyz
+                storage: /data/acme.json
+                tlschallenge: true
           logs:
             access:
               enabled: true
