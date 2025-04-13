@@ -52,7 +52,7 @@ runcmd:
 
   # 1 setup k3s (TODO version updater)
   - >
-    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.30.6+k3s1 sh -s - server
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.32.3+k3s1 sh -s - server
     --cluster-init
     --disable-cloud-controller
     --node-name="$(hostname -f)"
