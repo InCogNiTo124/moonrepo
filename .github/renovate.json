@@ -17,6 +17,12 @@
         },
         {
             "matchFileNames": [
+                "personal-reusables/**"
+            ],
+            "groupName": "personal-reusables"
+        },
+        {
+            "matchFileNames": [
                 "personal-blog/frontend/**"
             ],
             "groupName": "personal-blog-frontend"
