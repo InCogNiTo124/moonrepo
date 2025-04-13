@@ -1,0 +1,20 @@
+{
+  "name": "orbit",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "5.6.2",
+    "vite": "5.4.7"
+  },
+  "dependencies": {
+    "@types/three": "0.168.0",
+    "lil-gui": "0.19.2",
+    "serve": "^14.2.4",
+    "three": "0.168.0"
+  }
+}

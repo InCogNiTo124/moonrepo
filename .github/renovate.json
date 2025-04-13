@@ -32,6 +32,12 @@
                 "personal-blog/database/**"
             ],
             "groupName": "personal-blog-database"
+        },
+        {
+            "matchFileNames": [
+                "kepler-orbit/**"
+            ],
+            "groupName": "kepler-orbit"
         }
     ]
 }
