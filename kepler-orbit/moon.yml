@@ -1,0 +1,24 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+
+# Inherit tasks from the `sveltekit` preset
+# https://github.com/moonrepo/moon-configs
+tags:
+  - vite
+
+type: application
+project:
+  name: kepler-orbit
+  description: "Keplerian orbit visualization"
+
+tasks: 
+  docker:
+    command: 'docker buildx build --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
+    options:
+      runFromWorkspaceRoot: true
+
+  docker-push:
+    command: 'docker buildx build --push --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
+    options:
+      runFromWorkspaceRoot: true
+
+

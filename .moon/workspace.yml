@@ -13,9 +13,9 @@ $schema: 'https://moonrepo.dev/schemas/workspace.json'
 # and cannot reference projects located outside the workspace boundary.
 projects:
   globs:
-    - 'personal-website'
-    - 'personal-reusables'
-    - 'personal-blog'
+    - personal-website
+    - personal-reusables
+    - kepler-orbit
   sources:
     personal-blog-database: "./personal-blog/database"
     personal-blog-frontend: "./personal-blog/frontend"
