@@ -44,7 +44,7 @@ COPY --from=skeleton /app/.moon/docker/sources .
 # Build something (optional)
 RUN moon run kepler-orbit:build
 
-FROM node:20.13.1-alpine3.18 AS prod
+FROM node:22.2.0-alpine3.18 AS prod
 LABEL org.opencontainers.image.source="https://github.com/InCogNiTo124/moonrepo"
 WORKDIR /app
 COPY --from=build /app/kepler-orbit/dist ./dist/
