@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "./cosmos",
+			"name": "cosmos",
+		},
+		{ "path": "./personal-website"},
+		{ "path": "./personal-reusables"},
+		{ "path": "./personal-blog/frontend", "name": "personal-blog-frontend"},
+		{ "path": "./personal-blog/database", "name": "personal-blog-database"},
+		{ "path": "./kepler-orbit"}
+	],
+	"settings": {}
+}
