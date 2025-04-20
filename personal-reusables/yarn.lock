@@ -290,9 +290,9 @@
     import-meta-resolve "^4.1.0"
 
 "@sveltejs/kit@^2.16.0":
-  version "2.20.5"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-2.20.5.tgz#72546cf594fe8cebc2ef0bbf2923dffb411a5e20"
-  integrity sha512-zT/97KvVUo19jEGZa972ls7KICjPCB53j54TVxnEFT5VEwL16G+YFqRVwJbfxh7AmS7/Ptr1rKF7Qt4FBMDNlw==
+  version "2.20.7"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-2.20.7.tgz#c6fd581403fe55a6a2deefd027e0547c98e780b4"
+  integrity sha512-dVbLMubpJJSLI4OYB+yWYNHGAhgc2bVevWuBjDj8jFUXIJOAnLwYP3vsmtcgoxNGUXoq0rHS5f7MFCsryb6nzg==
   dependencies:
     "@types/cookie" "^0.6.0"
     cookie "^0.6.0"
@@ -307,9 +307,9 @@
     sirv "^3.0.0"
 
 "@sveltejs/package@^2.0.0":
-  version "2.3.10"
-  resolved "https://registry.yarnpkg.com/@sveltejs/package/-/package-2.3.10.tgz#301ab16ae9d40cd85d451baaec0cfd8cd6ae6eca"
-  integrity sha512-A4fQacgjJ7C/7oSmxR61/TdB14u6ecyMZ8V9JCR5Lol0bLj/PdJPU4uFodFBsKzO3iFiJMpNTgZZ+zYsYZNpUg==
+  version "2.3.11"
+  resolved "https://registry.yarnpkg.com/@sveltejs/package/-/package-2.3.11.tgz#bf79d05d4bc0523fd6b8112f16c2dfbf7c3ddd6e"
+  integrity sha512-DSMt2U0XNAdoQBYksrmgQi5dKy7jUTVDJLiagS/iXF7AShjAmTbGJQKruBuT/FfYAWvNxfQTSjkXU8eAIjVeNg==
   dependencies:
     chokidar "^4.0.3"
     kleur "^4.1.5"
@@ -453,10 +453,10 @@ esrap@^1.4.6:
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.4.15"
 
-fdir@^6.2.0:
-  version "6.4.3"
-  resolved "https://registry.yarnpkg.com/fdir/-/fdir-6.4.3.tgz#011cdacf837eca9b811c89dbb902df714273db72"
-  integrity sha512-PMXmW2y1hDDfTSRc9gaXIuCCRpuoz3Kaz8cUelp3smouvfT632ozg2vrT6lJsHKKOF59YLbOGfAWGUcKEfRMQw==
+fdir@^6.2.0, fdir@^6.4.3, fdir@^6.4.4:
+  version "6.4.4"
+  resolved "https://registry.yarnpkg.com/fdir/-/fdir-6.4.4.tgz#1cfcf86f875a883e19a8fab53622cfe992e8d2f9"
+  integrity sha512-1NZP+GK4GfuAv3PqKvxQRDMjdSRZjnkq7KfhlNrCNNlZ0ygQFpebfrnfnq/W7fpUnAv9aGWmY1zKx7FYL3gwhg==
 
 fsevents@~2.3.2, fsevents@~2.3.3:
   version "2.3.3"
@@ -543,9 +543,9 @@ no-case@^3.0.4:
     tslib "^2.0.3"
 
 package-manager-detector@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/package-manager-detector/-/package-manager-detector-1.1.0.tgz#2c9f19adb9835d0b9e9baaab484a020d4ee07b87"
-  integrity sha512-Y8f9qUlBzW8qauJjd/eu6jlpJZsuPJm2ZAV0cDVd420o4EdpH5RPdoCv+60/TdJflGatr4sDfpAL6ArWZbM5tA==
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/package-manager-detector/-/package-manager-detector-1.2.0.tgz#e78d886b843c6fa4eacfb3a5739d1ef09980cd65"
+  integrity sha512-PutJepsOtsqVfUsxCzgTTpyXmiAgvKptIgY4th5eq5UXXFhj5PxfQ9hnGkypMeovpAvVshFRItoFHYO18TCOqA==
 
 pascal-case@^3.1.1:
   version "3.1.2"
@@ -559,6 +559,11 @@ picocolors@^1.0.0, picocolors@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.1.1.tgz#3d321af3eab939b083c8f929a1d12cda81c26b6b"
   integrity sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==
+
+picomatch@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-4.0.2.tgz#77c742931e8f3b8820946c76cd0c1f13730d1dab"
+  integrity sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==
 
 postcss@^8.5.3:
   version "8.5.3"
@@ -590,9 +595,9 @@ prismjs@^1.17.1:
   integrity sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==
 
 publint@^0.3.2:
-  version "0.3.11"
-  resolved "https://registry.yarnpkg.com/publint/-/publint-0.3.11.tgz#b48fbc93edab48d1c5d7b3b132e6d8658b499141"
-  integrity sha512-snArkBXO8Sl1Nlnqr3Y3DCT9CzNw8QxzlFXZ6nRkyEPEUGPRg25lM4IjNQyIyp3vRwpsZ24EEexmKSIZdVMizA==
+  version "0.3.12"
+  resolved "https://registry.yarnpkg.com/publint/-/publint-0.3.12.tgz#c15154f9b67812c92d4bef7cf29d093a5d18ff39"
+  integrity sha512-1w3MMtL9iotBjm1mmXtG3Nk06wnq9UhGNRpQ2j6n1Zq7YAD6gnxMMZMIxlRPAydVjVbjSm+n0lhwqsD1m4LD5w==
   dependencies:
     "@publint/pack" "^0.1.2"
     package-manager-detector "^1.1.0"
@@ -604,7 +609,7 @@ readdirp@^4.0.1:
   resolved "https://registry.yarnpkg.com/readdirp/-/readdirp-4.1.2.tgz#eb85801435fbf2a7ee58f19e0921b068fc69948d"
   integrity sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==
 
-rollup@^4.30.1:
+rollup@^4.34.9:
   version "4.40.0"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-4.40.0.tgz#13742a615f423ccba457554f006873d5a4de1920"
   integrity sha512-Noe455xmA96nnqH5piFtLobsGbCij7Tu+tb3c1vYjNbTkfzGqXqQXG3wJaYXkRZuQ0vEYN4bhwg7QnIrqB5B+w==
@@ -684,9 +689,9 @@ svelte2tsx@~0.7.33:
     pascal-case "^3.1.1"
 
 svelte@^5.0.0:
-  version "5.26.2"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.26.2.tgz#7f813fc492f97743c1ee5b51865f4a495d606a09"
-  integrity sha512-e2TEcGK2YKVwDWYy5OsptVclYgDvfY1E/8IzPiOq63uG/GDo/j5VUYTC9EinQNraoZalbMWN+5f5TYC1QlAqOw==
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.28.1.tgz#4a0cd28c92ea23f4d5caa8eaf0e8d0af6c83c397"
+  integrity sha512-iOa9WmfNG95lSOSJdMhdjJ4Afok7IRAQYXpbnxhd5EINnXseG0GVa9j6WPght4eX78XfFez45Fi+uRglGKPV/Q==
   dependencies:
     "@ampproject/remapping" "^2.3.0"
     "@jridgewell/sourcemap-codec" "^1.5.0"
@@ -702,6 +707,14 @@ svelte@^5.0.0:
     locate-character "^3.0.0"
     magic-string "^0.30.11"
     zimmerframe "^1.1.2"
+
+tinyglobby@^0.2.12:
+  version "0.2.13"
+  resolved "https://registry.yarnpkg.com/tinyglobby/-/tinyglobby-0.2.13.tgz#a0e46515ce6cbcd65331537e57484af5a7b2ff7e"
+  integrity sha512-mEwzpUgrLySlveBwEVDMKk5B57bhLPYovRfPAXD5gA/98Opn0rCDj3GtLwFvCvH5RK9uPCExUROW5NjDwvqkxw==
+  dependencies:
+    fdir "^6.4.4"
+    picomatch "^4.0.2"
 
 totalist@^3.0.0:
   version "3.0.1"
@@ -734,13 +747,16 @@ vfile-message@^2.0.4:
     unist-util-stringify-position "^2.0.0"
 
 vite@^6.0.0:
-  version "6.2.6"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-6.2.6.tgz#7f0ccf2fdc0c1eda079ce258508728e2473d3f61"
-  integrity sha512-9xpjNl3kR4rVDZgPNdTL0/c6ao4km69a/2ihNQbcANz8RuCOK3hQBmLSJf3bRKVQjVMda+YvizNE8AwvogcPbw==
+  version "6.3.2"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-6.3.2.tgz#4c1bb01b1cea853686a191657bbc14272a038f0a"
+  integrity sha512-ZSvGOXKGceizRQIZSz7TGJ0pS3QLlVY/9hwxVh17W3re67je1RKYzFHivZ/t0tubU78Vkyb9WnHPENSBCzbckg==
   dependencies:
     esbuild "^0.25.0"
+    fdir "^6.4.3"
+    picomatch "^4.0.2"
     postcss "^8.5.3"
-    rollup "^4.30.1"
+    rollup "^4.34.9"
+    tinyglobby "^0.2.12"
   optionalDependencies:
     fsevents "~2.3.3"
 
