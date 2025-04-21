@@ -4,6 +4,9 @@
         "config:recommended"
     ],
     "timezone": "Europe/Zagreb",
+    "schedule": [
+        "* * * * SUN"
+    ],
     "lockFileMaintenance": {
         "enabled": true
     },
