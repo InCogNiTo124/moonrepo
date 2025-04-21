@@ -41,6 +41,12 @@
                 "kepler-orbit/**"
             ],
             "groupName": "kepler-orbit"
+        },
+        {
+            "matchFileNames": [
+                "cosmos/**"
+            ],
+            "groupName": "cosmos"
         }
     ],
     "customManagers": [
