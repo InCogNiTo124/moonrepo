@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
         - name: personal-website
-          image: ghcr.io/incognito124/personal-website:1745247278 # {"$imagepolicy": "flux-system:incognito124-personal-website-policy"} 
+          image: ghcr.io/incognito124/personal-website:1745268303 # {"$imagepolicy": "flux-system:incognito124-personal-website-policy"} 
           ports:
             - name: web
               containerPort: 80
