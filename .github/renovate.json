@@ -5,7 +5,7 @@
     ],
     "timezone": "Europe/Zagreb",
     "schedule": [
-        "* * * * SUN"
+        "* * * * 7"
     ],
     "lockFileMaintenance": {
         "enabled": true
