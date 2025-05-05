@@ -9,12 +9,12 @@
   },
   "devDependencies": {
     "typescript": "5.8.3",
-    "vite": "6.3.2"
+    "vite": "6.3.5"
   },
   "dependencies": {
-    "@types/three": "0.175.0",
+    "@types/three": "0.176.0",
     "lil-gui": "0.20.0",
     "serve": "^14.2.4",
-    "three": "0.175.0"
+    "three": "0.176.0"
   }
 }
