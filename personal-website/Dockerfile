@@ -1,5 +1,5 @@
 #### BASE
-FROM node:22.14.0 AS base
+FROM node:22.15.0 AS base
 WORKDIR /app
 
 # Install moon binary
