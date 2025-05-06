@@ -1,0 +1,16 @@
+[project]
+name = "py"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ipython>=9.2.0",
+    "numpy>=2.2.5",
+    "pynvim",
+    "scipy>=1.15.2",
+    "sympy>=1.14.0",
+]
+
+[tool.uv.sources]
+pynvim = { git = "https://github.com/neovim/pynvim.git" }

@@ -16,9 +16,11 @@ projects:
     - personal-website
     - personal-reusables
     - kepler-orbit
+    - brachi
   sources:
     personal-blog-database: "./personal-blog/database"
     personal-blog-frontend: "./personal-blog/frontend"
+    brachistochrone-solver: "./crates/brachistochrone_solver"
 
 vcs:
   defaultBranch: main

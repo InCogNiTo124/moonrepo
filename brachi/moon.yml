@@ -1,0 +1,25 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+
+# Inherit tasks from the `sveltekit` preset
+# https://github.com/moonrepo/moon-configs
+tags: ['sveltekit']
+
+type: application
+project:
+  name: brachi
+  description: "Brachistochrone visualizer"
+
+tasks:
+  build:
+    deps:
+      - brachistochrone-solver:build
+
+  docker:
+    command: 'docker buildx build --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
+    options:
+      runFromWorkspaceRoot: true
+
+  docker-push:
+    command: 'docker buildx build --push --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
+    options:
+      runFromWorkspaceRoot: true
