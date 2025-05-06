@@ -44,7 +44,7 @@ spec:
             - name: BLOG_DB
               value: "localhost:80"
         - name: blog-db
-          image: ghcr.io/incognito124/personal-blog-database:1744550392 # {"$imagepolicy": "flux-system:incognito124-personal-blog-database-policy"}
+          image: ghcr.io/incognito124/personal-blog-database:1746570278 # {"$imagepolicy": "flux-system:incognito124-personal-blog-database-policy"}
           ports:
             - name: web
               containerPort: 80
