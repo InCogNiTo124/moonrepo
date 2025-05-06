@@ -36,7 +36,7 @@ spec:
     spec:
       containers:
         - name: kepler-orbit
-          image: ghcr.io/incognito124/kepler-orbit:1746475689 # {"$imagepolicy": "flux-system:incognito124-kepler-orbit-policy"} 
+          image: ghcr.io/incognito124/kepler-orbit:1746570278 # {"$imagepolicy": "flux-system:incognito124-kepler-orbit-policy"} 
           ports:
             - name: web
               containerPort: 6090
