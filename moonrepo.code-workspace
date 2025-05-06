@@ -11,7 +11,9 @@
 		{ "path": "./personal-reusables"},
 		{ "path": "./personal-blog/frontend", "name": "personal-blog-frontend"},
 		{ "path": "./personal-blog/database", "name": "personal-blog-database"},
-		{ "path": "./kepler-orbit"}
+		{ "path": "./kepler-orbit"},
+		{ "path": "./brachi"},
+		{ "path": "./crates/brachistochrone_solver"},
 	],
 	"settings": {}
 }

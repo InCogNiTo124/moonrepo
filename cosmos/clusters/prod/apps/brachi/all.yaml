@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: brachi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: brachi
+  name: brachi
+spec:
+  ports:
+    - protocol: TCP
+      name: web
+      port: 80
+      targetPort: 80
+  selector:
+    app: brachi
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: brachi
+  name: brachi
+  labels:
+    app: brachi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: brachi
+  template:
+    metadata:
+      labels:
+        app: brachi
+    spec:
+      containers:
+        - name: brachi
+          image: ghcr.io/incognito124/brachi:0 # {"$imagepolicy": "flux-system:incognito124-brachi-policy"} 
+          ports:
+            - name: web
+              containerPort: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ingressroutetls
+  namespace: brachi
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`brachi.msmetko.xyz`)
+      kind: Rule
+      services:
+        - name: brachi
+          port: 80
+  tls:
+    certResolver: letsencrypt
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: incognito124-brachi
+  namespace: flux-system
+spec:
+  image: ghcr.io/incognito124/brachi
+  interval: 1m0s
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: incognito124-brachi-policy
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: incognito124-brachi
+  policy:
+    numerical:
+      order: asc

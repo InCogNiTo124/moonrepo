@@ -1,0 +1,14 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+
+tags: ['rust', 'wasm']
+
+type: library
+project:
+  name: brachistochrone-solver
+  description: "Solver for the Brachistochrone problem"
+
+tasks:
+  build:
+    command: wasm-pack build
+    outputs:
+      - 'pkg/'

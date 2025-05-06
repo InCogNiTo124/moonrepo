@@ -44,6 +44,13 @@
         },
         {
             "matchFileNames": [
+                "brachi/**",
+                "crates/brachistochrone_solver/**"
+            ],
+            "groupName": "brachi"
+        },
+        {
+            "matchFileNames": [
                 "cosmos/**"
             ],
             "groupName": "cosmos"
