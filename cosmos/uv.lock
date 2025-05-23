@@ -125,7 +125,7 @@ wheels = [
 
 [[package]]
 name = "pulumi"
-version = "3.170.0"
+version = "3.171.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "debugpy" },
@@ -137,21 +137,21 @@ dependencies = [
     { name = "semver" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/44/f0/b23f19dae871bb3d43bf3f29b11535d536d2ef9a4b7703e4d2467afc6cf9/pulumi-3.170.0-py3-none-any.whl", hash = "sha256:824b3c293c659be0cd6b975a719d921987a359f4c97639fc7ecd24a83e8cfd4d", size = 338393, upload-time = "2025-05-15T15:00:49.237Z" },
+    { url = "https://files.pythonhosted.org/packages/7b/1b/14d5e7a76b21c5f168634f9ba05a39efc8239f0f9c120314ab2acf56cde6/pulumi-3.171.0-py3-none-any.whl", hash = "sha256:4092439e01a42509132c2ef837e09317eaf3fd38a4d12faa2b826015e58df094", size = 353578, upload-time = "2025-05-21T16:15:31.019Z" },
 ]
 
 [[package]]
 name = "pulumi-hcloud"
-version = "1.22.1"
+version = "1.23.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "parver" },
     { name = "pulumi" },
     { name = "semver" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b1/3f/e7e46b62223fa94148b42fb2ec393ada46fa077df10257b63092d07d1010/pulumi_hcloud-1.22.1.tar.gz", hash = "sha256:145a2186e6b0b97d9abe71a9e940c6a415501337310bb072d604bda5b8724556", size = 80381, upload-time = "2025-04-25T03:51:56.414Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4d/ca/776510a6e38ecf1edd7a6a982e6404ce4626eb6418b8516371d84109fdc0/pulumi_hcloud-1.23.0.tar.gz", hash = "sha256:624b4160bc555d1e7d15a9ad934de882322d0154bd51607136dcdb46b8f8fe1b", size = 81658, upload-time = "2025-05-21T03:52:53.22Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/03/20/90459ad90a95022ada61261ab274377b9e9484ea93008a7b9532454c70aa/pulumi_hcloud-1.22.1-py3-none-any.whl", hash = "sha256:29d02b0cb148b833100bd88b2c1154147052bc6079daaa7a67b9c20fce401587", size = 149181, upload-time = "2025-04-25T03:51:54.528Z" },
+    { url = "https://files.pythonhosted.org/packages/0f/0f/f141b6046d4ed7f0dc6148d4a77e1890f0942cb1282a6d66b57b39f43bc3/pulumi_hcloud-1.23.0-py3-none-any.whl", hash = "sha256:590377ac702ce178e57cf3bf3428fd0302982c83f053b13ebf322063b6e9b2fd", size = 150620, upload-time = "2025-05-21T03:52:51.524Z" },
 ]
 
 [[package]]
