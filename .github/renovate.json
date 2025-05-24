@@ -53,6 +53,9 @@
             "groupName": "cosmos"
         }
     ],
+    "flux": {
+        "managerFilePatterns": ["/^cosmos/clusters/prod/.+\\.ya?ml$/"]
+    },
     "customManagers": [
         {
             "customType": "regex",
