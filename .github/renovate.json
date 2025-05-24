@@ -56,6 +56,9 @@
     "flux": {
         "managerFilePatterns": ["/^cosmos/clusters/prod/.+\\.ya?ml$/"]
     },
+    "pyenv": {
+        "enabled": false
+    },
     "customManagers": [
         {
             "customType": "regex",
