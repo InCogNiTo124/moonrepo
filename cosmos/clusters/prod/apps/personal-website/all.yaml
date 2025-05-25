@@ -51,6 +51,8 @@ spec:
   routes:
     - match: Host(`msmetko.xyz`)
       kind: Rule
+      middlewares:
+        - name: wsc2025-redirectregex
       services:
         - name: personal-website
           port: 80
@@ -83,8 +85,8 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: wsc2025-redirectregex
+  namespace: personal-website
 spec:
   redirectRegex:
-    regex: ^https?://msmetko.xyz/feedback-wsc2025$
+    regex: ^https?://msmetko.xyz/wsc2025-feedback$
     replacement: https://forms.gle/6JKANYBypzFE5eA29
-    permanent: true
