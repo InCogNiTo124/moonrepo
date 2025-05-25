@@ -77,3 +77,14 @@ spec:
   policy:
     numerical:
       order: asc
+---
+# redirect to the Google form for the feedback for WSC2025 workshop
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: wsc2025-redirectregex
+spec:
+  redirectRegex:
+    regex: ^https?://msmetko.xyz/feedback-wsc2025$
+    replacement: https://forms.gle/6JKANYBypzFE5eA29
+    permanent: true
