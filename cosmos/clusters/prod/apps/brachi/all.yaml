@@ -36,7 +36,7 @@ spec:
     spec:
       containers:
         - name: brachi
-          image: ghcr.io/incognito124/brachi:1748090694 # {"$imagepolicy": "flux-system:incognito124-brachi-policy"} 
+          image: ghcr.io/incognito124/brachi:1748291771 # {"$imagepolicy": "flux-system:incognito124-brachi-policy"} 
           ports:
             - name: web
               containerPort: 80
