@@ -12,7 +12,7 @@ COPY . .
 RUN /root/.proto/bin/moon docker scaffold personal-blog-database
 RUN /root/.proto/bin/moon run personal-blog-database:build  # creates a target/release/database binary
 
-FROM python:3.13.3 AS sqlite
+FROM python:3.13.5 AS sqlite
 RUN wget https://moonrepo.dev/install/proto.sh && bash proto.sh --yes
 RUN /root/.proto/bin/proto install moon && /root/.proto/bin/proto install uv
 COPY . .
