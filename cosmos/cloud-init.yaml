@@ -51,9 +51,9 @@ runcmd:
   # TODO maybe there's a better way of doing this with cloud-init or pulumi
   - ip addr add 49.12.115.123 dev eth0
 
-  # 1 setup k3s (TODO version updater)
+  # 1 setup k3s
   - >
-    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.33.0+k3s1 sh -s - server
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.32.5+k3s1 sh -s - server
     --cluster-init
     --disable-cloud-controller
     --node-name="$(hostname -f)"
