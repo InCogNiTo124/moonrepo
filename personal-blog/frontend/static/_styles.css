@@ -21,3 +21,15 @@ blockquote p {
     display: inline;
     font-style: oblique;
 }
+
+td, th {
+    border: rgba(218, 0, 0, 1) solid;
+    border-width: medium;
+    border-radius: 2px;
+    padding: 4px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
