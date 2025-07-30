@@ -16,10 +16,10 @@ tasks:
 
   docker:
     command: 'docker buildx build --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
-    options:
-      runFromWorkspaceRoot: true
+    deps:
+      - build
 
   docker-push:
     command: 'docker buildx build --push --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
-    options:
-      runFromWorkspaceRoot: true
+    deps:
+      - build

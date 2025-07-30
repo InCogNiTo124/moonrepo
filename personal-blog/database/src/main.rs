@@ -135,13 +135,11 @@ fn get_post_list(page: u32) -> Json<Vec<Post>> {
     Json(posts)
 }
 
-
-
 #[get("/filter/tags/<tag_id>?<page>")]
 fn filter_posts_by_tag(tag_id: u32, page: Option<u32>) -> Json<Vec<Post>> {
     println!("tag_id: {}, page: {:?}", tag_id, page);
     let connection = sqlite::open("/db.sqlite3").unwrap();
-    let query = "select posts.id as id, posts.title as title, posts.date as date, posts.subtitle as subtitle from post_tags join posts on posts.id = post_tags.post_id join tags on post_tags.tag_id = tags.id where post_tags.tag_id = ? and posts.show = 1 order by date desc limit 11 offset ?";    
+    let query = "select posts.id as id, posts.title as title, posts.date as date, posts.subtitle as subtitle from post_tags join posts on posts.id = post_tags.post_id join tags on post_tags.tag_id = tags.id where post_tags.tag_id = ? and posts.show = 1 order by date desc limit 11 offset ?";
     let mut posts: Vec<Post> = vec![];
     for row in connection
         .prepare(query)
@@ -149,10 +147,14 @@ fn filter_posts_by_tag(tag_id: u32, page: Option<u32>) -> Json<Vec<Post>> {
         .into_iter()
         .bind_iter::<_, (_, sqlite::Value)>([
             (1, (tag_id as i64).into()),
-            (2, (match page {
-                Some(page) => 10*(page-1),
-                None => 0,
-            } as i64).into())
+            (
+                2,
+                (match page {
+                    Some(page) => 10 * (page - 1),
+                    None => 0,
+                } as i64)
+                    .into(),
+            ),
         ])
         .unwrap()
         .map(|row| row.unwrap())
@@ -172,5 +174,14 @@ fn filter_posts_by_tag(tag_id: u32, page: Option<u32>) -> Json<Vec<Post>> {
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![post_tags, get_post, get_tag, get_post_list, filter_posts_by_tag])
+    rocket::build().mount(
+        "/",
+        routes![
+            post_tags,
+            get_post,
+            get_tag,
+            get_post_list,
+            filter_posts_by_tag
+        ],
+    )
 }
