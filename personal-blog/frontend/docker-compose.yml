@@ -1,7 +1,7 @@
 services:
   blog:
     container_name: personal-blog
-    image: ghcr.io/incognito124/personal-blog-frontend:1753996488
+    image: ghcr.io/incognito124/personal-blog-frontend:1754170764
     restart: always
     environment:
       BLOG_DB: 'blog-db:80'
