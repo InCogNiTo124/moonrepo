@@ -1,6 +1,6 @@
 # NOTE: there are two stages because it's very hard to build a standalone rust binary
 #### Build phase
-FROM rust:1.87.0-alpine3.20 AS build
+FROM rust:1.88.0-alpine3.20 AS build
 RUN apk add --no-cache musl-dev
 WORKDIR /app
 RUN rustup target add x86_64-unknown-linux-musl
