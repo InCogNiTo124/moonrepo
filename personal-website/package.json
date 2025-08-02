@@ -27,19 +27,19 @@
     "svelte-preprocess": "6.0.3",
     "tslib": "2.8.1",
     "typescript": "5.8.3",
-    "vite": "6.3.5",
+    "vite": "7.0.6",
     "vite-plugin-node-polyfills": "^0.23.0"
   },
   "type": "module",
   "dependencies": {
     "@sveltejs/adapter-static": "3.0.8",
-    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "@sveltejs/vite-plugin-svelte": "^6.0.0",
     "axios": "1.10.0",
     "dayjs": "1.11.13",
     "js-cookie": "3.0.5",
     "personal-reusables": "link:../personal-reusables"
   },
   "engines": {
-    "node": "^22.0.0"
+    "node": "^24.0.0"
   }
 }

@@ -47,13 +47,17 @@ package_reboot_if_required: true
 packages:
   - jq
 runcmd:
-  # add a static IP
+  # 0a add a static IP
   # TODO maybe there's a better way of doing this with cloud-init or pulumi
   - ip addr add 49.12.115.123 dev eth0
+  
+  # 0b remove unattended upgrades
+  - sudo apt remove unattended-upgrades -y
+
 
   # 1 setup k3s
   - >
-    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.32.6+k3s1 sh -s - server
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.33.3+k3s1 sh -s - server
     --cluster-init
     --disable-cloud-controller
     --node-name="$(hostname -f)"
