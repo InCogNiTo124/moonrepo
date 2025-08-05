@@ -1,5 +1,0 @@
-node:
-  packageManager: yarn
-  version: "22.2.0"
-
-rust: {}
