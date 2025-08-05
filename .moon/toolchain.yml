@@ -1,0 +1,14 @@
+node:
+  packageManager: 'yarn'
+  yarn: {}
+
+rust:
+  bins:
+    - 'cargo-nextest'
+    - 'wasm-pack'
+  targets:
+    - 'x86_64-unknown-linux-musl'
+    - 'wasm32-unknown-unknown'
+
+python:
+  packageManager: 'uv'
