@@ -4,11 +4,11 @@ requires-python = ">=3.12"
 
 [[package]]
 name = "arpeggio"
-version = "2.0.2"
+version = "2.0.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/12/c4/516bb54456f85ad1947702ea4cef543a59de66d31a9887dbc3d9df36e3e1/Arpeggio-2.0.2.tar.gz", hash = "sha256:c790b2b06e226d2dd468e4fbfb5b7f506cec66416031fde1441cf1de2a0ba700", size = 766643, upload-time = "2023-07-09T12:30:04.737Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3b/58/ba011f3cf8291804ce80f9d81289ac15f0319a27f9d7e3c124aa5e4981cc/Arpeggio-2.0.3.tar.gz", hash = "sha256:9e85ad35cfc6c938676817c7ae9a1000a7c72a34c71db0c687136c460d12b85e", size = 766566, upload-time = "2025-09-12T12:45:20.594Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f7/4f/d28bf30a19d4649b40b501d531b44e73afada99044df100380fd9567e92f/Arpeggio-2.0.2-py2.py3-none-any.whl", hash = "sha256:f7c8ae4f4056a89e020c24c7202ac8df3e2bc84e416746f20b0da35bb1de0250", size = 55287, upload-time = "2023-07-09T12:30:01.87Z" },
+    { url = "https://files.pythonhosted.org/packages/84/4d/53b8186b41842f7a5e971b1d1c28e678364dcf841e4170f5d14d38ac1e2a/Arpeggio-2.0.3-py2.py3-none-any.whl", hash = "sha256:9374d9c531b62018b787635f37fd81c9a6ee69ef2d28c5db3cd18791b1f7db2f", size = 54656, upload-time = "2025-09-12T12:45:17.971Z" },
 ]
 
 [[package]]
@@ -127,7 +127,7 @@ wheels = [
 
 [[package]]
 name = "pulumi"
-version = "3.191.0"
+version = "3.196.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "debugpy" },
@@ -139,7 +139,7 @@ dependencies = [
     { name = "semver" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8d/9a/33c0f993b62b09a6f92d1135be6ba3938a9a50032940550cdb4a110cf931/pulumi-3.191.0-py3-none-any.whl", hash = "sha256:137ead3d750d66e9d67ab452bf2762e080a273229d6c77263420057be54529d3", size = 375069, upload-time = "2025-08-21T08:36:00.821Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/a9/49e1211b98e2d4d12bd1a8f3cae1cb808596df76cf9edcacc31282b82803/pulumi-3.196.0-py3-none-any.whl", hash = "sha256:df1d5c0afc582d70e2e2a7543532ee52b95449b6ccb4b4e260707c620bfd87cb", size = 377974, upload-time = "2025-09-12T23:12:43.71Z" },
 ]
 
 [[package]]
