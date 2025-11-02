@@ -203,6 +203,7 @@ def process_markdown(file: Path):
     md = markdown.Markdown(
         extensions=[
             "pymdownx.extra",
+            "pymdownx.tilde",
             "markdown_katex",
             "full_yaml_metadata",
             # "mdx_urlize",
