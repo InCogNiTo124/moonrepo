@@ -13,9 +13,10 @@ tags:
 Recently, I finally decided to pursue my passion for aerospace, so I enrolled
 into a pilot school and started theory classes to become a proud holder of
 PPL(A). Due to other personal commitments in my private life, I could not make
-it to the live classes offered by my DTO, so I opted for remote classes, hoping
-I could learn all the necessary theory by watching the lessons on my Android
-tablet that I usually use for note-taking.
+it to the live classes offered by my
+[DTO](https://www.flightschoolcroatia.com/), so I opted for remote classes,
+hoping I could learn all the necessary theory by watching the lessons on my
+Android tablet that I usually use for note-taking.
 
 Alas, that idea was immediately torn to shreds. You see, the lessons aren't in a
 prerecorded video format I was hoping for. As a matter of fact, the lessons
@@ -38,13 +39,13 @@ the three to obtain.
 Next, where do I put Windows such that I can access it from everywhere anytime?
 After a few discussions with my tech friends (and Gemini[^foe]), I reached the
 conclusion that I should simply create a virtual Windows instance in cloud and
-connect to it with RDP. The alternative of running a local virtualized instance
-on my computer (like QEMU or something) is a bad fit, due to my (apparently
-controversial??) habit of turning the computer off after a day's work. For the
-cloud provider, I kind of defaulted to Hetzner without much thinking, as I run
-all my things there and they're pretty cheap. Reflecting back, going with Azure
-potentially could have made my life easier, but this does work, so I'm never
-going to have that counterfactual.
+connect to it with RDP (Remote Desktop Protocol). The alternative of running a
+local virtualized instance on my computer (like QEMU or something) is a bad fit,
+due to my (apparently controversial??) habit of turning the computer off after a
+day's work. For the cloud provider, I kind of defaulted to Hetzner without much
+thinking, as I run all my things there and they're pretty cheap. Reflecting
+back, going with Azure potentially could have made my life easier, but this does
+work, so I'm never going to have that counterfactual.
 
 And last, my tablet and the cloud machine are connected through a Tailscale
 network. While this is not _strictly_ necessary (to quote Gemini, "Tailscale
@@ -120,7 +121,7 @@ want a VirtIO SCSI for the Windows Server version you're installing - in this
 case 2k25
 ![Be careful to select the SCSI drivers that correspond to your favorite NBA video game release](/images/step_1_3_3-3.png)
 
-Bonus: depending in you use case, you may want internet on your Windows Server
+Bonus: depending on your use case, you may want internet on your Windows Server
 instance on Hetzner. You'll be surprised that you also don't get internet by
 default when you install Windows Server. For that, you'll have to additionally
 install NetKVM drivers in that menu.
@@ -203,7 +204,7 @@ values.
 ### 3.1 Install Tailscale
 
 This was the part of my setup I actually did first, and as previously mentioned,
-I created my account with Google SSO out of pure lazyness. You should definitely
+I created my account with Google SSO out of pure laziness. You should definitely
 login in with the same method that you created the account, though.
 
 Before you start setting up the RDP client, and if you did the Tailscale setup
