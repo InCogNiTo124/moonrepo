@@ -8,14 +8,14 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "typescript": "5.9.2",
-    "vite": "7.1.5"
+    "typescript": "5.9.3",
+    "vite": "7.1.12"
   },
   "dependencies": {
-    "@types/three": "0.180.0",
-    "lil-gui": "0.20.0",
+    "@types/three": "0.181.0",
+    "lil-gui": "0.21.0",
     "serve": "^14.2.4",
-    "three": "0.180.0"
+    "three": "0.181.0"
   },
   "engines": {
     "node": "^24.0.0"
