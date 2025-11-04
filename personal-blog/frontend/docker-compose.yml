@@ -1,7 +1,7 @@
 services:
   blog:
     container_name: personal-blog
-    image: ghcr.io/incognito124/personal-blog-frontend:1762104408
+    image: ghcr.io/incognito124/personal-blog-frontend:1762206359
     restart: always
     environment:
       BLOG_DB: 'blog-db:80'
@@ -9,5 +9,5 @@ services:
       - 3000:3000
   blog-db:
     container_name: blog-db
-    image: ghcr.io/incognito124/personal-blog-database:1762103202
+    image: ghcr.io/incognito124/personal-blog-database:1762209002
     restart: always
