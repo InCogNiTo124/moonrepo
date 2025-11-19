@@ -22,6 +22,7 @@ write_files:
               port: 9101
               expose:
                 default: true
+              exposedPort: 9101
           metrics:
             prometheus:
               entryPoint: metrics
@@ -47,23 +48,63 @@ write_files:
                 volumeMounts:
                   - mountPath: /data
                     name: data
+          persistence:
+            enabled: true
+            size: 1Gi
+            storageClass: "local-path"
+            path: /data
+
   # this allows me to run kubectl commands without specifying --kubeconfig all the time
   - path: /etc/environment
     content: |-
       KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+  - path: /opt/mount_persistence.sh
+    permissions: '0755'
+    content: |-
+      #!/bin/bash
+      set -euxo pipefail
+      
+      # 1. IDENTIFY THE DISK
+      # Hetzner volumes usually appear in /dev/disk/by-id/scsi-0HC_Volume_<your_volume_id>
+      # REPLACE THIS with your specific identifier logic or pass it via Pulumi vars
+      DISK="/dev/disk/by-id/scsi-0HC_Volume_104152301" 
+      MOUNT_POINT="/var/lib/rancher"
+      
+      echo "Checking disk $DISK..."
+      
+      # 2. SAFETY CHECK: DOES IT HAVE A FILESYSTEM?
+      # blkid returns exit code 2 if no filesystem is found
+      if ! blkid $DISK; then
+          echo "No filesystem found on $DISK. Formatting as ext4..."
+          mkfs.ext4 $DISK
+      else
+          echo "Filesystem found on $DISK. Skipping format."
+      fi
+      
+      # 3. MOUNT IT
+      mkdir -p $MOUNT_POINT
+      mount $DISK $MOUNT_POINT
+      
+      # 4. PERSIST IN FSTAB (so it survives a reboot, though not strictly needed for rebuilds)
+      echo "$DISK $MOUNT_POINT ext4 defaults,noatime 0 0" >> /etc/fstab
+      
+      echo "Persistence layer ready."
 package_update: true
 package_upgrade: true
 package_reboot_if_required: true
 packages:
   - jq
 runcmd:
+  # mount persistence volume
+  - /opt/mount_persistence.sh
+
   # 0a add a static IP
   # TODO maybe there's a better way of doing this with cloud-init or pulumi
   - ip addr add 49.12.115.123 dev eth0
   
   # 0b remove unattended upgrades
   - sudo apt remove unattended-upgrades -y
-
 
   # 1 setup k3s
   - >
@@ -101,6 +142,9 @@ runcmd:
     --read-write-key
     --personal
     --components-extra=image-reflector-controller,image-automation-controller
+
+  # setup k9s manually
+  - wget https://github.com/derailed/k9s/releases/download/v0.50.16/k9s_Linux_amd64.tar.gz && tar -xzvf k9s_Linux_amd64.tar.gz && mv k9s /usr/local/bin/
   # 4 install longhorn via helm (NOT USED ATM, I DO A LOT OF SHIT I DONT NEED BUT THIS I MOST DEFINITELY DONT NEED (YET))
   # - >
   #   helm repo add longhorn https://charts.longhorn.io &&
