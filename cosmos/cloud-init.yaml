@@ -19,7 +19,9 @@ write_files:
             - --entrypoints.web.http.redirections.entrypoint.scheme=https
           ports:
             metrics:
-              port: 9100
+              port: 9101
+              expose:
+                default: true
           metrics:
             prometheus:
               entryPoint: metrics
