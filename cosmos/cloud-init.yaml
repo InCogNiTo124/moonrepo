@@ -17,6 +17,14 @@ write_files:
             - --entrypoints.web.http.redirections.entrypoint.to=:443
             - --entrypoints.web.http.redirections.entrypoint.permanent=true
             - --entrypoints.web.http.redirections.entrypoint.scheme=https
+          ports:
+            metrics:
+              port: 9100
+          metrics:
+            prometheus:
+              entryPoint: metrics
+              addEntryPointsLabels: true
+              addRoutersLabels: true
           certificatesResolvers:
             letsencrypt:
               acme:
