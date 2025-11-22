@@ -7,7 +7,6 @@ resources:
   - ./repository.yaml
   - ./namespace.yaml
   - ./grafana-ingress.yaml
-  - ./traefik-servicemonitor.yaml
 configMapGenerator:
   - name: flux-kube-state-metrics-config
     namespace: flux-system
