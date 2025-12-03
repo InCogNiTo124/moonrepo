@@ -9,11 +9,18 @@ jobs:
     name: "CI"
     runs-on: "ubuntu-latest"
     steps:
+      - name: Set up musl
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-dev musl-tools
       - uses: "actions/checkout@main"
         with:
           fetch-depth: 0
 
       - uses: "moonrepo/setup-toolchain@v0"
+        with:
+          auto-install: true
+          auto-setup: true
 
       - run: "moon ci :build :test"
 
