@@ -13,13 +13,14 @@ project:
 
 tasks:
   build:
-    # NOTE: on the build node, this is built with glibc. In docker, it's built with musl.
-    command: 'cargo build --release'
+    command: 'cargo build --release --locked'
     outputs:
-      - 'target/release/database'
+      - 'target/x86_64-unknown-linux-musl/release/database'
 
   compile:
-    command: 'uv run compile.py @files(posts)' 
+    command: 'uv run compile.py @in(0)' 
+    inputs:
+      - '@files(posts)'
     outputs:
       - 'db.sqlite3'
 
@@ -27,6 +28,7 @@ tasks:
     command: 'docker buildx build --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
     deps:
       - compile
+      - build
 
   docker-push:
     command: 'docker buildx build --push --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
@@ -39,3 +41,4 @@ tasks:
       - uv.lock
     deps:
       - compile
+      - build
