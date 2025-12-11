@@ -1,13 +1,15 @@
 #cloud-config
-
 # this file is actually a yaml template that gets formatted in Python
-
-mounts:
-  - ["/dev/sdb", "/var/lib/rancher", "ext4", "defaults,noatime", "0", "0"]
+# the order of the fiels as kept as much up to date of the official ordering:
+# https://github.com/canonical/cloud-init/blob/main/config/cloud.cfg.tmpl
+# (or should I say, *the canonical ordering*, hehe)
 
 write_files:
   # prod traefik configuration (test one has a different caserver)
-  - path: /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+  # an astute reader will notice that this file is first being written in a
+  # temporary location before being moved to its final destination
+  # that's because of the cloud-init module ordering :shrug:
+  - path: /run/traefik-config.yaml
     content: |-
       apiVersion: helm.cattle.io/v1
       kind: HelmChartConfig
@@ -62,11 +64,15 @@ write_files:
     content: |-
       KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
+mounts:
+  - ["/dev/sdb", "/var/lib/rancher", "ext4", "defaults,noatime", "0", "0"]
+
 package_update: true
 package_upgrade: true
 package_reboot_if_required: true
 packages:
   - jq
+
 runcmd:
   - 'mountpoint -q /var/lib/rancher || echo "WARNING: Volume not mounted!"'
   # setup k9s manually
@@ -79,7 +85,9 @@ runcmd:
   # 0b remove unattended upgrades
   - sudo apt remove unattended-upgrades -y
 
-  # 1 setup k3s
+  # 1a prek3s setup: configure traefik
+  - mkdir -p /var/lib/rancher/k3s/server/manifests && mv /run/traefik-config.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+  # 1b setup k3s
   - >
     curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.33.5+k3s1 sh -s - server
     --cluster-init
