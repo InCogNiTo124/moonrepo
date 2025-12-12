@@ -1,0 +1,11 @@
+# https://moonrepo.dev/docs/config/template
+$schema: '../../.moon/cache/schemas/template.json'
+
+title: 'docker-compose'
+description: 'A template for docker-compose.yml files for testing purposes'
+variables:
+  dockerImage:
+    type: 'string'
+    default: ''
+    required: true
+    prompt: 'Docker image?'

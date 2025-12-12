@@ -2,6 +2,8 @@ $schema: 'https://moonrepo.dev/schemas/project.json'
 
 type: application
 language: rust
+tags:
+  - docker
 
 fileGroups:
   posts:
@@ -25,20 +27,19 @@ tasks:
       - 'db.sqlite3'
 
   docker:
-    command: 'docker buildx build --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
     deps:
       - compile
       - build
 
   docker-push:
-    command: 'docker buildx build --push --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
-    inputs:
-      - Cargo.toml
-      - Cargo.lock
-      - compile.py
-      - "posts/*.md"
-      - pyproject.toml
-      - uv.lock
     deps:
       - compile
       - build
+
+  staging:
+    script: |
+      FRONTEND_LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/personal-blog-frontend' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
+      DB_LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/personal-blog-database' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
+      moon generate --force docker-compose-blog $projectSource -- --frontendDockerImage "$FRONTEND_LATEST_IMAGE" --dbDockerImage "$DB_LATEST_IMAGE"
+      docker compose -f $projectSource/docker-compose.yaml up && docker compose -f $projectSource/docker-compose.yaml rm -fs
+ 

@@ -1,0 +1,5 @@
+services:
+  svc:
+    image: "{{ dockerImage }}"
+    ports:
+      - "3000:80"

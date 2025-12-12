@@ -1,4 +1,4 @@
-name: "Pipeline (PR to main)"
+name: "Moon (PR to main)"
 on:
   pull_request:
     branches:

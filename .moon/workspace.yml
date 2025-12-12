@@ -28,3 +28,7 @@ vcs:
 docker:
   prune:
     installToolchainDeps: true
+
+generator:
+  templates:
+    - '.moon/templates/'

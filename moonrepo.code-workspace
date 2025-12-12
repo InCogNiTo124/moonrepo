@@ -15,5 +15,9 @@
 		{ "path": "./brachi"},
 		{ "path": "./crates/brachistochrone_solver"},
 	],
-	"settings": {}
+	"settings": {
+		"yaml.schemas": {
+			"https://moonrepo.dev/schemas/tasks.json": "file:///home/msmetko/moonrepo/.moon/tasks/tag-docker.yaml"
+		}
+	}
 }

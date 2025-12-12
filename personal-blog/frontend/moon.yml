@@ -2,7 +2,9 @@ $schema: 'https://moonrepo.dev/schemas/project.json'
 
 # Inherit tasks from the `sveltekit` preset
 # https://github.com/moonrepo/moon-configs
-tags: ['sveltekit']
+tags:
+  - sveltekit
+  - docker
 
 type: application
 
@@ -15,13 +17,11 @@ tasks:
     deps:
       - personal-reusables:build
       - personal-reusables:prepack
-  docker:
-    command: 'docker buildx build --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
-    deps:
-      - build
-    
-  docker-push:
-    command: 'docker buildx build --push --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
-    deps:
-      - build
-    
+  
+  staging:
+    script: |
+      FRONTEND_LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/personal-blog-frontend' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
+      DB_LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/personal-blog-database' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
+      moon generate --force docker-compose-blog $projectSource -- --frontendDockerImage "$FRONTEND_LATEST_IMAGE" --dbDockerImage "$DB_LATEST_IMAGE"
+      docker compose -f $projectSource/docker-compose.yaml up && docker compose -f $projectSource/docker-compose.yaml rm -fs
+ 

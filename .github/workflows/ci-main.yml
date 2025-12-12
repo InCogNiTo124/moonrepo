@@ -1,4 +1,4 @@
-name: "Pipeline (main)"
+name: "Moon (main)"
 on:
   push:
     branches:

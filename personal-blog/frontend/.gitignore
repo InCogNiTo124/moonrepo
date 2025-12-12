@@ -8,3 +8,5 @@ build
 *.rss
 db.sqlite3
 database/target
+
+docker-compose.yaml

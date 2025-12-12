@@ -1,0 +1,26 @@
+$schema: 'https://moonrepo.dev/schemas/tasks.json'
+
+tasks:
+  docker:
+    command: 'docker buildx build --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
+    deps:
+      - build
+
+  docker-push:
+    command: 'docker buildx build --push --no-cache -t ghcr.io/incognito124/$projectName:$timestamp -f $projectRoot/Dockerfile .'
+    deps:
+      - build
+  
+  # this scripts relies on docker images being built and tagged with a lexicographically sortable timestamp
+  # TODO fix this before Saturday, November 20, 2286 17:46:39 UTC 
+  staging:
+    script: |
+      LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/$projectName' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
+      moon generate --force docker-compose $projectSource -- --dockerImage "$LATEST_IMAGE"
+      docker compose -f $projectSource/docker-compose.yaml up && docker compose -f $projectSource/docker-compose.yaml rm -fs
+    deps:
+      - docker
+    preset: server
+    options:
+      allowFailure: true
+      runFromWorkspaceRoot: true

@@ -1,0 +1,16 @@
+# https://moonrepo.dev/docs/config/template
+$schema: '../../.moon/cache/schemas/template.json'
+
+title: 'docker-compose-blog'
+description: 'A template for docker-compose.yml for blog for testing purposes'
+variables:
+  frontendDockerImage:
+    type: 'string'
+    default: ''
+    required: true
+    prompt: 'Docker frontend image?'
+  dbDockerImage:
+    type: 'string'
+    default: ''
+    required: true
+    prompt: 'Docker database image?'
