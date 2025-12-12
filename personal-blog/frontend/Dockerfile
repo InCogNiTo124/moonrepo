@@ -1,4 +1,4 @@
-FROM node:24.11.0-alpine3.22 AS prod
+FROM node:24.12.0-alpine3.22 AS prod
 LABEL org.opencontainers.image.source=https://github.com/incognito124/moonrepo
 WORKDIR /app
 COPY package.json yarn.lock ./
