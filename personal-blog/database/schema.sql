@@ -5,7 +5,8 @@ CREATE TABLE posts (
     title TEXT NOT NULL,
     subtitle TEXT NOT NULL,
     content TEXT NOT NULL,
-    show INTEGER DEFAULT 1
+    show INTEGER DEFAULT 1,
+    slug TEXT NOT NULL UNIQUE
 );
 
 DROP TABLE IF EXISTS tags;

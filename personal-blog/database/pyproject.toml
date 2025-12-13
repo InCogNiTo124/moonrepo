@@ -13,4 +13,5 @@ dependencies = [
     "mdx-breakless-lists>=1.0.1",
     "pygments>=2.19.1",
     "pymdown-extensions>=10.14.3",
+    "sqlmodel>=0.0.27",
 ]

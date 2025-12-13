@@ -71,7 +71,7 @@ said, you might want to skip the absolute minimum of CPU/RAM purely because it
 installs faster and performs better (snappier). I did not expect Windows Server
 to be this resource hungry (and, for the record, I think ATPdigital may also
 play a part in slowness of my system).
-![I took the cheapest instance that was available. That was a mistake](/images/step_1_1.png)
+![I took the cheapest instance that was available. That was a mistake](step_1_1.png)
 
 ### 1.2 Mount the Windows Server ISO and reboot
 
@@ -79,7 +79,7 @@ When the instance starts, go to the "ISO Images" tab, mount the Windows Server
 ISO and reboot the instance. After the instance starts again, you should open
 the console via Actions -> Console and check the checkbox that says GUI mode.
 
-![Mounting the Windows Server installation ISO. Once you do that, restart the instance and start the Hetzner Console](/images/step_1_2.png)
+![Mounting the Windows Server installation ISO. Once you do that, restart the instance and start the Hetzner Console](step_1_2.png)
 
 ### 1.3 Installing Windows Server
 
@@ -96,44 +96,43 @@ Soon we'll install the drivers for storage and networking. I could not figure
 out[^figure] how to do this with the current version of the install wizard, but
 it somehow works with a previous versions.
 
-![It was hard for me to install drivers on the current version of the setup so I picked a previous one](/images/step_1_3_1.png)
+![It was hard for me to install drivers on the current version of the setup so I picked a previous one](step_1_3_1.png)
 
 #### 1.3.2 Install desktop
 
 For my use case, which was connecting to the remote desktop to learn about
 airplanes and flying, it's really handy to actually have a desktop experience.
-![Having a desktop for a desktop app is a necessity](/images/step_1_3_2.png)
+![Having a desktop for a desktop app is a necessity](step_1_3_2.png)
 
 #### 1.3.3 The driver dance
 
 Now it gets a little bit tricky. In order to install Windows to the disk, the
 installer software needs to know which disks there are. And it can't know that
 until disk drivers are not installed.
-![Reaching this point means we need to install drivers](/images/step_1_3_3-1.png)
-So before we continue, we should install said drivers. To do that, we'll first
-have to dismount the ISO for the installer and mount the virtio-win ISO. I'd
-suggest to search by `virtio` and sorting by ID to install the latest one
-available. At the time of my writing, the latest version was 0.1.127.
+![Reaching this point means we need to install drivers](step_1_3_3-1.png) So
+before we continue, we should install said drivers. To do that, we'll first have
+to dismount the ISO for the installer and mount the virtio-win ISO. I'd suggest
+to search by `virtio` and sorting by ID to install the latest one available. At
+the time of my writing, the latest version was 0.1.127.
 
-![Unmount Windows Server ISO and mount virtio](/images/step_1_3_3-2.png) Once
-mounted, you can then click `Load driver` button and search for the drivers. You
-want a VirtIO SCSI for the Windows Server version you're installing - in this
-case 2k25
-![Be careful to select the SCSI drivers that correspond to your favorite NBA video game release](/images/step_1_3_3-3.png)
+![Unmount Windows Server ISO and mount virtio](step_1_3_3-2.png) Once mounted,
+you can then click `Load driver` button and search for the drivers. You want a
+VirtIO SCSI for the Windows Server version you're installing - in this case 2k25
+![Be careful to select the SCSI drivers that correspond to your favorite NBA video game release](step_1_3_3-3.png)
 
 Bonus: depending on your use case, you may want internet on your Windows Server
 instance on Hetzner. You'll be surprised that you also don't get internet by
 default when you install Windows Server. For that, you'll have to additionally
 install NetKVM drivers in that menu.
-![If you want to have Internet, you better install drivers for that, too](/images/step_1_3_3-4.png)
+![If you want to have Internet, you better install drivers for that, too](step_1_3_3-4.png)
 
 #### 1.3.4 Onwards with install
 
 Once you're done installing everything, go to the Hetzner Console, unmount the
 virtio iso and remount **the same Windows Server ISO** you started with.
 
-![❌Delete all partitions and install Windows on a new one](/images/step_1_3_4.png)
-I recommend to delete all partitions and install Windows on the Drive 0
+![❌Delete all partitions and install Windows on a new one](step_1_3_4.png) I
+recommend to delete all partitions and install Windows on the Drive 0
 unallocated space. In case the installer doesn't let you, which happens
 irregularly, just create a default partition.
 
@@ -148,8 +147,8 @@ The setup goes as usual, you pick an Administrator password and you're ready to
 login. Windows Server doesn't seem to spam you with all the unnecessary AI
 features you need to opt out of, which is a surprise, to be sure, but a welcome
 one.
-![Administrator passwords have super stringent requirements](/images/step_1_4-1.png)
-If you plan on logging in via Hetzner console a lot, try to keep the password as
+![Administrator passwords have super stringent requirements](step_1_4-1.png) If
+you plan on logging in via Hetzner console a lot, try to keep the password as
 simple as possible. Pasting the password in the Hetzner Console doesn't work
 properly so you'll have to retype it every time :)
 
@@ -158,11 +157,11 @@ OS, which is pretty difficult when you're connecting remotely. Hetzner Console
 provides a nifty feature, for what I'm assuming is exactly this reason, where
 you can send the Ctrl+Alt+Del event to the remote server. Do that and type your
 password.
-![Invoking the Task Manager via Hetzner Console has never been easier](/images/step_1_4-2.png)
+![Invoking the Task Manager via Hetzner Console has never been easier](step_1_4-2.png)
 
 ### 1.5 Enabling Remote Desktop
 
-![PC name redacted because I can't risk other people learning about flying on my expense](/images/step_1_5.png)
+![PC name redacted because I can't risk other people learning about flying on my expense](step_1_5.png)
 The last step is enabling RDP, which is disabled by default. To enable Remote
 Desktop, search for Remote Desktop and pick Remote Desktop _Settings_, and not
 Remote Desktop _Connection_.
@@ -222,8 +221,8 @@ The first thing you should absolutely do is to add an account. In my case that
 was the very account I set up as the administrator. The reason is that otherwise
 you'll have to enter username and password every time you try to login. I grew
 weary after the third time or so.
-![Make sure to add the account to save time and sanity](/images/step_3_2.png) In
-the field `PC name` you should enter the name of the PC from Step 1.5. Leave all
+![Make sure to add the account to save time and sanity](step_3_2.png) In the
+field `PC name` you should enter the name of the PC from Step 1.5. Leave all
 other settings at their defaults.
 
 ---
@@ -236,10 +235,10 @@ firewall setup from Step 2.2.
 
 Now you can do whatever you need. For example this is what I see when I remotely
 learn about flying:
-![ATPdigital on my Android tablet! They said it couldn't be done, and I said it could](/images/final_rdp.jpg)
+![ATPdigital on my Android tablet! They said it couldn't be done, and I said it could](final_rdp.jpg)
 
 And this is how it looks IRL:
-![Don't worry, I deleted that instance (right after updating my packages), so the IP is not available anymore.](/images/final_irl.jpg)
+![Don't worry, I deleted that instance (right after updating my packages), so the IP is not available anymore.](final_irl.jpg)
 
 [^win]:
     Actually, that's not really true, I have a dual-boot and I use it solely for
