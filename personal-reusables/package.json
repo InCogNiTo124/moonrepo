@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build && npm run prepack",
+		"build": "yarn prepack",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"prepack": "svelte-kit sync && svelte-package",
@@ -30,10 +30,10 @@
 		}
 	},
 	"peerDependencies": {
+		"@sveltejs/kit": "^2.0.0",
 		"svelte": "^5.0.0"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/package": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^6.0.0",
@@ -52,6 +52,7 @@
 	"private": true,
 	"dependencies": {
 		"@types/js-cookie": "^3.0.6",
+		"esm-env": "^1.2.2",
 		"js-cookie": "^3.0.5"
 	}
 }

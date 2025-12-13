@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
+	import { BROWSER as browser } from 'esm-env';
 	import Cookies from 'js-cookie';
 
 	import { LIGHT, DARK, COOKIE_KEY_THEME, dark, light, theme } from 'personal-reusables';
@@ -18,11 +18,18 @@
 	}
 </script>
 
-<img onclick={toggleTheme} src={val === LIGHT ? dark : light} alt="Toggle theme" />
+<button onclick={toggleTheme} type="button" class="theme-toggle">
+	<img src={val === LIGHT ? dark : light} alt="Toggle theme" />
+</button>
 
 <style scoped>
-	img {
+	.theme-toggle {
+		background: none;
+		border: none;
+		padding: 0;
 		cursor: pointer;
+	}
+	img {
 		height: 2rem;
 	}
 </style>

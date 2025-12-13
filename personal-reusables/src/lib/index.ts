@@ -15,6 +15,6 @@ import Pager from './components/Filters/Pager.svelte';
 import dark from './images/dark.png';
 import light from './images/light.png';
 
-import styles from './assets/_styles.css';
+import './assets/_styles.css';
 
-export { smetko, dark, light, favicon, theme, SectionGroup, Section, Theme, Loader, BIRTHDATE, BLANK, COOKIE_KEY_THEME, DARK, FER_LINK_EN, FER_LINK_HR, INLINE_CLASS, LIGHT, REPO_API, SELF, TARGET_BLANK, styles, Tags, Pager};
+export { smetko, dark, light, favicon, theme, SectionGroup, Section, Theme, Loader, BIRTHDATE, BLANK, COOKIE_KEY_THEME, DARK, FER_LINK_EN, FER_LINK_HR, INLINE_CLASS, LIGHT, REPO_API, SELF, TARGET_BLANK, Tags, Pager};

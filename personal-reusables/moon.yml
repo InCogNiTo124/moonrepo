@@ -6,3 +6,5 @@ type: library
 tasks:
   prepack:
     command: yarn run prepack
+  build:
+    command: nop

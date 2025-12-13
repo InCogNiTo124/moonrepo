@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
+	import { BROWSER as browser } from 'esm-env';
 	import Cookies from 'js-cookie';
 	import { BLANK, LIGHT, COOKIE_KEY_THEME } from 'personal-reusables';
 	import { theme } from 'personal-reusables';
