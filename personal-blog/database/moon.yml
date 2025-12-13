@@ -7,7 +7,7 @@ tags:
 
 fileGroups:
   posts:
-    - "posts/*.md"
+    - "posts/*"
 
 project:
   name: personal-blog-database
@@ -22,9 +22,10 @@ tasks:
   compile:
     command: 'uv run compile.py @in(0)' 
     inputs:
-      - '@files(posts)'
+      - '@dirs(posts)'
     outputs:
       - 'db.sqlite3'
+      - 'feed.rss'
 
   docker:
     deps:

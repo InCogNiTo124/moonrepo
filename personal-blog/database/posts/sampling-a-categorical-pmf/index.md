@@ -1,6 +1,6 @@
 ---
 date: 2025-01-04
-title: 'Sampling a categorical PMF'
+title: "Sampling a categorical PMF"
 subtitle: "There's more than meets the eye"
 tags:
   - math
@@ -41,13 +41,13 @@ print(cdf)
 # 0.98509095, 1.        ])
 ```
 
-![1. The logits of a chosen distribution. I've just plotted the values](/images/sampling-logit.png)
+![1. The logits of a chosen distribution. I've just plotted the values](sampling-logit.png)
 
-![2. The PMF of a chosen distribution. This is the output of a Softmax operation. We can se that the relative shape went unchanged, but high values were pushed up highed, and low values pushed down lower.](/images/sampling-prob.png)
+![2. The PMF of a chosen distribution. This is the output of a Softmax operation. We can se that the relative shape went unchanged, but high values were pushed up highed, and low values pushed down lower.](sampling-prob.png)
 
-![3. The CDF of a chosen distribution. In every integer point the CDF jumps by the amount which is the probability of observing that x. The largest jump is for x=3 which jumps from 0.13 to 0.94, or a relative jump of P(X=3)=0.81](/images/sampling-cdf.png)
+![3. The CDF of a chosen distribution. In every integer point the CDF jumps by the amount which is the probability of observing that x. The largest jump is for x=3 which jumps from 0.13 to 0.94, or a relative jump of P(X=3)=0.81](sampling-cdf.png)
 
-![4. The quantile function (QF) of a chosen distribution. Simply an inverse of the CDF.](/images/sampling-quantile.png)
+![4. The quantile function (QF) of a chosen distribution. Simply an inverse of the CDF.](sampling-quantile.png)
 
 In order to actually sample from the example distribution, we'll sample
 uniformly from 0 to 1 (also known as the unit uniform) and search the
@@ -238,7 +238,7 @@ Maybe it's just for the total :smile: maybe most of the time it really is faster
 ... [^bargain] Let's plot the values with respect to the number of categorical
 dimensions:
 
-![Plot of average inference latency wrt number of dimensions for all three methods](/images/sampling-time.png)
+![Plot of average inference latency wrt number of dimensions for all three methods](sampling-time.png)
 
 And this is a summary of linear regressions fitting:
 
@@ -409,7 +409,7 @@ def sample_gumbel(logits):
 
 The results speak for themselves :sweat:
 
-![Not only that this new method is not faster than the "original" gumbel, it's the slowest <i>by far</i></br>](/images/gumbel_wins.png)
+![Not only that this new method is not faster than the "original" gumbel, it's the slowest <i>by far</i></br>](gumbel_wins.png)
 
 $`R^2`$ also strongly suggests the slowdown:
 
@@ -522,13 +522,13 @@ but they're also pretty straightforward.
 
 There are the graphs for `cargo run` timings:
 
-![Rust reimplementations timings with respect to a chosen dimensionality of a discrete variable. Now, not only that the "direct" gumbels method is slow, the "original" gumbel is too slow as well. Both of gumbel methods are vastly inferior to a simple linear or lg2 search](/images/rust1.png)
+![Rust reimplementations timings with respect to a chosen dimensionality of a discrete variable. Now, not only that the "direct" gumbels method is slow, the "original" gumbel is too slow as well. Both of gumbel methods are vastly inferior to a simple linear or lg2 search](rust1.png)
 
 Still no dice.[^depression] However, the situation finally changed once I
 remembered there's an `--release` flag in the `cargo run` command which applies
 optimizations.[^bargain] The final graphs are:
 
-![Rust reimplementations compiled with optimizations. _Finally_ one of the methods for Gumbel sampling was as performant as the quantile function ones; too bad it's only approximate.](/images/rust_release.png)
+![Rust reimplementations compiled with optimizations. _Finally_ one of the methods for Gumbel sampling was as performant as the quantile function ones; too bad it's only approximate.](rust_release.png)
 
 And for completion here's the relevant statistics:
 
@@ -584,15 +584,10 @@ dimensions, but they're all pretty similar.
     the max is necessary
 
 [^anger]: Anger
-
 [^denial]: Denial
-
 [^bargain]: Bargaining
-
 [^depression]: Depression
-
 [^accept]: Acceptance
-
 [^maclaurin]:
     Actually, for numerical stability, I'll implicitly move the function such
     that f(0)=0 and not 1/e as is the default. That makes it a MacLaurin series

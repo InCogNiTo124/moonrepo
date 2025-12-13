@@ -7,9 +7,9 @@ import xml.etree.ElementTree as ET
 from email.utils import formatdate
 from pathlib import Path
 
-import htmlmin
+import htmlmin  # noqa: F401
 import markdown
-import markdown_katex
+import markdown_katex  # noqa: F401 - used implicitly in L207
 
 
 # monkey patching xml.etree.ElementTree
@@ -33,9 +33,10 @@ LINK = "https://blog.msmetko.xyz/posts/{}"
 
 
 class Post:
-    def __init__(self, html, metadata):
+    def __init__(self, html, slug, metadata):
         self._id = None
         self.html = html
+        self.slug = slug
         self.metadata = metadata
         return
 
@@ -92,20 +93,20 @@ class RssBuilder:
             },
         )
         self.channel = ET.SubElement(self.root, "channel")
-        title = subelement(self.channel, "title", "blog.msmetko.xyz")
-        link = subelement(self.channel, "link", "https://blog.msmetko.xyz")
-        description = subelement(
+        _title = subelement(self.channel, "title", "blog.msmetko.xyz")
+        _link = subelement(self.channel, "link", "https://blog.msmetko.xyz")
+        _description = subelement(
             self.channel,
             "description",
             "Marijan Smetko writes about programming, Python, math, physics, machine and deep learning, statistics, Linux, music...",
         )
-        language = subelement(self.channel, "language", "en-us")
-        generator = subelement(self.channel, "generator", "msmetko")
-        docs = subelement(self.channel, "docs", "https://www.rssboard.org/rss-2-0-11")
-        managing_editor = subelement(
+        _language = subelement(self.channel, "language", "en-us")
+        _generator = subelement(self.channel, "generator", "msmetko")
+        _docs = subelement(self.channel, "docs", "https://www.rssboard.org/rss-2-0-11")
+        _managing_editor = subelement(
             self.channel, "managingEditor", "msmetko@msmetko.xyz"
         )
-        atom_link = ET.SubElement(
+        _atom_link = ET.SubElement(
             self.channel,
             "atom:link",
             {
@@ -114,15 +115,15 @@ class RssBuilder:
                 "type": "application/rss+xml",
             },
         )
-        webmaster = subelement(self.channel, "webmaster", "msmetko@msmetko.xyz")
-        subelement(self.channel, "copyright", "CC BY 4.0")
+        _webmaster = subelement(self.channel, "webmaster", "msmetko@msmetko.xyz")
+        _copyright = subelement(self.channel, "copyright", "CC BY 4.0")
         for post in post_list:
             self.add_post(post)
         return
 
     def write(self, filename):
-        subelement(self.channel, "pubDate", self.build_date)
-        subelement(self.channel, "lastBuildDate", self.build_date)
+        _pubDate = subelement(self.channel, "pubDate", self.build_date)
+        _lastBuildDate = subelement(self.channel, "lastBuildDate", self.build_date)
         ET.ElementTree(self.root).write(
             filename, encoding="UTF-8", xml_declaration=True
         )
@@ -131,18 +132,18 @@ class RssBuilder:
     def add_post(self, post: Post):
         if post.show:
             item = ET.SubElement(self.channel, "item")
-            title = CDATA(item, "title", post.title)
-            description = CDATA(item, "description", post.subtitle)
-            link = subelement(item, "link", LINK.format(post.id))
-            author = subelement(item, "author", "msmetko@msmetko.xyz")
+            _title = CDATA(item, "title", post.title)
+            _description = CDATA(item, "description", post.subtitle)
+            _link = subelement(item, "link", LINK.format(post.slug))
+            _author = subelement(item, "author", "msmetko@msmetko.xyz")
             for tag in post.tags:
                 CDATA(item, "category", tag)
-            pub_date = subelement(
+            _pub_date = subelement(
                 item,
                 "pubDate",
                 formatdate(time.mktime(post.date.timetuple())).replace("-", "+"),
             )
-            dc_creator = subelement(item, "dc:creator", "Marijan Smetko")
+            _dc_creator = subelement(item, "dc:creator", "Marijan Smetko")
         return
 
 
@@ -173,8 +174,8 @@ class Database:
     def insert_post(self, post: Post):
         tag_id_list = self.update_tags(post.tags)
         post.id = self.db_con.execute(
-            "INSERT INTO posts (content, title, subtitle, date, show) VALUES (?, ?, ?, ?, ?)",
-            (post.html, post.title, post.subtitle, post.date, post.show),
+            "INSERT INTO posts (content, title, subtitle, date, show, slug) VALUES (?, ?, ?, ?, ?, ?)",
+            (post.html, post.title, post.subtitle, post.date, post.show, post.slug),
         ).lastrowid
         self.db_con.executemany(
             "INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)",
@@ -198,8 +199,11 @@ def ensure_database():
     return Database(db_con)
 
 
-def process_markdown(file: Path):
-    content = file.read_text()
+def process_blog_entry_dir(blog_dir: Path) -> Post:
+    assert blog_dir.is_dir()
+
+    # all blog entries are in index.md
+    content = (blog_dir / "index.md").read_text()
     md = markdown.Markdown(
         extensions=[
             "pymdownx.extra",
@@ -227,15 +231,14 @@ def process_markdown(file: Path):
     # TODO
     # html = htmlmin.minify(html)
     metadata = md.Meta
-    post = Post(html, metadata)
-    # assert post.id is not None
+    post = Post(html, blog_dir.name, metadata)
     return post
 
 
 def main(file_list):
     db_con = ensure_database()
     post_list = sorted(
-        (process_markdown(file) for file in file_list), key=lambda post: post.date
+        (process_blog_entry_dir(file) for file in file_list), key=lambda post: post.date
     )
     with db_con:
         for post in post_list:
