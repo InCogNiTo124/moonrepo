@@ -76,8 +76,8 @@
         },
         {
             "customType": "regex",
-            "fileMatch": [
-                "^\\.moon/toolchain\\.yml$"
+            "managerFilePatterns": [
+                "/^\\.moon/toolchain\\.yml$/"
             ],
             "matchStrings": [
                 "node:\\n\\s+version: \"(?<currentValue>[^\"]+)\""
@@ -87,8 +87,8 @@
         },
         {
             "customType": "regex",
-            "fileMatch": [
-                "^\\.moon/toolchain\\.yml$"
+            "managerFilePatterns": [
+                "/^\\.moon/toolchain\\.yml$/"
             ],
             "matchStrings": [
                 "yarn:\\n\\s+version: \"(?<currentValue>[^\"]+)\""
@@ -98,8 +98,8 @@
         },
         {
             "customType": "regex",
-            "fileMatch": [
-                "^\\.moon/toolchain\\.yml$"
+            "managerFilePatterns": [
+                "/^\\.moon/toolchain\\.yml$/"
             ],
             "matchStrings": [
                 "rust:\\n\\s+version: \"(?<currentValue>[^\"]+)\""
@@ -109,8 +109,8 @@
         },
         {
             "customType": "regex",
-            "fileMatch": [
-                "^\\.moon/toolchain\\.yml$"
+            "managerFilePatterns": [
+                "/^\\.moon/toolchain\\.yml$/"
             ],
             "matchStrings": [
                 "uv:\\n\\s+version: \"(?<currentValue>[^\"]+)\""
@@ -120,8 +120,8 @@
         },
         {
             "customType": "regex",
-            "fileMatch": [
-                "^\\.github/workflows/ci-main\\.yml$"
+            "managerFilePatterns": [
+                "/^\\.github/workflows/ci-main\\.yml$/"
             ],
             "matchStrings": [
                 "WASM_PACK_VERSION: \"(?<currentValue>[^\"]+)\""
