@@ -1854,10 +1854,8 @@ pbkdf2@^3.1.2, pbkdf2@^3.1.5:
     to-buffer "^1.2.1"
 
 "personal-reusables@link:../personal-reusables":
-  version "0.0.1"
-  dependencies:
-    "@types/js-cookie" "^3.0.6"
-    js-cookie "^3.0.5"
+  version "0.0.0"
+  uid ""
 
 picocolors@^1.0.0, picocolors@^1.1.1:
   version "1.1.1"

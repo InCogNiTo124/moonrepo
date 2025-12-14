@@ -281,9 +281,9 @@
   integrity sha512-h8fgEd/DpoS9CBrjEQXR+dIDraopAEfu4wYVNY2tEPwk60stPWhvZMf4Foo5FakuQ7HFZoa8WceaWFervK2Ovg==
 
 "@webgpu/types@*":
-  version "0.1.67"
-  resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.67.tgz#235916a49d8e5b87c6a20896fbce689a0f42245e"
-  integrity sha512-uk53+2ECGUkWoDFez/hymwpRfdgdIn6y1ref70fEecGMe5607f4sozNFgBk0oxlr7j2CRGWBEc3IBYMmFdGGTQ==
+  version "0.1.68"
+  resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.68.tgz#7c1017f42595fbd596f0804c2aec139449a379f3"
+  integrity sha512-3ab1B59Ojb6RwjOspYLsTpCzbNB3ZaamIAxBMmvnNkiDoLTZUOBXZ9p5nAYVEkQlDdf6qAZWi1pqj9+ypiqznA==
 
 "@zeit/schemas@2.36.0":
   version "2.36.0"
