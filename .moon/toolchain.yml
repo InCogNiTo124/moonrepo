@@ -10,7 +10,7 @@ rust:
   version: "1.92.0"
   bins:
     - "cargo-nextest"
-    - "wasm-pack"
+    # - "wasm-pack"  # takes too long, switching to manual install in ci-main.yml
   targets:
     - "x86_64-unknown-linux-musl"
     - "wasm32-unknown-unknown"

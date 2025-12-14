@@ -117,6 +117,17 @@
             ],
             "depNameTemplate": "astral-sh/uv",
             "datasourceTemplate": "github-releases"
+        },
+        {
+            "customType": "regex",
+            "fileMatch": [
+                "^\\.github/workflows/ci-main\\.yml$"
+            ],
+            "matchStrings": [
+                "WASM_PACK_VERSION: \"(?<currentValue>[^\"]+)\""
+            ],
+            "depNameTemplate": "drager/wasm-pack",
+            "datasourceTemplate": "github-releases"
         }
     ],
     "customDatasources": {
