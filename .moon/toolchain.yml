@@ -1,14 +1,21 @@
+$schema: "https://moonrepo.dev/schemas/toolchain.json"
+
 node:
-  packageManager: 'yarn'
-  yarn: {}
+  version: "24.12.0"
+  packageManager: "yarn"
+  yarn:
+    version: "1.22.22"
 
 rust:
+  version: "1.92.0"
   bins:
-    - 'cargo-nextest'
-    - 'wasm-pack'
+    - "cargo-nextest"
+    - "wasm-pack"
   targets:
-    - 'x86_64-unknown-linux-musl'
-    - 'wasm32-unknown-unknown'
+    - "x86_64-unknown-linux-musl"
+    - "wasm32-unknown-unknown"
 
 python:
-  packageManager: 'uv'
+  packageManager: "uv"
+  uv:
+    version: "0.9.17"

@@ -54,7 +54,9 @@
         }
     ],
     "flux": {
-        "managerFilePatterns": ["/^cosmos/clusters/prod/.+\\.ya?ml$/"]
+        "managerFilePatterns": [
+            "/^cosmos/clusters/prod/.+\\.ya?ml$/"
+        ]
     },
     "pyenv": {
         "enabled": false
@@ -71,6 +73,50 @@
             "depNameTemplate": "k3s",
             "versioningTemplate": "regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?<compatibility>\\+k3s)(?<build>\\d+)$",
             "datasourceTemplate": "custom.k3s"
+        },
+        {
+            "customType": "regex",
+            "fileMatch": [
+                "^\\.moon/toolchain\\.yml$"
+            ],
+            "matchStrings": [
+                "node:\\n\\s+version: \"(?<currentValue>[^\"]+)\""
+            ],
+            "depNameTemplate": "node",
+            "datasourceTemplate": "node-version"
+        },
+        {
+            "customType": "regex",
+            "fileMatch": [
+                "^\\.moon/toolchain\\.yml$"
+            ],
+            "matchStrings": [
+                "yarn:\\n\\s+version: \"(?<currentValue>[^\"]+)\""
+            ],
+            "depNameTemplate": "yarn",
+            "datasourceTemplate": "npm"
+        },
+        {
+            "customType": "regex",
+            "fileMatch": [
+                "^\\.moon/toolchain\\.yml$"
+            ],
+            "matchStrings": [
+                "rust:\\n\\s+version: \"(?<currentValue>[^\"]+)\""
+            ],
+            "depNameTemplate": "rust-lang/rust",
+            "datasourceTemplate": "github-releases"
+        },
+        {
+            "customType": "regex",
+            "fileMatch": [
+                "^\\.moon/toolchain\\.yml$"
+            ],
+            "matchStrings": [
+                "uv:\\n\\s+version: \"(?<currentValue>[^\"]+)\""
+            ],
+            "depNameTemplate": "astral-sh/uv",
+            "datasourceTemplate": "github-releases"
         }
     ],
     "customDatasources": {

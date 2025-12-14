@@ -8,12 +8,6 @@ project:
   description: "Solver for the Brachistochrone problem"
 
 tasks:
-  # this is a hack until I can figure out how to make moon install wasm prerequisites
-  ensure-wasm-pack:
-    script: |
-      if ! command -v wasm-pack &> /dev/null; then
-        cargo install wasm-pack
-      fi
   build:
     command: wasm-pack build
     outputs:
