@@ -36,7 +36,6 @@ jobs:
 
       - uses: "moonrepo/setup-toolchain@v0"
         with:
-          auto-install: true
           auto-setup: true
           cache: false  # i don't care, install all tools fresh
 
