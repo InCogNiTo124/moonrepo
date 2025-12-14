@@ -12,5 +12,3 @@ tasks:
     command: wasm-pack build
     outputs:
       - 'pkg/'
-    deps:
-      - ensure-wasm-pack
