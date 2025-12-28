@@ -151,18 +151,22 @@ fn get_post_list(page: u32, db_path: &State<String>) -> Json<Vec<Post>> {
     Json(posts)
 }
 
-#[get("/filter/tags/<tag_id>?<page>")]
-fn filter_posts_by_tag(tag_id: u32, page: Option<u32>, db_path: &State<String>) -> Json<Vec<Post>> {
-    println!("tag_id: {}, page: {:?}", tag_id, page);
+#[get("/filter/tags/<tag_name>?<page>")]
+fn filter_posts_by_tag(
+    tag_name: &str,
+    page: Option<u32>,
+    db_path: &State<String>,
+) -> Json<Vec<Post>> {
+    println!("tag_name: {}, page: {:?}", tag_name, page);
     let connection = get_connection(db_path);
-    let query = "select posts.id as id, posts.title as title, posts.date as date, posts.subtitle as subtitle from post_tags join posts on posts.id = post_tags.post_id join tags on post_tags.tag_id = tags.id where post_tags.tag_id = ? and posts.show = 1 order by date desc limit 11 offset ?";
+    let query = "select posts.id as id, posts.title as title, posts.date as date, posts.subtitle as subtitle, posts.slug as slug from post_tags join posts on posts.id = post_tags.post_id join tags on post_tags.tag_id = tags.id where tags.tag_name = ? and posts.show = 1 order by date desc limit 11 offset ?";
     let mut posts: Vec<Post> = vec![];
     for row in connection
         .prepare(query)
         .unwrap()
         .into_iter()
         .bind_iter::<_, (_, sqlite::Value)>([
-            (1, (tag_id as i64).into()),
+            (1, tag_name.into()),
             (
                 2,
                 (match page {

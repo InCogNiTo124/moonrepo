@@ -13,7 +13,7 @@
 
 <div class="tag-group">
   {#each tags as tag (tag.id)}
-    <a class="post-tag" href="/filter/tags/{tag.id}">
+    <a class="post-tag" href="/filter/tags/{tag.tag_name}">
       <div class="tag-wrapper">
         {tag.tag_name}
       </div>
