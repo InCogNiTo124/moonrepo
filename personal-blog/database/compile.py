@@ -10,6 +10,29 @@ from pathlib import Path
 import htmlmin  # noqa: F401
 import markdown
 import markdown_katex  # noqa: F401 - used implicitly in L207
+from markdown.treeprocessors import Treeprocessor
+from markdown.extensions import Extension
+
+
+class ImgUrlRewriter(Treeprocessor):
+    def __init__(self, slug, md=None):
+        super().__init__(md)
+        self.slug = slug
+
+    def run(self, root):
+        for element in root.iter("img"):
+            src = element.get("src")
+            if src and not src.startswith(("/", "http://", "https://")):
+                element.set("src", f"{self.slug}/{src}")
+
+
+class ImgUrlExtension(Extension):
+    def __init__(self, slug, **kwargs):
+        self.slug = slug
+        super().__init__(**kwargs)
+
+    def extendMarkdown(self, md):
+        md.treeprocessors.register(ImgUrlRewriter(self.slug, md), "img_rewriter", 15)
 
 
 # monkey patching xml.etree.ElementTree
@@ -201,11 +224,13 @@ def ensure_database():
 
 def process_blog_entry_dir(blog_dir: Path) -> Post:
     assert blog_dir.is_dir()
+    slug = blog_dir.name
 
     # all blog entries are in index.md
     content = (blog_dir / "index.md").read_text()
     md = markdown.Markdown(
         extensions=[
+            ImgUrlExtension(slug=slug),
             "pymdownx.extra",
             "pymdownx.tilde",
             "markdown_katex",
