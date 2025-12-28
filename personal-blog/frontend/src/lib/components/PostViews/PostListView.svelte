@@ -8,7 +8,7 @@
   let { post }: Props = $props();
 </script>
 
-<Section url={`/posts/${post.id}`} urlTarget={SELF} title={post.title}>
+<Section url={`/posts/${post.slug}`} urlTarget={SELF} title={post.title}>
   {#snippet body()}
     <div>
       <p class="subtitle">

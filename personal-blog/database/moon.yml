@@ -42,5 +42,8 @@ tasks:
       FRONTEND_LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/personal-blog-frontend' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
       DB_LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/personal-blog-database' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
       moon generate --force docker-compose-blog $projectSource -- --frontendDockerImage "$FRONTEND_LATEST_IMAGE" --dbDockerImage "$DB_LATEST_IMAGE"
-      docker compose -f $projectSource/docker-compose.yaml up && docker compose -f $projectSource/docker-compose.yaml rm -fs
+      docker compose -f $projectSource/docker-compose.yaml up && docker compose -f $projectSource/docker-compose.yaml rm -fs && rm $projectSource/docker-compose.yaml
+    deps:
+      - docker
+      - personal-blog-frontend:docker
  
