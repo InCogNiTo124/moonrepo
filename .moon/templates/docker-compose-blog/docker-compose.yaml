@@ -11,3 +11,5 @@ services:
     container_name: blog-db
     image: "{{ dbDockerImage }}"
     restart: always
+    environment:
+      ROCKET_LOG_LEVEL: "debug"

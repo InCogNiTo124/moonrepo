@@ -2,7 +2,7 @@
 extern crate rocket;
 use rocket::serde::json::Json;
 use rocket::serde::Serialize;
-use sqlite;
+use rocket::State;
 
 #[derive(Serialize, Clone)]
 #[serde(crate = "rocket::serde")]
@@ -25,6 +25,7 @@ struct Post {
     subtitle: String,
     content: String,
     tags: Vec<Tag>,
+    slug: String,
 }
 
 #[derive(Serialize, Clone)]
@@ -39,9 +40,13 @@ struct TagResponse {
     tagName: String,
 }
 
+fn get_connection(path: &str) -> sqlite::Connection {
+    sqlite::open(path).unwrap()
+}
+
 #[get("/posts/<post_id>/tags")]
-fn post_tags(post_id: u32) -> Json<TagList> {
-    let connection = sqlite::open("/db.sqlite3").unwrap();
+fn post_tags(post_id: u32, db_path: &State<String>) -> Json<TagList> {
+    let connection = get_connection(db_path);
     let query = "select tags.tag_name as tag_name, tags.id as id from post_tags join tags on post_tags.tag_id = tags.id where post_tags.post_id = ?;";
     let mut tags: Vec<Tag> = vec![];
     // TODO optimize
@@ -58,19 +63,19 @@ fn post_tags(post_id: u32) -> Json<TagList> {
             tag_name: row.read::<&str, _>("tag_name").to_string(),
         });
     }
-    Json(TagList { tags: tags })
+    Json(TagList { tags })
 }
 
-#[get("/post/<post_id>")]
-fn get_post(post_id: u32) -> Json<PostResponse> {
-    let connection = sqlite::open("/db.sqlite3").unwrap();
-    let query = "SELECT * FROM posts where id = ?";
+#[get("/post/<slug>")]
+fn get_post_by_slug(slug: &str, db_path: &State<String>) -> Json<PostResponse> {
+    let connection = get_connection(db_path);
+    let query = "SELECT * FROM posts where slug = ?";
     let mut posts: Vec<Post> = vec![];
     for row in connection
         .prepare(query)
         .unwrap()
         .into_iter()
-        .bind((1, post_id as i64))
+        .bind((1, slug))
         .unwrap()
         .map(|row| row.unwrap())
     {
@@ -81,6 +86,7 @@ fn get_post(post_id: u32) -> Json<PostResponse> {
             subtitle: row.read::<&str, _>("subtitle").to_string(),
             content: row.read::<&str, _>("content").to_string(),
             tags: vec![],
+            slug: row.read::<&str, _>("slug").into(),
         });
     }
     Json(PostResponse {
@@ -89,30 +95,31 @@ fn get_post(post_id: u32) -> Json<PostResponse> {
 }
 
 #[get("/tags/<tag_id>")]
-fn get_tag(tag_id: u32) -> Json<TagResponse> {
-    let connection = sqlite::open("/db.sqlite3").unwrap();
+fn get_tag(tag_id: u32, db_path: &State<String>) -> Json<TagResponse> {
+    let connection = get_connection(db_path);
     let query = "SELECT tag_name FROM tags where id = ?";
-    for row in connection
+    if let Some(row) = connection
         .prepare(query)
         .unwrap()
         .into_iter()
         .bind((1, tag_id as i64))
         .unwrap()
         .map(|row| row.unwrap())
+        .next()
     {
         return Json(TagResponse {
             tagName: row.read::<&str, _>("tag_name").to_string(),
         });
     }
-    return Json(TagResponse {
+    Json(TagResponse {
         tagName: "".to_string(),
-    });
+    })
 }
 
 #[get("/posts/<page>")]
-fn get_post_list(page: u32) -> Json<Vec<Post>> {
+fn get_post_list(page: u32, db_path: &State<String>) -> Json<Vec<Post>> {
     let offset = 10 * (page - 1);
-    let connection = sqlite::open("/db.sqlite3").unwrap();
+    let connection = get_connection(db_path);
     let query = "SELECT * FROM posts WHERE show = 1 ORDER BY date DESC LIMIT 11 OFFSET ?";
     let mut posts: Vec<Post> = vec![];
     for row in connection
@@ -130,15 +137,16 @@ fn get_post_list(page: u32) -> Json<Vec<Post>> {
             subtitle: row.read::<&str, _>("subtitle").to_string(),
             content: row.read::<&str, _>("content").to_string(),
             tags: vec![],
+            slug: row.read::<&str, _>("slug").into(),
         });
     }
     Json(posts)
 }
 
 #[get("/filter/tags/<tag_id>?<page>")]
-fn filter_posts_by_tag(tag_id: u32, page: Option<u32>) -> Json<Vec<Post>> {
+fn filter_posts_by_tag(tag_id: u32, page: Option<u32>, db_path: &State<String>) -> Json<Vec<Post>> {
     println!("tag_id: {}, page: {:?}", tag_id, page);
-    let connection = sqlite::open("/db.sqlite3").unwrap();
+    let connection = get_connection(db_path);
     let query = "select posts.id as id, posts.title as title, posts.date as date, posts.subtitle as subtitle from post_tags join posts on posts.id = post_tags.post_id join tags on post_tags.tag_id = tags.id where post_tags.tag_id = ? and posts.show = 1 order by date desc limit 11 offset ?";
     let mut posts: Vec<Post> = vec![];
     for row in connection
@@ -167,6 +175,7 @@ fn filter_posts_by_tag(tag_id: u32, page: Option<u32>) -> Json<Vec<Post>> {
             subtitle: row.read::<&str, _>("subtitle").to_string(),
             content: "".to_string(),
             tags: vec![],
+            slug: row.read::<&str, _>("slug").into(),
         });
     }
     Json(posts)
@@ -174,14 +183,15 @@ fn filter_posts_by_tag(tag_id: u32, page: Option<u32>) -> Json<Vec<Post>> {
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount(
+    let db_path = std::env::var("DB_PATH").unwrap_or_else(|_| "db.sqlite3".to_string());
+    rocket::build().manage(db_path).mount(
         "/",
         routes![
-            post_tags,
-            get_post,
-            get_tag,
+            filter_posts_by_tag,
+            get_post_by_slug,
             get_post_list,
-            filter_posts_by_tag
+            get_tag,
+            post_tags,
         ],
     )
 }

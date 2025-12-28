@@ -16,6 +16,7 @@ interface Post {
   subtitle: string;
   content: string;
   tags: Tag[];
+  slug: string;
 }
 
 interface Tag {

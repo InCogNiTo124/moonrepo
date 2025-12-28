@@ -1,6 +1,6 @@
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch }) {
-  let res = await fetch(`/api/getters/post/${params.postid}`);
+  let res = await fetch(`/api/getters/post/${params.slug}`);
   const { post } = await res.json();
 
   res = await fetch(`/api/getters/tags/${post.id}`);

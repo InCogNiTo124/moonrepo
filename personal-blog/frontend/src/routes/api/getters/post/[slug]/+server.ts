@@ -3,7 +3,7 @@ import { env } from '$env/dynamic/private';
 
 interface Arguments {
   params: {
-    postid: string;
+    slug: string;
   };
 }
 
@@ -13,8 +13,8 @@ interface Body {
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ params }: Arguments): Promise<Response> {
-  const { postid } = params;
+  const { slug } = params;
   const blog_db = env.BLOG_DB;
-  const responseData: Body = await fetch(`http://${blog_db}/post/${postid}`).then(res => res.json());
+  const responseData: Body = await fetch(`http://${blog_db}/post/${slug}`).then(res => res.json());
   return json(responseData);
 }
