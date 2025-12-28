@@ -1,8 +1,10 @@
 #[macro_use]
 extern crate rocket;
+use rocket::fs::NamedFile;
 use rocket::serde::json::Json;
 use rocket::serde::Serialize;
 use rocket::State;
+use std::path::Path;
 
 #[derive(Serialize, Clone)]
 #[serde(crate = "rocket::serde")]
@@ -92,6 +94,12 @@ fn get_post_by_slug(slug: &str, db_path: &State<String>) -> Json<PostResponse> {
     Json(PostResponse {
         post: posts[0].clone(),
     })
+}
+
+#[get("/post/<slug>/<image>")]
+async fn get_post_image(slug: &str, image: &str) -> Option<NamedFile> {
+    let path = Path::new(slug).join(image);
+    NamedFile::open(path).await.ok()
 }
 
 #[get("/tags/<tag_id>")]
@@ -189,6 +197,7 @@ fn rocket() -> _ {
         routes![
             filter_posts_by_tag,
             get_post_by_slug,
+            get_post_image,
             get_post_list,
             get_tag,
             post_tags,
