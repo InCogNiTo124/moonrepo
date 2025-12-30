@@ -99,6 +99,11 @@ fn get_tag(tag_id: i32, pool: &State<DbPool>) -> Json<ApiTagResponse> {
     Json(ApiTagResponse { tagName: tag_name })
 }
 
+#[get("/feed.rss")]
+async fn get_rss_feed() -> Option<NamedFile> {
+    NamedFile::open("feed.rss").await.ok()
+}
+
 fn attach_tags(conn: &mut SqliteConnection, posts: Vec<Post>) -> Vec<ApiPost> {
     let post_ids: Vec<i32> = posts.iter().map(|p| p.id).collect();
 
@@ -191,6 +196,7 @@ fn rocket() -> _ {
             get_post_list,
             get_post_tags,
             get_tag,
+            get_rss_feed,
         ],
     )
 }
