@@ -37,6 +37,7 @@ pub struct PostTag {
 #[derive(Serialize, Clone)]
 #[serde(crate = "rocket::serde")]
 pub struct ApiTag {
+    pub id: i32,
     pub tag_name: String,
 }
 
@@ -75,6 +76,7 @@ pub struct ApiTagResponse {
 impl From<Tag> for ApiTag {
     fn from(tag: Tag) -> Self {
         Self {
+            id: tag.id,
             tag_name: tag.tag_name,
         }
     }
