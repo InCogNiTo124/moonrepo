@@ -9,7 +9,7 @@ RUN find . -type f ! -name '*.jpg' ! -name '*.png' -delete && \
 FROM scratch
 LABEL org.opencontainers.image.source=https://github.com/incognito124/moonrepo
 COPY --from=image-preparer /out ./
-COPY ./target/x86_64-unknown-linux-musl/release/database ./db.sqlite3 ./
+COPY ./target/x86_64-unknown-linux-musl/release/database ./db.sqlite3 ./feed.rss ./
 ENV ROCKET_PORT=80
 ENV ROCKET_ADDRESS=0.0.0.0
 ENV ROCKET_LOG_LEVEL=normal
