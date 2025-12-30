@@ -131,7 +131,7 @@ fn get_post_list(page: u32, pool: &State<DbPool>) -> Json<Vec<ApiPost>> {
     // 1. Fetch page of posts
     let db_posts = posts::table
         .filter(posts::show.eq(true))
-        .order(posts::date.desc())
+        .order((posts::date.desc(), posts::id.desc()))
         .limit(11)
         .offset(offset as i64)
         .load::<Post>(&mut conn)
@@ -154,7 +154,7 @@ fn filter_posts_by_tag(
         .inner_join(crate::schema::post_tags::table.inner_join(tags::table))
         .filter(tags::tag_name.eq(tag_name))
         .filter(posts::show.eq(true))
-        .order(posts::date.desc())
+        .order((posts::date.desc(), posts::id.desc()))
         .limit(11)
         .offset(offset as i64)
         .select(posts::all_columns)

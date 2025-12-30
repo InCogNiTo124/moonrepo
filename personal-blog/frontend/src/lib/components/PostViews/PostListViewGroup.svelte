@@ -13,12 +13,13 @@
 </script>
 
 <SectionGroup
-  sections={posts.map((post) => ({ post, id: post.id }))}
+  sections={posts.map((post) => ({ post, id: post.slug }))}
   noSections={noPosts}
   {lastPage}
   {page}
   Section={PostListView}
 >
-  <!-- @migration-task: migrate this slot by hand, `empty-list` is an invalid identifier -->
-  <p slot="empty-list">No posts found!</p>
+  {#snippet emptyList()}
+    <p>No posts found!</p>
+  {/snippet}
 </SectionGroup>
