@@ -34,17 +34,10 @@ pub struct PostTag {
 
 // --- API Response Models (JSON) ---
 
-#[derive(Serialize, Clone)]
-#[serde(crate = "rocket::serde")]
-pub struct ApiTag {
-    pub id: i32,
-    pub tag_name: String,
-}
-
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct ApiTagList {
-    pub tags: Vec<ApiTag>,
+    pub tags: Vec<String>,
 }
 
 #[derive(Serialize, Clone)]
@@ -54,7 +47,7 @@ pub struct ApiPost {
     pub title: String,
     pub subtitle: String,
     pub content: String,
-    pub tags: Vec<ApiTag>,
+    pub tags: Vec<String>,
     pub slug: String,
 }
 
@@ -73,15 +66,6 @@ pub struct ApiTagResponse {
 
 // --- Conversion Helpers ---
 
-impl From<Tag> for ApiTag {
-    fn from(tag: Tag) -> Self {
-        Self {
-            id: tag.id,
-            tag_name: tag.tag_name,
-        }
-    }
-}
-
 impl ApiPost {
     pub fn from_db(post: Post, tags: Vec<Tag>) -> Self {
         Self {
@@ -89,7 +73,7 @@ impl ApiPost {
             title: post.title,
             subtitle: post.subtitle,
             content: post.content,
-            tags: tags.into_iter().map(ApiTag::from).collect(),
+            tags: tags.into_iter().map(|t| t.tag_name).collect(),
             slug: post.slug,
         }
     }

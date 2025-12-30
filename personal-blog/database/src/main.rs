@@ -29,7 +29,7 @@ fn get_post_tags(post_id: i32, pool: &State<DbPool>) -> Json<ApiTagList> {
         .load::<Tag>(&mut conn)
         .expect("Error loading tags");
 
-    let api_tags: Vec<ApiTag> = db_tags.into_iter().map(ApiTag::from).collect();
+    let api_tags: Vec<String> = db_tags.into_iter().map(|t| t.tag_name).collect();
     Json(ApiTagList { tags: api_tags })
 }
 

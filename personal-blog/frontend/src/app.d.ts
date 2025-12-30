@@ -9,17 +9,13 @@ declare namespace App {
 	// interface Stuff {}
 }
 
+type Tag = string;
+
 interface Post {
-  id: number;
   date: string;
   title: string;
   subtitle: string;
   content: string;
   tags: Tag[];
   slug: string;
-}
-
-interface Tag {
-  id: number;
-  tag_name: string;
 }

@@ -1,9 +1,6 @@
 <script lang="ts">
-  interface Tag {
-    id: number;
-    tag_name: string;
-  }
-  
+  type Tag = string;
+
   interface Props {
     tags?: Tag[];
   }
@@ -12,10 +9,10 @@
 </script>
 
 <div class="tag-group">
-  {#each tags as tag (tag.id)}
-    <a class="post-tag" href="/filter/tags/{tag.tag_name}">
+  {#each tags as tag (tag)}
+    <a class="post-tag" href="/filter/tags/{tag}">
       <div class="tag-wrapper">
-        {tag.tag_name}
+        {tag}
       </div>
     </a>
   {/each}
