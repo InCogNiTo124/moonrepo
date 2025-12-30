@@ -1,17 +1,57 @@
-#!/usr/bin/env python3
-
-import argparse
-import sqlite3
 import time
 import xml.etree.ElementTree as ET
+from datetime import date as date_type
+from datetime import datetime
 from email.utils import formatdate
 from pathlib import Path
+from typing import Dict, List, Optional
 
-import htmlmin  # noqa: F401
+import htmlmin
 import markdown
-import markdown_katex  # noqa: F401 - used implicitly in L207
-from markdown.treeprocessors import Treeprocessor
+import markdown_katex  # noqa: F401
+import typer
 from markdown.extensions import Extension
+from markdown.treeprocessors import Treeprocessor
+from sqlalchemy import UniqueConstraint
+from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select
+
+app = typer.Typer()
+
+
+# --- Database Models ---
+
+
+class PostTagLink(SQLModel, table=True):
+    __tablename__ = "post_tags"
+    __table_args__ = (UniqueConstraint("post_id", "tag_id"),)
+    post_id: Optional[int] = Field(
+        default=None, foreign_key="posts.id", primary_key=True
+    )
+    tag_id: Optional[int] = Field(default=None, foreign_key="tags.id", primary_key=True)
+
+
+class Tag(SQLModel, table=True):
+    __tablename__ = "tags"
+    id: Optional[int] = Field(default=None, primary_key=True)
+    tag_name: str = Field(unique=True, index=True)
+
+    posts: List["Post"] = Relationship(back_populates="tags", link_model=PostTagLink)
+
+
+class Post(SQLModel, table=True):
+    __tablename__ = "posts"
+    id: Optional[int] = Field(default=None, primary_key=True)
+    date: date_type
+    title: str
+    subtitle: str
+    content: str
+    show: bool = Field(default=True)
+    slug: str = Field(unique=True, index=True)
+
+    tags: List[Tag] = Relationship(back_populates="posts", link_model=PostTagLink)
+
+
+# --- Markdown Extensions ---
 
 
 class ImgUrlRewriter(Treeprocessor):
@@ -35,6 +75,9 @@ class ImgUrlExtension(Extension):
         md.treeprocessors.register(ImgUrlRewriter(self.slug, md), "img_rewriter", 15)
 
 
+# --- RSS Builder ---
+
+
 # monkey patching xml.etree.ElementTree
 # https://stackoverflow.com/a/8915039
 ET._original_serialize_xml = ET._serialize_xml
@@ -51,45 +94,7 @@ def _serialize_xml(write, elem, qnames, namespaces, short_empty_elements, **kwar
 
 ET._serialize_xml = ET._serialize["xml"] = _serialize_xml
 
-
 LINK = "https://blog.msmetko.xyz/posts/{}"
-
-
-class Post:
-    def __init__(self, html, slug, metadata):
-        self._id = None
-        self.html = html
-        self.slug = slug
-        self.metadata = metadata
-        return
-
-    @property
-    def date(self):
-        return self.metadata.get("date")
-
-    @property
-    def tags(self):
-        return self.metadata.get("tags")
-
-    @property
-    def title(self):
-        return self.metadata.get("title")
-
-    @property
-    def subtitle(self):
-        return self.metadata.get("subtitle")
-
-    @property
-    def show(self):
-        return self.metadata.get("show", True)
-
-    @property
-    def id(self):
-        return self._id
-
-    @id.setter
-    def id(self, value):
-        self._id = value
 
 
 def subelement(parent, tag, text):
@@ -104,7 +109,7 @@ def CDATA(parent, tag, text):
 
 
 class RssBuilder:
-    def __init__(self, post_list):
+    def __init__(self, post_list: List[Post]):
         self.build_date = formatdate().replace("-", "+")
         self.root = ET.Element(
             "rss",
@@ -116,20 +121,18 @@ class RssBuilder:
             },
         )
         self.channel = ET.SubElement(self.root, "channel")
-        _title = subelement(self.channel, "title", "blog.msmetko.xyz")
-        _link = subelement(self.channel, "link", "https://blog.msmetko.xyz")
-        _description = subelement(
+        subelement(self.channel, "title", "blog.msmetko.xyz")
+        subelement(self.channel, "link", "https://blog.msmetko.xyz")
+        subelement(
             self.channel,
             "description",
             "Marijan Smetko writes about programming, Python, math, physics, machine and deep learning, statistics, Linux, music...",
         )
-        _language = subelement(self.channel, "language", "en-us")
-        _generator = subelement(self.channel, "generator", "msmetko")
-        _docs = subelement(self.channel, "docs", "https://www.rssboard.org/rss-2-0-11")
-        _managing_editor = subelement(
-            self.channel, "managingEditor", "msmetko@msmetko.xyz"
-        )
-        _atom_link = ET.SubElement(
+        subelement(self.channel, "language", "en-us")
+        subelement(self.channel, "generator", "msmetko")
+        subelement(self.channel, "docs", "https://www.rssboard.org/rss-2-0-11")
+        subelement(self.channel, "managingEditor", "msmetko@msmetko.xyz")
+        ET.SubElement(
             self.channel,
             "atom:link",
             {
@@ -138,96 +141,53 @@ class RssBuilder:
                 "type": "application/rss+xml",
             },
         )
-        _webmaster = subelement(self.channel, "webmaster", "msmetko@msmetko.xyz")
-        _copyright = subelement(self.channel, "copyright", "CC BY 4.0")
+        subelement(self.channel, "webmaster", "msmetko@msmetko.xyz")
+        subelement(self.channel, "copyright", "CC BY 4.0")
+
         for post in post_list:
             self.add_post(post)
-        return
 
     def write(self, filename):
-        _pubDate = subelement(self.channel, "pubDate", self.build_date)
-        _lastBuildDate = subelement(self.channel, "lastBuildDate", self.build_date)
+        subelement(self.channel, "pubDate", self.build_date)
+        subelement(self.channel, "lastBuildDate", self.build_date)
         ET.ElementTree(self.root).write(
             filename, encoding="UTF-8", xml_declaration=True
         )
-        return
 
     def add_post(self, post: Post):
         if post.show:
             item = ET.SubElement(self.channel, "item")
-            _title = CDATA(item, "title", post.title)
-            _description = CDATA(item, "description", post.subtitle)
-            _link = subelement(item, "link", LINK.format(post.slug))
-            _author = subelement(item, "author", "msmetko@msmetko.xyz")
+            CDATA(item, "title", post.title)
+            CDATA(item, "description", post.subtitle)
+            subelement(item, "link", LINK.format(post.slug))
+            subelement(item, "author", "msmetko@msmetko.xyz")
             for tag in post.tags:
-                CDATA(item, "category", tag)
-            _pub_date = subelement(
+                CDATA(item, "category", tag.tag_name)
+
+            # Handle date conversion for RSS
+            # post.date is a date object (from SQLModel/Python)
+            dt = datetime(post.date.year, post.date.month, post.date.day)
+            subelement(
                 item,
                 "pubDate",
-                formatdate(time.mktime(post.date.timetuple())).replace("-", "+"),
+                formatdate(time.mktime(dt.timetuple())).replace("-", "+"),
             )
-            _dc_creator = subelement(item, "dc:creator", "Marijan Smetko")
-        return
+            subelement(item, "dc:creator", "Marijan Smetko")
 
 
-class Database:
-    def __init__(self, db_con):
-        self.db_con = db_con
-        return
-
-    def __enter__(self):
-        return self.db_con.__enter__()
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.db_con.__exit__(exc_type, exc_value, traceback)
-        self.db_con.close()
-        return
-
-    def update_tags(self, tag_list):
-        assert all(isinstance(t, str) for t in tag_list)
-        cursor = self.db_con.executemany(
-            "INSERT OR IGNORE INTO tags(tag_name) VALUES (?)", ((t,) for t in tag_list)
-        )
-        id_list = cursor.execute(
-            f"SELECT id FROM tags WHERE tag_name IN ({', '.join('?' for _ in tag_list)})",
-            tag_list,
-        )
-        return list(t[0] for t in id_list)
-
-    def insert_post(self, post: Post):
-        tag_id_list = self.update_tags(post.tags)
-        post.id = self.db_con.execute(
-            "INSERT INTO posts (content, title, subtitle, date, show, slug) VALUES (?, ?, ?, ?, ?, ?)",
-            (post.html, post.title, post.subtitle, post.date, post.show, post.slug),
-        ).lastrowid
-        self.db_con.executemany(
-            "INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)",
-            ((post.id, tag_id) for tag_id in tag_id_list),
-        )
-        return
+# --- Main Logic ---
 
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("files", type=Path, nargs="+")
-    return parser.parse_args()
+def process_blog_entry_dir(blog_dir: Path, tag_cache: Dict[str, Tag]) -> Post:
+    if not blog_dir.is_dir():
+        raise ValueError(f"{blog_dir} is not a directory")
 
-
-def ensure_database():
-    with sqlite3.connect("db.sqlite3") as db_con:
-        with open("schema.sql") as schema:
-            db_con.executescript(schema.read())
-            # TODO: migrations
-    # here the changes are commited
-    return Database(db_con)
-
-
-def process_blog_entry_dir(blog_dir: Path) -> Post:
-    assert blog_dir.is_dir()
     slug = blog_dir.name
+    index_file = blog_dir / "index.md"
+    if not index_file.exists():
+        raise ValueError(f"index.md not found in {blog_dir}")
 
-    # all blog entries are in index.md
-    content = (blog_dir / "index.md").read_text()
+    content = index_file.read_text()
     md = markdown.Markdown(
         extensions=[
             ImgUrlExtension(slug=slug),
@@ -235,7 +195,6 @@ def process_blog_entry_dir(blog_dir: Path) -> Post:
             "pymdownx.tilde",
             "markdown_katex",
             "full_yaml_metadata",
-            # "mdx_urlize",
             "smarty",
             "sane_lists",
             "footnotes",
@@ -252,28 +211,79 @@ def process_blog_entry_dir(blog_dir: Path) -> Post:
         ),
         output_format="html5",
     )
+    t0 = time.perf_counter()
     html = md.convert(content)
-    # TODO
-    # html = htmlmin.minify(html)
-    metadata = md.Meta
-    post = Post(html, blog_dir.name, metadata)
-    return post
+    t1 = time.perf_counter()
+    html = htmlmin.minify(html)
+    t2 = time.perf_counter()
 
-
-def main(file_list):
-    db_con = ensure_database()
-    post_list = sorted(
-        (process_blog_entry_dir(file) for file in file_list), key=lambda post: post.date
+    typer.secho(
+        f"[{slug}] Markdown: {t1 - t0:.4f}s, Minify: {t2 - t1:.4f}s",
+        fg=typer.colors.CYAN,
     )
-    with db_con:
-        for post in post_list:
-            db_con.insert_post(post)
-    assert all(getattr(post, "id", None) is not None for post in post_list)
-    rss_builder = RssBuilder(post_list)
-    rss_builder.write("feed.rss")
-    return
+
+    metadata = md.Meta
+
+    # Extract tags
+    tag_names = metadata.get("tags", [])
+    tag_objs = []
+    for tag_name in tag_names:
+        if tag_name not in tag_cache:
+            tag_cache[tag_name] = Tag(tag_name=tag_name)
+        tag_objs.append(tag_cache[tag_name])
+
+    return Post(
+        date=metadata.get("date"),
+        title=metadata.get("title"),
+        subtitle=metadata.get("subtitle"),
+        content=html,
+        show=metadata.get("show", True),
+        slug=slug,
+        tags=tag_objs,
+    )
+
+
+@app.command()
+def main(files: List[Path]):
+    db_path = Path("db.sqlite3")
+    if db_path.exists():
+        db_path.unlink()
+
+    sqlite_url = f"sqlite:///{db_path}"
+    engine = create_engine(sqlite_url)
+    SQLModel.metadata.create_all(engine)
+
+    tag_cache: Dict[str, Tag] = {}
+    posts: List[Post] = []
+
+    for blog_dir in files:
+        try:
+            post = process_blog_entry_dir(blog_dir, tag_cache)
+            posts.append(post)
+        except Exception as e:
+            typer.echo(f"Error processing {blog_dir}: {e}", err=True)
+
+    # Sort by date (oldest first)
+    posts.sort(key=lambda p: p.date)
+
+    t_db_start = time.perf_counter()
+    with Session(engine) as session:
+        for post in posts:
+            session.add(post)
+        session.commit()
+
+        # Re-fetch posts sorted by date for RSS
+        statement = select(Post).order_by(Post.date)
+        posts_for_rss = session.exec(statement).all()
+
+        # Generate RSS
+        rss_builder = RssBuilder(posts_for_rss)
+        rss_builder.write("feed.rss")
+    t_db_end = time.perf_counter()
+    typer.secho(
+        f"Database & RSS: {t_db_end - t_db_start:.4f}s", fg=typer.colors.MAGENTA
+    )
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args.files)
+    app()
