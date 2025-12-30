@@ -10,6 +10,7 @@ use diesel::r2d2::{self, ConnectionManager};
 use rocket::fs::NamedFile;
 use rocket::serde::json::Json;
 use rocket::State;
+use std::collections::HashMap;
 use std::path::Path;
 
 use crate::models::*;
@@ -36,22 +37,45 @@ fn get_post_tags(post_id: i32, pool: &State<DbPool>) -> Json<ApiTagList> {
 fn get_post_by_slug(slug: &str, pool: &State<DbPool>) -> Json<ApiPostResponse> {
     let mut conn = pool.get().expect("database connection failed");
 
-    let post = posts::table
+    // Single query: Join posts -> post_tags -> tags
+    let results = posts::table
+        .left_join(crate::schema::post_tags::table.inner_join(tags::table))
         .filter(posts::slug.eq(slug))
-        .first::<Post>(&mut conn)
+        .select((posts::all_columns, Option::<Tag>::as_select()))
+        .load::<(Post, Option<Tag>)>(&mut conn)
         .expect("Error loading post");
 
-    // Fetch tags for this post
-    // Note: In a real app, you might want to do this in a single query or batch it,
-    // but for a single post view, a second query is fine.
-    let db_tags = crate::schema::post_tags::table
-        .filter(crate::schema::post_tags::post_id.eq(post.id))
-        .inner_join(tags::table)
-        .select(tags::all_columns)
-        .load::<Tag>(&mut conn)
-        .unwrap_or_default();
+    if results.is_empty() {
+        // In a real app, return 404. Here we panic/error as per original behavior expectation
+        panic!("Post not found");
+    }
 
-    let api_post = ApiPost::from_db(post, db_tags);
+    // Grouping logic: The post is the same for all rows, tags vary
+    let (post, tags): (Post, Vec<Tag>) = results.into_iter().fold(
+        (
+            Post {
+                id: 0,
+                date: "".to_string(),
+                title: "".to_string(),
+                subtitle: "".to_string(),
+                content: "".to_string(),
+                show: false,
+                slug: "".to_string(),
+            },
+            vec![],
+        ),
+        |mut acc, (p, t)| {
+            if acc.0.id == 0 {
+                acc.0 = p;
+            }
+            if let Some(tag) = t {
+                acc.1.push(tag);
+            }
+            acc
+        },
+    );
+
+    let api_post = ApiPost::from_db(post, tags);
 
     Json(ApiPostResponse { post: api_post })
 }
@@ -75,11 +99,36 @@ fn get_tag(tag_id: i32, pool: &State<DbPool>) -> Json<ApiTagResponse> {
     Json(ApiTagResponse { tagName: tag_name })
 }
 
+fn attach_tags(conn: &mut SqliteConnection, posts: Vec<Post>) -> Vec<ApiPost> {
+    let post_ids: Vec<i32> = posts.iter().map(|p| p.id).collect();
+
+    let tags_data: Vec<(i32, Tag)> = crate::schema::post_tags::table
+        .inner_join(tags::table)
+        .filter(crate::schema::post_tags::post_id.eq_any(&post_ids))
+        .select((crate::schema::post_tags::post_id, tags::all_columns))
+        .load::<(i32, Tag)>(conn)
+        .unwrap_or_default();
+
+    let mut tags_map: HashMap<i32, Vec<Tag>> = HashMap::new();
+    for (pid, tag) in tags_data {
+        tags_map.entry(pid).or_default().push(tag);
+    }
+
+    posts
+        .into_iter()
+        .map(|p| {
+            let p_tags = tags_map.remove(&p.id).unwrap_or_default();
+            ApiPost::from_db(p, p_tags)
+        })
+        .collect()
+}
+
 #[get("/posts/<page>")]
 fn get_post_list(page: u32, pool: &State<DbPool>) -> Json<Vec<ApiPost>> {
     let offset = 10 * (page.saturating_sub(1));
     let mut conn = pool.get().expect("database connection failed");
 
+    // 1. Fetch page of posts
     let db_posts = posts::table
         .filter(posts::show.eq(true))
         .order(posts::date.desc())
@@ -88,14 +137,7 @@ fn get_post_list(page: u32, pool: &State<DbPool>) -> Json<Vec<ApiPost>> {
         .load::<Post>(&mut conn)
         .expect("Error loading posts");
 
-    // For the list view, we currently return empty tags as per original implementation
-    // "tags: vec![]" was in the original code.
-    let api_posts: Vec<ApiPost> = db_posts
-        .into_iter()
-        .map(|p| ApiPost::from_db(p, vec![]))
-        .collect();
-
-    Json(api_posts)
+    Json(attach_tags(&mut conn, db_posts))
 }
 
 #[get("/filter/tags/<tag_name>?<page>")]
@@ -107,7 +149,7 @@ fn filter_posts_by_tag(
     let offset = 10 * (page.unwrap_or(1).saturating_sub(1));
     let mut conn = pool.get().expect("database connection failed");
 
-    // Join posts -> post_tags -> tags
+    // 1. Fetch posts filtered by tag
     let db_posts = posts::table
         .inner_join(crate::schema::post_tags::table.inner_join(tags::table))
         .filter(tags::tag_name.eq(tag_name))
@@ -119,16 +161,12 @@ fn filter_posts_by_tag(
         .load::<Post>(&mut conn)
         .expect("Error loading posts by tag");
 
-    // Again, returning empty tags list for the summary view as per original
-    let api_posts: Vec<ApiPost> = db_posts
-        .into_iter()
-        .map(|p| {
-            // Original code set content to "" for this endpoint
-            let mut api_p = ApiPost::from_db(p, vec![]);
-            api_p.content = "".to_string();
-            api_p
-        })
-        .collect();
+    let mut api_posts = attach_tags(&mut conn, db_posts);
+
+    // Clear content for this view
+    for p in &mut api_posts {
+        p.content.clear();
+    }
 
     Json(api_posts)
 }
