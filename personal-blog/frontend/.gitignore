@@ -5,7 +5,6 @@ build
 /package
 .env
 *.xml
-*.rss
 db.sqlite3
 database/target
 
