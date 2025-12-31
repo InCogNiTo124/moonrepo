@@ -18,4 +18,4 @@ rust:
 python:
   packageManager: "uv"
   uv:
-    version: "0.9.17"
+    version: "0.9.21"
