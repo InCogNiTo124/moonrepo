@@ -17,7 +17,7 @@
       const d = document,
         s = d.createElement('script');
       s.src = 'https://blog-msmetko.disqus.com/embed.js';
-      s.setAttribute('data-timestamp', +new Date());
+      s.setAttribute('data-timestamp', (+new Date()).toString());
       (d.head || d.body).appendChild(s);
     })();
   }

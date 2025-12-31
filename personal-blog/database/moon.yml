@@ -26,6 +26,7 @@ tasks:
     outputs:
       - 'db.sqlite3'
       - 'feed.rss'
+    toolchain: python
 
   docker:
     deps:
