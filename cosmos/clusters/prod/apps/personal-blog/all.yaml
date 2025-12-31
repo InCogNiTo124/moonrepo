@@ -36,7 +36,7 @@ spec:
     spec:
       containers:
         - name: blog
-          image: ghcr.io/incognito124/personal-blog-frontend:1767201313 # {"$imagepolicy": "flux-system:incognito124-personal-blog-frontend-policy"}
+          image: ghcr.io/incognito124/personal-blog-frontend:1767204688 # {"$imagepolicy": "flux-system:incognito124-personal-blog-frontend-policy"}
           ports:
             - name: web
               containerPort: 3000
