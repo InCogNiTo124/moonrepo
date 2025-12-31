@@ -8,7 +8,7 @@ on:
       targets:
         description: "Targets to run"
         required: false
-        default: ":docker-push"
+        default: ""
         type: string
 
 jobs:

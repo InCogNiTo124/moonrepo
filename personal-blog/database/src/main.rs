@@ -5,6 +5,7 @@ extern crate diesel;
 mod models;
 mod schema;
 
+use chrono::NaiveDate;
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 use rocket::fs::NamedFile;
@@ -17,21 +18,6 @@ use crate::models::*;
 use crate::schema::{posts, tags};
 
 type DbPool = r2d2::Pool<ConnectionManager<SqliteConnection>>;
-
-#[get("/posts/<post_id>/tags")]
-fn get_post_tags(post_id: i32, pool: &State<DbPool>) -> Json<ApiTagList> {
-    let mut conn = pool.get().expect("database connection failed");
-
-    let db_tags = crate::schema::post_tags::table
-        .filter(crate::schema::post_tags::post_id.eq(post_id))
-        .inner_join(tags::table)
-        .select(tags::all_columns)
-        .load::<Tag>(&mut conn)
-        .expect("Error loading tags");
-
-    let api_tags: Vec<String> = db_tags.into_iter().map(|t| t.tag_name).collect();
-    Json(ApiTagList { tags: api_tags })
-}
 
 #[get("/post/<slug>")]
 fn get_post_by_slug(slug: &str, pool: &State<DbPool>) -> Json<ApiPostResponse> {
@@ -55,7 +41,7 @@ fn get_post_by_slug(slug: &str, pool: &State<DbPool>) -> Json<ApiPostResponse> {
         (
             Post {
                 id: 0,
-                date: "".to_string(),
+                date: NaiveDate::default(),
                 title: "".to_string(),
                 subtitle: "".to_string(),
                 content: "".to_string(),
@@ -84,19 +70,6 @@ fn get_post_by_slug(slug: &str, pool: &State<DbPool>) -> Json<ApiPostResponse> {
 async fn get_post_image(slug: &str, image: &str) -> Option<NamedFile> {
     let path = Path::new(slug).join(image);
     NamedFile::open(path).await.ok()
-}
-
-#[get("/tags/<tag_id>")]
-fn get_tag(tag_id: i32, pool: &State<DbPool>) -> Json<ApiTagResponse> {
-    let mut conn = pool.get().expect("database connection failed");
-
-    let tag_name = tags::table
-        .find(tag_id)
-        .select(tags::tag_name)
-        .first::<String>(&mut conn)
-        .unwrap_or_default();
-
-    Json(ApiTagResponse { tagName: tag_name })
 }
 
 #[get("/feed.rss")]
@@ -194,8 +167,6 @@ fn rocket() -> _ {
             get_post_by_slug,
             get_post_image,
             get_post_list,
-            get_post_tags,
-            get_tag,
             get_rss_feed,
         ],
     )

@@ -1,7 +1,7 @@
 diesel::table! {
     posts (id) {
         id -> Integer,
-        date -> Text,
+        date -> Date,
         title -> Text,
         subtitle -> Text,
         content -> Text,

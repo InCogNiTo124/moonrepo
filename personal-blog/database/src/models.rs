@@ -1,3 +1,4 @@
+use chrono::NaiveDate;
 use diesel::prelude::*;
 use rocket::serde::Serialize;
 
@@ -7,7 +8,7 @@ use rocket::serde::Serialize;
 #[diesel(table_name = crate::schema::posts)]
 pub struct Post {
     pub id: i32,
-    pub date: String,
+    pub date: NaiveDate,
     pub title: String,
     pub subtitle: String,
     pub content: String,
@@ -34,16 +35,10 @@ pub struct PostTag {
 
 // --- API Response Models (JSON) ---
 
-#[derive(Serialize)]
-#[serde(crate = "rocket::serde")]
-pub struct ApiTagList {
-    pub tags: Vec<String>,
-}
-
 #[derive(Serialize, Clone)]
 #[serde(crate = "rocket::serde")]
 pub struct ApiPost {
-    pub date: String,
+    pub date: NaiveDate,
     pub title: String,
     pub subtitle: String,
     pub content: String,
@@ -55,13 +50,6 @@ pub struct ApiPost {
 #[serde(crate = "rocket::serde")]
 pub struct ApiPostResponse {
     pub post: ApiPost,
-}
-
-#[derive(Serialize, Clone)]
-#[serde(crate = "rocket::serde")]
-#[allow(non_snake_case)]
-pub struct ApiTagResponse {
-    pub tagName: String,
 }
 
 // --- Conversion Helpers ---

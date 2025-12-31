@@ -58,21 +58,25 @@ class ImgUrlRewriter(Treeprocessor):
     def __init__(self, slug, md=None):
         super().__init__(md)
         self.slug = slug
+        return
 
     def run(self, root):
         for element in root.iter("img"):
             src = element.get("src")
             if src and not src.startswith(("/", "http://", "https://")):
                 element.set("src", f"{self.slug}/{src}")
+        return
 
 
 class ImgUrlExtension(Extension):
     def __init__(self, slug, **kwargs):
         self.slug = slug
         super().__init__(**kwargs)
+        return
 
     def extendMarkdown(self, md):
         md.treeprocessors.register(ImgUrlRewriter(self.slug, md), "img_rewriter", 15)
+        return
 
 
 # --- RSS Builder ---
@@ -146,6 +150,7 @@ class RssBuilder:
 
         for post in post_list:
             self.add_post(post)
+        return
 
     def write(self, filename):
         subelement(self.channel, "pubDate", self.build_date)
@@ -153,6 +158,7 @@ class RssBuilder:
         ET.ElementTree(self.root).write(
             filename, encoding="UTF-8", xml_declaration=True
         )
+        return
 
     def add_post(self, post: Post):
         if post.show:
@@ -173,6 +179,7 @@ class RssBuilder:
                 formatdate(time.mktime(dt.timetuple())).replace("-", "+"),
             )
             subelement(item, "dc:creator", "Marijan Smetko")
+        return
 
 
 # --- Main Logic ---
@@ -283,6 +290,7 @@ def main(files: List[Path]):
     typer.secho(
         f"Database & RSS: {t_db_end - t_db_start:.4f}s", fg=typer.colors.MAGENTA
     )
+    return
 
 
 if __name__ == "__main__":
