@@ -24,7 +24,7 @@ test_server = hcloud.Server(
     datacenter="fsn1-dc14",
     public_nets=[hcloud.ServerPublicNetArgs(ipv4_enabled=True, ipv6_enabled=False)],
     ssh_keys=[ssh_key.id],
-    server_type="cx22",
+    server_type="cx33",
     image="ubuntu-24.04",
     user_data=CLOUD_INIT,  # this sets everything up
 )
