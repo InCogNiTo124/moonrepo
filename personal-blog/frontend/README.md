@@ -1,41 +1,75 @@
-# personal-blog
+# Personal Blog Frontend
 
-My personal blog
+This is the frontend application for "Terra Incognita", my personal blog. It is
+a [SvelteKit](https://svelte.dev/docs/kit/introduction) project designed to run
+with the Bun runtime.
 
-## Creation
+## Architecture
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte);
+The project is structured as a dynamic SvelteKit application using
+`svelte-adapter-bun`.
 
-## Developing
+- **Framework**: SvelteKit (Svelte 5)
+- **Runtime**: Bun
+- **Dependencies**:
+  - `personal-reusables`: Shared logic and components, managed via the moon
+    workspace.
+  - `js-cookie`: For client-side cookie handling.
+- **Output**: Generates a Bun-compatible server build in `build/`.
 
-Install dependencies with:
+## Prerequisites
+
+- [Bun](https://bun.sh) (Runtime & Package Manager)
+- [moon](https://moonrepo.dev) (Task Runner)
+
+## Running Locally
+
+1.  **Install dependencies**:
+
+    ```bash
+    bun install
+    ```
+
+    Note: This project relies on the workspace dependency `personal-reusables`.
+
+2.  **Start the development server**:
+
+    Use the moon task:
+
+    ```bash
+    moon run personal-blog-frontend:dev
+    ```
+
+    Or directly with bun:
+
+    ```bash
+    bun run dev
+    ```
+
+    The application will run at `http://localhost:5173`.
+
+## Building
+
+To create the production build:
 
 ```bash
-yarn install
+moon run personal-blog-frontend:build
 ```
 
-Start a development server with either of these:
+This task ensures that `personal-reusables:build` is executed first. The output
+is a standalone Bun server located in the `build/` directory.
+
+To run the built server:
 
 ```bash
-# start server, link provided in output
-yarn dev
-
-# start server, open in new tab
-yarn dev --open
-
-# start server, make available for other devices on local network
-yarn dev --host
-
-# all of the above
-yarn dev --host --open
+bun run build/index.js
 ```
 
-## Building for production
+## Staging (Docker)
 
-Before creating a production version of your app, install an [adapter](https://kit.svelte.dev/docs#adapters) for your target environment. Then:
+To build and serve the application as a local Docker image (mimicking
+production):
 
 ```bash
-yarn build
+moon run personal-blog-frontend:staging
 ```
-
-> You can preview the built app with `yarn preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
