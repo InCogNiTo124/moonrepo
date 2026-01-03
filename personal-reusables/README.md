@@ -1,58 +1,56 @@
-# create-svelte
+# Personal Reusables
 
-Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+This is a shared [Svelte](https://svelte.dev/) library containing reusable
+components, stores, assets, and utility functions used across the `moonrepo`
+workspace projects (for now `personal-website` and `personal-blog-frontend`).
 
-Read more about creating a library [in the docs](https://svelte.dev/docs/kit/packaging).
+## Architecture
 
-## Creating a project
+This project is a SvelteKit library packaged using
+[`@sveltejs/package`](https://kit.svelte.dev/docs/packaging).
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Components**: Located in `src/lib/components/`. Includes structural elements
+  like `Section`, `SectionGroup`, and UI controls like `Theme`, `Loader`,
+  `Tags`, and `Pager`.
+- **Stores**: Shared state, such as `theme_store` for managing light/dark mode.
+- **Assets**: Shared static assets like favicons and theme icons.
+- **Styles**: Global CSS variables and styles in `src/lib/assets/_styles.css`.
+- **Preview App**: The `src/routes/` directory contains a test application to
+  preview components during development.
 
-```bash
-# create a new project in the current directory
-npx sv create
+## Prerequisites
 
-# create a new project in my-app
-npx sv create my-app
+- [Bun](https://bun.sh) (Runtime & Package Manager)
+- [moon](https://moonrepo.dev) (Task Runner)
+
+## Usage in Other Projects
+
+This library is essentially a local npm package. Other projects in the workspace
+reference it via file dependency or path aliases.
+
+Projects import components directly:
+
+```svelte
+<script>
+  import { Section, Theme, theme } from 'personal-reusables';
+</script>
 ```
 
-## Developing
+And ensuring the styles are loaded (often via the layout):
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+```javascript
+import "personal-reusables/dist/style.css"; // Path may vary depending on packaging
 ```
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+_(Note: Refer to `src/lib/index.ts` for strictly exported members)_
 
 ## Building
 
-To build your library:
+To package the library for consumption by other applications:
 
 ```bash
-npm run package
+moon run personal-reusables:build
 ```
 
-To create a production version of your showcase app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
-
-## Publishing
-
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
-
-```bash
-npm publish
-```
+This will run `svelte-package` and output the generated type definitions and
+JavaScript files to the `dist/` directory.

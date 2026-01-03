@@ -1,10 +1,10 @@
-$schema: 'https://moonrepo.dev/schemas/project.json'
+$schema: "https://moonrepo.dev/schemas/project.json"
 
 # Inherit tasks from the `sveltekit` preset
 # https://github.com/moonrepo/moon-configs
 tags:
-  - 'sveltekit'
-  - 'docker'
+  - "sveltekit"
+  - "docker"
 
 type: application
 project:
@@ -15,4 +15,3 @@ tasks:
   build:
     deps:
       - personal-reusables:build
-      - personal-reusables:prepack

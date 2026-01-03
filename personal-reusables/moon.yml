@@ -1,10 +1,20 @@
-# Inherit tasks from the `sveltekit` preset
-# https://github.com/moonrepo/moon-configs
-tags: ['sveltekit']
-type: library
+# yaml-language-server: $schema=../.moon/cache/schemas/project.json
+tags:
+  - "sveltekit"
+
+layer: library
+language: typescript
+
+toolchain:
+  default: "bun"
 
 tasks:
-  prepack:
-    command: yarn run prepack
   build:
-    command: nop
+    command: bun
+    args:
+      - "run"
+      - "build"
+    outputs:
+      - "dist/**"
+    options:
+      merge: replace
