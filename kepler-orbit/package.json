@@ -1,23 +1,23 @@
 {
-  "name": "orbit",
+  "name": "kepler-orbit",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "bunx --bun vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
-    "typescript": "5.9.3",
-    "vite": "7.3.0"
+    "typescript": "~5.9.3",
+    "vite": "npm:rolldown-vite@7.2.5",
+    "@types/three": "^0.182.0"
+  },
+  "overrides": {
+    "vite": "npm:rolldown-vite@7.2.5"
   },
   "dependencies": {
-    "@types/three": "0.182.0",
-    "lil-gui": "0.21.0",
-    "serve": "^14.2.4",
-    "three": "0.182.0"
-  },
-  "engines": {
-    "node": "^24.0.0"
+    "lil-gui": "^0.21.0",
+    "three": "^0.182.0"
   }
 }

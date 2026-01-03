@@ -1,16 +1,6 @@
-$schema: "https://moonrepo.dev/schemas/toolchain.json"
-
-node:
-  version: "24.12.0"
-  packageManager: "yarn"
-  yarn:
-    version: "1.22.22"
-
+# yaml-language-server: $schema=./cache/schemas/toolchain.json
 rust:
   version: "1.92.0"
-  bins:
-    - "cargo-nextest"
-    # - "wasm-pack"  # takes too long, switching to manual install in ci-main.yml
   targets:
     - "x86_64-unknown-linux-musl"
     - "wasm32-unknown-unknown"
@@ -19,3 +9,12 @@ python:
   packageManager: "uv"
   uv:
     version: "0.9.21"
+
+unstable_bun:
+  version: "1.3.5"
+
+unstable_javascript:
+  packageManager: "bun"
+  inferTasksFromScripts: true
+  syncPackageManagerField: true
+  syncProjectWorkspaceDependencies: true

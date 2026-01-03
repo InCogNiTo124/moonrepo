@@ -1,15 +1,14 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import wasm from "vite-plugin-wasm";
-import topLevelAwait from "vite-plugin-top-level-await";
 
-
+/** @type {import('@sveltejs/kit').Config} */
 const config = {
+	// Consult https://svelte.dev/docs/kit/integrations	// for more information about preprocessors
 	preprocess: vitePreprocess(),
-	kit: { adapter: adapter() },
-	plugins: [
-		wasm(),
-	topLevelAwait()],
+
+	kit: {
+		adapter: adapter(),
+	},
 };
 
 export default config;

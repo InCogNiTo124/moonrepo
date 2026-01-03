@@ -30,7 +30,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: "Setup wasm-pack"
         env:
           WASM_PACK_VERSION: "v0.13.1"
@@ -46,7 +46,12 @@ jobs:
       - uses: "moonrepo/setup-toolchain@v0"
         with:
           auto-setup: true
-          cache: false  # i don't care, install all tools fresh
+          cache: false # i don't care, install all tools fresh
+
+      - name: Install uv
+        run: |
+          UV_VERSION=$(grep -A 2 "uv:" .moon/toolchain.yml | grep "version:" | cut -d '"' -f 2)
+          proto install uv $UV_VERSION
 
       - run:
           "moon ${{ github.event.inputs.targets && github.event.inputs.targets
@@ -56,7 +61,7 @@ jobs:
         if: success() || failure()
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: "Collect/retrospect on results"
         uses: "appthrust/moon-ci-retrospect@main"
         if: always()

@@ -1,12 +1,25 @@
-$schema: 'https://moonrepo.dev/schemas/project.json'
+# yaml-language-server: $schema=../.moon/cache/schemas/project.json
 
 # Inherit tasks from the `sveltekit` preset
 # https://github.com/moonrepo/moon-configs
 tags:
-  - vite
+  - sveltekit
   - docker
 
-type: application
+layer: application
 project:
   name: kepler-orbit
   description: "Keplerian orbit visualization"
+
+language: typescript
+
+tasks:
+  build:
+    command: bun
+    args:
+      - "run"
+      - "build"
+    outputs:
+      - dist/**
+    options:
+      merge: replace
