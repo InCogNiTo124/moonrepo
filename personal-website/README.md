@@ -1,40 +1,65 @@
-# create-svelte
+# Personal Website
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+This is the source code for my personal website. It is a
+[SvelteKit](https://svelte.dev/docs/kit/introduction) project configured as a
+static site.
 
-## Creating a project
+## Architecture
 
-If you're seeing this, you've probably already done this step. Congrats!
+The project is structured as a static SvelteKit application using
+`@sveltejs/adapter-static`.
 
-```bash
-# create a new project in the current directory
-npm init svelte@next
+- **Pages**:
+  - `/`: Home page
+  - `/ilpc`: ILPC related content
+  - `/projects`: Portfolio/Projects listing
+- **Components**: Custom components are located in `src/lib/components/`.
+- **Dependencies**: This project depends on `personal-reusables` for shared
+  logic or assets, which is managed via the moon workspace.
+- **Style**: The site uses custom styles located in `static/_styles.css`.
 
-# create a new project in my-app
-npm init svelte@next my-app
-```
+## Prerequisites
 
-> Note: the `@next` is temporary
+- [Bun](https://bun.sh) (Runtime & Package Manager)
+- [moon](https://moonrepo.dev) (Task Runner)
 
-## Developing
+## Running Locally
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+1.  **Install dependencies**:
 
-```bash
-npm run dev
+    ```bash
+    bun install
+    ```
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+2.  **Start the development server**: You can use the moon task:
+
+    ```bash
+    moon run personal-website:dev
+    ```
+
+    Or directly with bun:
+
+    ```bash
+    bun run dev
+    ```
+
+    The site will run at `http://localhost:5173`.
 
 ## Building
 
-To create a production version of your app:
+To build the static site (output to `build/`):
 
 ```bash
-npm run build
+moon run personal-website:build
 ```
 
-You can preview the production build with `npm run preview`.
+This task ensures that the dependency `personal-reusables:build` is executed
+first.
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## Staging (Docker)
+
+To build and serve the application as a local Docker image:
+
+```bash
+moon run personal-website:staging
+```

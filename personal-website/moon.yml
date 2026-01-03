@@ -1,4 +1,4 @@
-$schema: "https://moonrepo.dev/schemas/project.json"
+# yaml-language-server: $schema=../.moon/cache/schemas/project.json
 
 # Inherit tasks from the `sveltekit` preset
 # https://github.com/moonrepo/moon-configs
@@ -6,12 +6,23 @@ tags:
   - "sveltekit"
   - "docker"
 
-type: application
+layer: application
 project:
   name: personal-website
   description: "Personal website"
 
 tasks:
-  build:
+  check:
     deps:
       - personal-reusables:build
+  build:
+    command: bun
+    args:
+      - "run"
+      - "build"
+    deps:
+      - personal-reusables:build
+    outputs:
+      - "build/**"
+    options:
+      merge: replace
