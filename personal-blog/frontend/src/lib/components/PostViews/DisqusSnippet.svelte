@@ -8,7 +8,7 @@
   if (browser) {
     const postUrl = window.location.href;
 
-    const disqus_config = function () {
+    const disqus_config = function (this: any) {
       this.page.url = postUrl; // Replace PAGE_URL with your page's canonical URL variable
       this.page.identifier = postUrl; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
     };

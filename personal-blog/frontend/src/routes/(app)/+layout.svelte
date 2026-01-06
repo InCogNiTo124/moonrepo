@@ -17,11 +17,11 @@
     if (browser) {
       theme.useCookie();
       theme.subscribe((newval) => {
-        document.getElementById('body').setAttribute('class', newval);
+        document.getElementById('body')?.setAttribute('class', newval);
       });
       document
         .getElementById('body')
-        .setAttribute('class', Cookies.get(COOKIE_KEY_THEME) || LIGHT);
+        ?.setAttribute('class', Cookies.get(COOKIE_KEY_THEME) || LIGHT);
     }
   });
 

@@ -1,25 +1,25 @@
 <script lang="ts">
-  import axios from 'axios';
-  import { REPO_API } from 'personal-reusables';
-  import SectionGroup from '$lib/components/SectionGroup.svelte';
+  import axios from "axios";
+  import { REPO_API } from "personal-reusables";
+  import SectionGroup from "$lib/components/SectionGroup.svelte";
 
-  let projects = [];
+  let projects: TSection[] = [];
   axios
     .get(REPO_API)
     .then((res: TGitHubProjectResponse) => {
-      const plist = [];
+      const plist: TProject[] = [];
       const whitelist = [
-        'ChaosPlotter',
-        'recursive-sgd',
-        'MojBlokZaBelu',
-        'PASS',
-        'dotfiles',
-        'personal-website',
-        'm-numbers',
-        'BelaBot',
-        'Jumper',
-        'chemeq',
-        'knarrow',
+        "ChaosPlotter",
+        "recursive-sgd",
+        "MojBlokZaBelu",
+        "PASS",
+        "dotfiles",
+        "personal-website",
+        "m-numbers",
+        "BelaBot",
+        "Jumper",
+        "chemeq",
+        "knarrow",
       ];
       res.data.forEach((project: TGitHubProject) => {
         if (whitelist.includes(project.name)) {

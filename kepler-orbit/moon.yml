@@ -3,7 +3,6 @@
 # Inherit tasks from the `sveltekit` preset
 # https://github.com/moonrepo/moon-configs
 tags:
-  - sveltekit
   - docker
 
 layer: application
@@ -14,6 +13,11 @@ project:
 language: typescript
 
 tasks:
+  check:
+    command: tsc
+    args:
+      - "--noEmit"
+
   build:
     command: bun
     args:

@@ -1,22 +1,22 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { browser } from '$app/environment';
-  import Cookies from 'js-cookie';
-  import { LIGHT, COOKIE_KEY_THEME } from 'personal-reusables';
-  import { theme } from 'personal-reusables';
-  import Nav from '$lib/components/Nav.svelte';
-  import Header from '$lib/components/Header.svelte';
+  import { onMount } from "svelte";
+  import { browser } from "$app/environment";
+  import Cookies from "js-cookie";
+  import { LIGHT, COOKIE_KEY_THEME } from "personal-reusables";
+  import { theme } from "personal-reusables";
+  import Nav from "$lib/components/Nav.svelte";
+  import Header from "$lib/components/Header.svelte";
   // import favicon from 'personal-reusables';
 
   onMount(() => {
     if (browser) {
       theme.useCookie();
       theme.subscribe((newval) => {
-        document.getElementById('body').setAttribute('class', newval);
+        document.getElementById("body")?.setAttribute("class", newval);
       });
       document
-        .getElementById('body')
-        .setAttribute('class', Cookies.get(COOKIE_KEY_THEME) || LIGHT);
+        .getElementById("body")
+        ?.setAttribute("class", Cookies.get(COOKIE_KEY_THEME) || LIGHT);
     }
   });
 </script>
