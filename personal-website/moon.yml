@@ -11,6 +11,9 @@ project:
   name: personal-website
   description: "Personal website"
 
+dependsOn:
+  - personal-reusables
+
 tasks:
   check:
     deps:

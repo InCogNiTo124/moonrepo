@@ -12,7 +12,13 @@ project:
   name: personal-blog-frontend
   description: "Terra Incognita, personal blog"
 
+dependsOn:
+  - personal-reusables
+
 tasks:
+  check:
+    deps:
+      - personal-reusables:build
   build:
     command: bun
     args:
