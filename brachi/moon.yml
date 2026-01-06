@@ -11,6 +11,9 @@ project:
   name: brachi
   description: "Brachistochrone visualizer"
 
+dependsOn:
+  - brachistochrone-solver
+
 tasks:
   build:
     command: "bun"
