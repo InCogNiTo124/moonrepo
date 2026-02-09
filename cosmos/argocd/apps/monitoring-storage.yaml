@@ -1,0 +1,98 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: manual
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus-data-pv
+  labels:
+    app: prometheus
+    storage-tier: monitoring
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/prometheus
+  storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: grafana-data-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/grafana
+  storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-data-pvc
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: manual
+  volumeName: grafana-data-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: alertmanager-data-pv
+  labels:
+    app: alertmanager
+    storage-tier: monitoring
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/alertmanager
+  storageClassName: manual
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fix-monitoring-permissions
+  namespace: monitoring
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: fix-permissions
+        image: busybox
+        command: ["sh", "-c", "echo 'Fixing permissions...'; chown -R 1000:1000 /data/prometheus /data/alertmanager /data/grafana; chmod -R 777 /data/prometheus /data/alertmanager /data/grafana; echo 'Done.'"]
+        volumeMounts:
+        - name: data-root
+          mountPath: /data
+      restartPolicy: OnFailure
+      volumes:
+      - name: data-root
+        hostPath:
+          path: /data
+          type: Directory

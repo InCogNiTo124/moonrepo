@@ -1,15 +1,16 @@
 [project]
 name = "cosmos"
-version = "0.1.0"
+version = "3.0.0"
 description = "Production universe of @InCogNiTo124 (powered by Hetzner and Pulumi)"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "pulumi==3.214.0",
-    "pulumi-hcloud==1.29.0",
+    "pulumi>=3.0.0,<4.0.0",
+    "pulumi-command>=1.1.3",
+    "pulumi-hcloud>=1.31.0",
 ]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.14.9",
+    "ruff>=0.15.0",
 ]

@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kepler-orbit
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: kepler-orbit=ghcr.io/incognito124/kepler-orbit
+    argocd-image-updater.argoproj.io/kepler-orbit.update-strategy: numeric
+    argocd-image-updater.argoproj.io/write-back-method: git
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/InCogNiTo124/moonrepo
+    targetRevision: HEAD
+    path: cosmos/argocd/overlays/prod/kepler-orbit
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kepler-orbit
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

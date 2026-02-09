@@ -1,16 +1,63 @@
 #cloud-config
-# this file is actually a yaml template that gets formatted in Python
-# the order of the fiels as kept as much up to date of the official ordering:
-# https://github.com/canonical/cloud-init/blob/main/config/cloud.cfg.tmpl
-# (or should I say, *the canonical ordering*, hehe)
-
+# this file is technically a Python string template that gets rendered as yaml
 write_files:
-  # prod traefik configuration (test one has a different caserver)
-  # an astute reader will notice that this file is first being written in a
-  # temporary location before being moved to its final destination
-  # that's because of the cloud-init module ordering :shrug:
-  - path: /run/traefik-config.yaml
+  - path: /etc/environment
     content: |-
+      KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+  # Configure k9s to show all namespaces by default
+  - path: /root/.config/k9s/config.yaml
+    content: |
+      k9s:
+        clusters:
+          default:
+            namespace:
+              active: all
+
+  # Configure Floating IP
+  - path: /etc/netplan/60-floating-ip.yaml
+    content: |
+      network:
+        version: 2
+        ethernets:
+          eth0:
+            addresses:
+              - {floating_ip}/32
+
+  # Create Static PV/PVC for Traefik ACME storage to ensure it uses the persistent volume
+  - path: /var/lib/rancher/k3s/server/manifests/traefik-storage.yaml
+    content: |
+      apiVersion: v1
+      kind: PersistentVolume
+      metadata:
+        name: traefik-acme-pv
+        labels:
+          type: local
+      spec:
+        storageClassName: manual
+        capacity:
+          storage: 100Mi
+        accessModes:
+          - ReadWriteOnce
+        hostPath:
+          path: /data/traefik
+      ---
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: traefik-acme-pvc
+        namespace: kube-system
+      spec:
+        storageClassName: manual
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Mi
+  
+  # Configure Traefik to use the persistent volume for ACME with proper permissions
+  - path: /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+    content: |
       apiVersion: helm.cattle.io/v1
       kind: HelmChartConfig
       metadata:
@@ -19,113 +66,164 @@ write_files:
       spec:
         valuesContent: |-
           additionalArguments:
-            - --entrypoints.web.http.redirections.entrypoint.to=:443
-            - --entrypoints.web.http.redirections.entrypoint.permanent=true
-            - --entrypoints.web.http.redirections.entrypoint.scheme=https
+            - "--log.level=DEBUG"
+            - "--accesslog=true"
+          certificatesResolvers:
+            letsencrypt:
+              acme:
+                email: "{email}"
+                storage: "/data/acme.json"
+                tlsChallenge: true
+                caServer: "{ca_server}"
+          persistence:
+            enabled: true
+            existingClaim: traefik-acme-pvc
+            mountPath: /data/traefik
           ports:
+            web:
+              redirections:
+                entryPoint:
+                  to: websecure
+                  scheme: https
+                  permanent: true
             metrics:
               port: 9101
+              exposedPort: 9101
               expose:
                 default: true
-              exposedPort: 9101
           metrics:
             prometheus:
               entryPoint: metrics
               addEntryPointsLabels: true
               addRoutersLabels: true
-          certificatesResolvers:
-            letsencrypt:
-              acme:
-                email: msmetko@msmetko.xyz
-                storage: /data/acme.json
-                tlschallenge: true
-          logs:
-            access:
-              enabled: true
-          deployment:
-            initContainers:
-              - name: volume-permission
-                image: busybox:latest
-                command:
-                  - sh
-                  - -c
-                  - touch /data/acme.json; chmod -v 600 /data/acme.json
-                volumeMounts:
-                  - mountPath: /data
-                    name: data
-          persistence:
-            enabled: true
-            size: 1Gi
-            storageClass: "local-path"
-            path: /data
 
-  # this allows me to run kubectl commands without specifying --kubeconfig all the time
-  - path: /etc/environment
-    content: |-
-      KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+  # Pre-seed Sealed Secrets Master Key
+  - path: /var/lib/rancher/k3s/server/manifests/sealed-secrets-key.yaml
+    content: |
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: sealed-secrets-key
+        namespace: kube-system
+        labels:
+          sealedsecrets.bitnami.com/sealed-secrets-key: active
+      type: kubernetes.io/tls
+      stringData:
+        tls.crt: |
+{ss_public_cert}
+        tls.key: |
+{ss_private_key}
 
-mounts:
-  - ["/dev/sdb", "/var/lib/rancher", "ext4", "defaults,noatime", "0", "0"]
+  # Install ArgoCD via HelmChart
+  - path: /var/lib/rancher/k3s/server/manifests/argocd-helm.yaml
+    content: |
+      apiVersion: helm.cattle.io/v1
+      kind: HelmChart
+      metadata:
+        name: argocd
+        namespace: kube-system
+      spec:
+        repo: https://argoproj.github.io/argo-helm
+        chart: argo-cd
+        targetNamespace: argocd
+        createNamespace: true
+        # Wait for the chart to be ready
+        valuesContent: |-
+          configs:
+            secret:
+              annotations:
+                sealedsecrets.bitnami.com/managed: "true"
+            cm:
+              timeout.reconciliation: "60s"
+          server:
+            extraArgs:
+              - --insecure # Optional: if you want to handle TLS at Traefik level easily
 
-package_update: true
-package_upgrade: true
-package_reboot_if_required: true
-packages:
-  - jq
+  # Bootstrap ArgoCD Apps
+  - path: /var/lib/rancher/k3s/server/manifests/argocd-apps.yaml
+    content: |
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: root-app
+        namespace: argocd
+        finalizers:
+        - resources-finalizer.argocd.argoproj.io
+      spec:
+        project: default
+        source:
+          repoURL: https://github.com/InCogNiTo124/moonrepo
+          targetRevision: HEAD
+          path: cosmos/argocd/apps
+        destination:
+          server: https://kubernetes.default.svc
+          namespace: argocd
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+          syncOptions:
+            - SkipDryRunOnMissingResource=true
+      ---
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: cosmos-next-repo
+        namespace: argocd
+        labels:
+          argocd.argoproj.io/secret-type: repository
+      stringData:
+        url: https://github.com/InCogNiTo124/moonrepo
+        type: git
+        password: {gh_pat}
+        username: git
 
 runcmd:
-  - 'mountpoint -q /var/lib/rancher || echo "WARNING: Volume not mounted!"'
-  # setup k9s manually
-  - wget https://github.com/derailed/k9s/releases/download/v0.50.16/k9s_Linux_amd64.tar.gz && tar -xzvf k9s_Linux_amd64.tar.gz && mv k9s /usr/local/bin/
-
-  # 0a add a static IP
-  # TODO maybe there's a better way of doing this with cloud-init or pulumi
-  - ip addr add 49.12.115.123 dev eth0
+  # Robust volume mounting logic
+  - |
+    DEVICE="/dev/disk/by-id/scsi-0HC_Volume_{volume_id}"
+    MOUNT_POINT="/data"
+    
+    echo "Waiting for device $DEVICE to appear..."
+    while [ ! -b "$DEVICE" ]; do
+      sleep 1
+    done
+    
+    echo "Device $DEVICE found. Checking filesystem..."
+    if ! blkid "$DEVICE"; then
+      echo "No filesystem found on $DEVICE. Formatting as ext4..."
+      mkfs.ext4 -F "$DEVICE"
+    fi
+    
+    echo "Mounting $DEVICE to $MOUNT_POINT..."
+    mkdir -p "$MOUNT_POINT"
+    mount -o discard,defaults "$DEVICE" "$MOUNT_POINT"
+    
+    echo "Adding $DEVICE to /etc/fstab..."
+    echo "$DEVICE $MOUNT_POINT ext4 discard,defaults 0 2" >> /etc/fstab
+    
+    # Apply Floating IP configuration
+    netplan apply
   
-  # 0b remove unattended upgrades
-  - sudo apt remove unattended-upgrades -y
+  # Ensure subdirectories exist on the mounted volume
+  - mkdir -p /data/traefik
+  - touch /data/traefik/acme.json
+  - chmod 600 /data/traefik/acme.json
+  - chown 65532:65532 /data/traefik/acme.json
+  - mkdir -p /data/k3s-storage
+  - mkdir -p /data/prometheus
+  - mkdir -p /data/grafana
+  - mkdir -p /data/alertmanager
+  # Explicitly set permissions (mkdir -p -m only affects NEW directories)
+  - chmod 755 /data/traefik
+  - chown -R 65532:65532 /data/traefik
+  - chmod 755 /data/k3s-storage
+  - chmod 777 /data/prometheus
+  - chmod 777 /data/grafana
+  - chmod 777 /data/alertmanager
 
-  # 1a prek3s setup: configure traefik
-  - mkdir -p /var/lib/rancher/k3s/server/manifests && mv /run/traefik-config.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
-  # 1b setup k3s
-  - >
-    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.34.3+k3s1 sh -s - server
-    --cluster-init
-    --disable-cloud-controller
-    --node-name="$(hostname -f)"
-    --kubelet-arg="cloud-provider=external"
-    --secrets-encryption
-    --debug
-
-  # 2 setup helm
-  - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-
-  # 3 install Hetzner Cloud Controller Manager
-  #   a) setup the api token (propagated from env)
-  - kubectl -n kube-system create secret generic hcloud --from-literal=token='{hcloud_token}'
-
-  #   b) install hccm via helm
-  # TODO provision kubeconfig configuration through a file in ~/.config/helm
-  - >
-    helm repo add hcloud https://charts.hetzner.cloud &&
-    helm repo update hcloud &&
-    helm --kubeconfig /etc/rancher/k3s/k3s.yaml install hccm hcloud/hcloud-cloud-controller-manager -n kube-system
-  # 4 install fluxcd (pat propagated from env)
-  - >
-    curl -s https://fluxcd.io/install.sh | sudo bash &&
-    until flux --kubeconfig=/etc/rancher/k3s/k3s.yaml check --pre; do sleep 5s; done &&
-    echo '{gh_pat}' | flux --kubeconfig=/etc/rancher/k3s/k3s.yaml bootstrap github
-    --token-auth
-    --owner=InCogNiTo124
-    --repository=moonrepo
-    --branch=main
-    --path=cosmos/clusters/prod
-    --read-write-key
-    --personal
-    --components-extra=image-reflector-controller,image-automation-controller
-
-  # 4 install longhorn via helm (NOT USED ATM, I DO A LOT OF SHIT I DONT NEED BUT THIS I MOST DEFINITELY DONT NEED (YET))
-  # - >
-  #   helm repo add longhorn https://charts.longhorn.io &&
-  #   helm repo update longhorn &&
-  #   helm --kubeconfig /etc/rancher/k3s/k3s.yaml install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace
+  # Install k9s
+  - wget https://github.com/derailed/k9s/releases/download/v0.50.16/k9s_Linux_amd64.tar.gz && tar -xzvf k9s_Linux_amd64.tar.gz && mv k9s /usr/local/bin/ && rm k9s_Linux_amd64.tar.gz
+  
+  # Install k3s (Only after volume is ready)
+  - curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.34.3+k3s1 sh -s - server --default-local-storage-path /data/k3s-storage

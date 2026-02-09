@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: personal-blog
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: blog=ghcr.io/incognito124/personal-blog-frontend, blog-db=ghcr.io/incognito124/personal-blog-database
+    argocd-image-updater.argoproj.io/blog.update-strategy: numeric
+    argocd-image-updater.argoproj.io/blog-db.update-strategy: numeric
+    argocd-image-updater.argoproj.io/write-back-method: git
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/InCogNiTo124/moonrepo
+    targetRevision: HEAD
+    path: cosmos/argocd/overlays/prod/personal-blog
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: personal-blog
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

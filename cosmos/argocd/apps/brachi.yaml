@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: brachi
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: brachi=ghcr.io/incognito124/brachi
+    argocd-image-updater.argoproj.io/brachi.update-strategy: numeric
+    argocd-image-updater.argoproj.io/write-back-method: git
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/InCogNiTo124/moonrepo
+    targetRevision: HEAD
+    path: cosmos/argocd/overlays/prod/brachi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: brachi
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

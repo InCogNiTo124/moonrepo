@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: personal-website-prod
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: personal-website=ghcr.io/incognito124/personal-website
+    argocd-image-updater.argoproj.io/personal-website.update-strategy: numeric
+    argocd-image-updater.argoproj.io/write-back-method: git
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/InCogNiTo124/moonrepo
+    targetRevision: HEAD
+    path: cosmos/argocd/overlays/prod/personal-website
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: personal-website
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
