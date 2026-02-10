@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - ghcr.io/incognito124/personal-website:1770757142
