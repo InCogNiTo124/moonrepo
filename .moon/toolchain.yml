@@ -8,7 +8,7 @@ rust:
 python:
   packageManager: "uv"
   uv:
-    version: "0.9.21"
+    version: "0.10.2"
 
 unstable_bun:
   version: "1.3.5"
