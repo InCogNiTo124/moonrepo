@@ -15,7 +15,7 @@ spec:
           registries:
             - name: GHCR
               api_url: https://ghcr.io
-              credentials: secret:argocd/cosmos-next-repo
+              credentials: secret:argocd/key-to-cosmos
         extraArgs:
           - --interval=1m
   destination:

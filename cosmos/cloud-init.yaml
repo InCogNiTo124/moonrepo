@@ -168,7 +168,7 @@ write_files:
       apiVersion: v1
       kind: Secret
       metadata:
-        name: cosmos-next-repo
+        name: key-to-cosmos
         namespace: argocd
         labels:
           argocd.argoproj.io/secret-type: repository
