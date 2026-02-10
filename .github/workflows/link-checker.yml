@@ -15,7 +15,7 @@ jobs:
       - name: Get URLs
         id: get_urls
         run: |
-          URLS=$(grep -Porh "(?<=Host\(\`).*?(?=\`\))" cosmos/clusters/prod/apps | sed 's/^/https:\/\//' | xargs)
+          URLS=$(grep -rh "\- host:" cosmos/argocd | sed 's/.*- host: //;s/^[ \t]*//;s/[ \t]*$//' | sed 's/^/https:\/\//' | xargs)
           echo "URLS_TO_CHECK=${URLS}" >> $GITHUB_OUTPUT
 
       - name: Link Checker
