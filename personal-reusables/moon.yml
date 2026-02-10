@@ -9,11 +9,21 @@ toolchain:
   default: "bun"
 
 tasks:
+  install:
+    command: "bun"
+    args:
+      - "install"
+    inputs:
+      - "package.json"
+      - "bun.lock"
+
   build:
     command: bun
     args:
       - "run"
       - "build"
+    deps:
+      - "~:install"
     outputs:
       - "dist/**"
     options:

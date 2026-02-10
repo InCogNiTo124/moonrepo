@@ -16,8 +16,17 @@ dependsOn:
   - personal-reusables
 
 tasks:
+  install:
+    command: "bun"
+    args:
+      - "install"
+    inputs:
+      - "package.json"
+      - "bun.lock"
+
   check:
     deps:
+      - "~:install"
       - personal-reusables:build
   build:
     command: bun
@@ -25,6 +34,7 @@ tasks:
       - "run"
       - "build"
     deps:
+      - "~:install"
       - personal-reusables:build
     outputs:
       - "build/**"

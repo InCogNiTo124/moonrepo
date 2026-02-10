@@ -15,12 +15,21 @@ dependsOn:
   - brachistochrone-solver
 
 tasks:
+  install:
+    command: "bun"
+    args:
+      - "install"
+    inputs:
+      - "package.json"
+      - "bun.lock"
+
   build:
     command: "bun"
     args:
       - "run"
       - "build"
     deps:
+      - "~:install"
       - brachistochrone-solver:build
     outputs:
       - "build/**"
