@@ -7,6 +7,7 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: kepler-orbit=ghcr.io/incognito124/kepler-orbit
     argocd-image-updater.argoproj.io/kepler-orbit.update-strategy: numeric
     argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/git-branch: main
 spec:
   project: default
   source:
