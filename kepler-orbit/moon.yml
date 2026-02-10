@@ -13,16 +13,28 @@ project:
 language: typescript
 
 tasks:
+  install:
+    command: "bun"
+    args:
+      - "install"
+    inputs:
+      - "package.json"
+      - "bun.lock"
+
   check:
     command: tsc
     args:
       - "--noEmit"
+    deps:
+      - "~:install"
 
   build:
     command: bun
     args:
       - "run"
       - "build"
+    deps:
+      - "~:install"
     outputs:
       - dist/**
     options:

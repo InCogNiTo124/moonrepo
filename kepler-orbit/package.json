@@ -10,11 +10,11 @@
   },
   "devDependencies": {
     "typescript": "~5.9.3",
-    "vite": "npm:rolldown-vite@7.2.5",
+    "vite": "npm:rolldown-vite@7.3.1",
     "@types/three": "^0.182.0"
   },
   "overrides": {
-    "vite": "npm:rolldown-vite@7.2.5"
+    "vite": "npm:rolldown-vite@7.3.1"
   },
   "dependencies": {
     "lil-gui": "^0.21.0",
