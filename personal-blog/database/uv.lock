@@ -293,15 +293,15 @@ wheels = [
 
 [[package]]
 name = "pymdown-extensions"
-version = "10.20.1"
+version = "10.21"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1e/6c/9e370934bfa30e889d12e61d0dae009991294f40055c238980066a7fbd83/pymdown_extensions-10.20.1.tar.gz", hash = "sha256:e7e39c865727338d434b55f1dd8da51febcffcaebd6e1a0b9c836243f660740a", size = 852860, upload-time = "2026-01-24T05:56:56.758Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ba/63/06673d1eb6d8f83c0ea1f677d770e12565fb516928b4109c9e2055656a9e/pymdown_extensions-10.21.tar.gz", hash = "sha256:39f4a020f40773f6b2ff31d2cd2546c2c04d0a6498c31d9c688d2be07e1767d5", size = 853363, upload-time = "2026-02-15T20:44:06.748Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/40/6d/b6ee155462a0156b94312bdd82d2b92ea56e909740045a87ccb98bf52405/pymdown_extensions-10.20.1-py3-none-any.whl", hash = "sha256:24af7feacbca56504b313b7b418c4f5e1317bb5fea60f03d57be7fcc40912aa0", size = 268768, upload-time = "2026-01-24T05:56:54.537Z" },
+    { url = "https://files.pythonhosted.org/packages/6f/2c/5b079febdc65e1c3fb2729bf958d18b45be7113828528e8a0b5850dd819a/pymdown_extensions-10.21-py3-none-any.whl", hash = "sha256:91b879f9f864d49794c2d9534372b10150e6141096c3908a455e45ca72ad9d3f", size = 268877, upload-time = "2026-02-15T20:44:05.464Z" },
 ]
 
 [[package]]
@@ -425,20 +425,20 @@ wheels = [
 
 [[package]]
 name = "sqlmodel"
-version = "0.0.32"
+version = "0.0.33"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d1/89/67f8964f3b2ed073fa4e95201e708291935d00e3600f36f09c1be3e279fe/sqlmodel-0.0.32.tar.gz", hash = "sha256:48e8fe4c8c3d7d8bf8468db17fa92ca680421e86cfec8b352217ef40736767be", size = 94140, upload-time = "2026-02-01T18:19:14.752Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/62/22c287122598e61d07d005eec0b4eb97e6bde9a1b051bcd66c2bca846ea8/sqlmodel-0.0.33.tar.gz", hash = "sha256:b473544ed5fc2097894d89033049e569e1f138363dd3ec2ed4b6932cc9f29f5f", size = 95578, upload-time = "2026-02-11T15:23:39.504Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ed/de/d9b40ed2c570fd612c2abd57e4d9084a9d8eb1797447e2ce897b77b1c4b2/sqlmodel-0.0.32-py3-none-any.whl", hash = "sha256:d62f0702599592046c1a136d3512feab3d5a80e2988642ef0ed2c89b9b8b297b", size = 27416, upload-time = "2026-02-01T18:19:15.992Z" },
+    { url = "https://files.pythonhosted.org/packages/63/39/13891bae4658133b489a4d8b6a2f193d56110e392289560f312748e796dc/sqlmodel-0.0.33-py3-none-any.whl", hash = "sha256:9045bb4d97d2ba099c5a068ee9525af2d106972dda1ff8488e187ce50556bf73", size = 27444, upload-time = "2026-02-11T15:23:38.678Z" },
 ]
 
 [[package]]
 name = "typer"
-version = "0.21.2"
+version = "0.23.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
@@ -446,9 +446,9 @@ dependencies = [
     { name = "rich" },
     { name = "shellingham" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f2/1e/a27cc02a0cd715118c71fa2aef2c687fdefc3c28d90fd0dd789c5118154c/typer-0.21.2.tar.gz", hash = "sha256:1abd95a3b675e17ff61b0838ac637fe9478d446d62ad17fa4bb81ea57cc54028", size = 120426, upload-time = "2026-02-10T19:33:46.182Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fd/07/b822e1b307d40e263e8253d2384cf98c51aa2368cc7ba9a07e523a1d964b/typer-0.23.1.tar.gz", hash = "sha256:2070374e4d31c83e7b61362fd859aa683576432fd5b026b060ad6b4cd3b86134", size = 120047, upload-time = "2026-02-13T10:04:30.984Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/cc/d59f893fbdfb5f58770c05febfc4086a46875f1084453621c35605cec946/typer-0.21.2-py3-none-any.whl", hash = "sha256:c3d8de54d00347ef90b82131ca946274f017cffb46683ae3883c360fa958f55c", size = 56728, upload-time = "2026-02-10T19:33:48.01Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/91/9b286ab899c008c2cb05e8be99814807e7fbbd33f0c0c960470826e5ac82/typer-0.23.1-py3-none-any.whl", hash = "sha256:3291ad0d3c701cbf522012faccfbb29352ff16ad262db2139e6b01f15781f14e", size = 56813, upload-time = "2026-02-13T10:04:32.008Z" },
 ]
 
 [[package]]

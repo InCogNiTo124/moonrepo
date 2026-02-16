@@ -336,7 +336,7 @@ wheels = [
 [[package]]
 name = "pynvim"
 version = "0.6.1.dev0"
-source = { git = "https://github.com/neovim/pynvim.git#c5279a5e046da979aa672f4f05f3c78a7b560465" }
+source = { git = "https://github.com/neovim/pynvim.git#0e904539d6de24acd9b28c36eafa6b0ce9515f37" }
 dependencies = [
     { name = "greenlet", marker = "platform_python_implementation != 'PyPy'" },
     { name = "msgpack" },
