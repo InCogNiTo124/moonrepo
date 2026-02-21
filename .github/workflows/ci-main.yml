@@ -47,6 +47,7 @@ jobs:
         with:
           auto-setup: true
           cache: false # i don't care, install all tools fresh
+          moon-version: "1.41.8"
 
       - name: Install uv
         run: |
