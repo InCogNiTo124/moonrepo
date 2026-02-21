@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" width="100%" height="100%">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b949e" />
+        </marker>
+
+        <style>
+            /* Base typography and node styles */
+            .code-text { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace; font-size: 13px; fill: #24292f; white-space: pre; }
+            .repo-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 15px; font-weight: 600; fill: #24292f; }
+            .highlight-text { fill: #0550ae; font-weight: 600; }
+            /* New class for bolding specific items like .git */
+            .bold-text { font-weight: 700; }
+
+            .node { fill: #ffffff; stroke-width: 3; }
+            .node-target { stroke: #2da44e; }
+            .node-dep { stroke: #bf3989; }
+            .node-merge { stroke: #8250df; fill: #f6f8fa; }
+
+            .graph-line { stroke: #d0d7de; stroke-width: 3; fill: none; }
+
+            /* New style for tree borders */
+            .tree-border { fill: #ffffff; stroke: #d0d7de; stroke-width: 1; rx: 4; }
+
+            /* Animation Definitions */
+            @keyframes fadeOutScene1 {
+                0%, 20% { opacity: 1; }
+                30%, 80% { opacity: 0; }
+                90%, 100% { opacity: 1; }
+            }
+
+            @keyframes slideUpFadeIn {
+                0%, 20% { opacity: 0; transform: translateY(30px); }
+                30%, 80% { opacity: 1; transform: translateY(0); }
+                90%, 100% { opacity: 0; transform: translateY(30px); }
+            }
+
+            @keyframes drawArrows {
+                0%, 25% { stroke-dashoffset: 350; opacity: 0; }
+                35%, 80% { stroke-dashoffset: 0; opacity: 1; }
+                85%, 100% { stroke-dashoffset: 350; opacity: 0; }
+            }
+
+            /* Applying animations */
+            .scene1-element { animation: fadeOutScene1 8s ease-in-out infinite; }
+            .scene2-element { animation: slideUpFadeIn 8s ease-in-out infinite; }
+            .merge-arrow {
+                stroke-dasharray: 350;
+                stroke-dashoffset: 350;
+                animation: drawArrows 8s ease-in-out infinite;
+                stroke: #8b949e;
+            }
+        </style>
+    </defs>
+
+    <g transform="translate(50, 50)">
+        <text class="repo-title" x="0" y="0">Target Repo</text>
+
+        <path class="graph-line" d="M 40 40 L 40 140" />
+        <circle class="node node-target" cx="40" cy="40" r="8" />
+        <circle class="node node-target" cx="40" cy="90" r="8" />
+        <circle class="node node-target" cx="40" cy="140" r="8" />
+
+        <rect class="tree-border scene1-element" x="75" y="20" width="140" height="115" />
+
+        <text class="code-text scene1-element" x="80" y="35">
+            <tspan x="80" dy="0">target-repo/</tspan>
+            <tspan class="bold-text" x="80" dy="20">├── .git/</tspan>
+            <tspan x="80" dy="20">├── src/</tspan>
+            <tspan x="80" dy="20">│   └── main.c</tspan>
+            <tspan x="80" dy="20">└── Makefile</tspan>
+        </text>
+    </g>
+
+    <g transform="translate(500, 50)">
+        <text class="repo-title" x="0" y="0">Dependency Repo</text>
+
+        <path class="graph-line" d="M 40 40 L 40 140" />
+        <circle class="node node-dep" cx="40" cy="40" r="8" />
+        <circle class="node node-dep" cx="40" cy="90" r="8" />
+        <circle class="node node-dep" cx="40" cy="140" r="8" />
+
+        <rect class="tree-border scene1-element" x="75" y="20" width="140" height="115" />
+
+        <text class="code-text scene1-element" x="80" y="35">
+            <tspan x="80" dy="0">dep/</tspan>
+            <tspan class="bold-text" x="80" dy="20">├── .git/</tspan>
+            <tspan x="80" dy="20">├── include/</tspan>
+            <tspan x="80" dy="20">│   └── lib.h</tspan>
+            <tspan x="80" dy="20">└── lib.c</tspan>
+        </text>
+    </g>
+
+    <path class="graph-line merge-arrow" d="M 90 190 L 305 285" marker-end="url(#arrow)" />
+    <path class="graph-line merge-arrow" d="M 540 190 L 325 285" marker-end="url(#arrow)" />
+
+    <g class="scene2-element" transform="translate(0, 0)">
+        <text class="repo-title" x="180" y="295">Merge Commit</text>
+        <circle class="node node-merge" cx="315" cy="290" r="10" />
+
+        <rect class="tree-border" x="290" y="315" width="160" height="195" />
+
+        <text class="code-text" x="300" y="330">
+            <tspan x="300" dy="0">target-repo/</tspan>
+            <tspan class="bold-text" x="300" dy="20">├── .git/</tspan>
+            <tspan x="300" dy="20">├── src/</tspan>
+            <tspan x="300" dy="20">│   └── main.c</tspan>
+            <tspan x="300" dy="20">├── Makefile</tspan>
+            <tspan class="highlight-text" x="300" dy="20">└── dep/             &lt;-- Subdirectory</tspan>
+            <tspan class="highlight-text" x="300" dy="20">    ├── include/</tspan>
+            <tspan class="highlight-text" x="300" dy="20">    │   └── lib.h</tspan>
+            <tspan class="highlight-text" x="300" dy="20">    └── lib.c</tspan>
+        </text>
+    </g>
+</svg>

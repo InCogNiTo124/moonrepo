@@ -3,7 +3,7 @@ FROM alpine:latest AS image-preparer
 WORKDIR /out
 COPY ./posts ./
 # Delete all files that are NOT .jpg AND NOT .png, then remove empty directories
-RUN find . -type f ! -name '*.jpg' ! -name '*.png' -delete && \
+RUN find . -type f ! -name '*.jpg' ! -name '*.png' ! -name '*.svg' -delete && \
     find . -type d -empty -delete   
 
 FROM scratch

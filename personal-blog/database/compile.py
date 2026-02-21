@@ -217,6 +217,7 @@ def process_blog_entry_dir(blog_dir: Path, tag_cache: Dict[str, Tag]) -> Post:
             toc={"marker": "!!!TOC!!!"},
         ),
         output_format="html5",
+        tab_length=2,
     )
     t0 = time.perf_counter()
     html = md.convert(content)
