@@ -9,7 +9,7 @@ dependencies = [
     "markdown>=3.7",
     "markdown-captions>=2.1.2",
     "markdown-full-yaml-metadata>=2.2.1",
-    "markdown-katex>=202406.1035",
+    "markdown-katex-rs==0.1.0",
     "mdx-breakless-lists>=1.0.1",
     "pygments>=2.19.1",
     "pymdown-extensions>=10.14.3",

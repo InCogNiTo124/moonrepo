@@ -8,7 +8,7 @@ from typing import Dict, List, Optional
 
 import htmlmin
 import markdown
-import markdown_katex  # noqa: F401
+import markdown_katex_rs  # noqa: F401 - used implicity in L203
 import typer
 from markdown.extensions import Extension
 from markdown.treeprocessors import Treeprocessor
@@ -200,7 +200,7 @@ def process_blog_entry_dir(blog_dir: Path, tag_cache: Dict[str, Tag]) -> Post:
             ImgUrlExtension(slug=slug),
             "pymdownx.extra",
             "pymdownx.tilde",
-            "markdown_katex",
+            "markdown_katex_rs",
             "full_yaml_metadata",
             "smarty",
             "sane_lists",

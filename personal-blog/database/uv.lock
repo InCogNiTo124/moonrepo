@@ -50,7 +50,7 @@ dependencies = [
     { name = "markdown" },
     { name = "markdown-captions" },
     { name = "markdown-full-yaml-metadata" },
-    { name = "markdown-katex" },
+    { name = "markdown-katex-rs" },
     { name = "mdx-breakless-lists" },
     { name = "pygments" },
     { name = "pymdown-extensions" },
@@ -64,7 +64,7 @@ requires-dist = [
     { name = "markdown", specifier = ">=3.7" },
     { name = "markdown-captions", specifier = ">=2.1.2" },
     { name = "markdown-full-yaml-metadata", specifier = ">=2.2.1" },
-    { name = "markdown-katex", specifier = ">=202406.1035" },
+    { name = "markdown-katex-rs", specifier = "==0.1.0" },
     { name = "mdx-breakless-lists", specifier = ">=1.0.1" },
     { name = "pygments", specifier = ">=2.19.1" },
     { name = "pymdown-extensions", specifier = ">=10.14.3" },
@@ -163,16 +163,22 @@ wheels = [
 ]
 
 [[package]]
-name = "markdown-katex"
-version = "202406.1035"
+name = "markdown-katex-rs"
+version = "0.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown" },
-    { name = "setuptools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/07/d1/fb725e498ae1119ce21d3f7b721a16e42fd43ee0433d1be092c279006b10/markdown-katex-202406.1035.tar.gz", hash = "sha256:e82f7bf9a8536451da8f01768d847516fa1827feb17140b8eaa0bea9826bdab0", size = 39561876, upload-time = "2024-06-24T12:28:11.445Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f4/34/780748d7d78fb4024dd1a290844374dd0d9830da35593c534638a4e9e54e/markdown_katex-202406.1035-py2.py3-none-any.whl", hash = "sha256:c1713e85854ddecb641ad96243a8b6cd67367bf1bf8d39b43b3680d7f2b1884d", size = 39766871, upload-time = "2024-06-24T12:27:46.251Z" },
+    { url = "https://files.pythonhosted.org/packages/fe/06/7d93f280278f3e95e9e5fefe5a34fbecd06f3203298d31f7e195331b81a9/markdown_katex_rs-0.1.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:55359e730237cb8fd0b5638a9555c3841abb25bb04cf07d26b768a60ba5d47ac", size = 999409, upload-time = "2026-02-22T16:33:53.695Z" },
+    { url = "https://files.pythonhosted.org/packages/34/54/eca87a69433a9f76f9219990481089b7945988bd2a1ef2e71fd4b20d7965/markdown_katex_rs-0.1.0-cp312-cp312-manylinux_2_34_x86_64.whl", hash = "sha256:5f3dcdd9dda28a3bff8fd6d139e06ff12ad4ea7d01ab43dd0ddc591a7fb9971b", size = 1085886, upload-time = "2026-02-22T16:33:54.903Z" },
+    { url = "https://files.pythonhosted.org/packages/f6/18/7a6888257cf3f3f2f70247ce20fa310e00aa8a0dfad1962e9054ba7b5952/markdown_katex_rs-0.1.0-cp312-cp312-win_amd64.whl", hash = "sha256:603c795fe11df04a44aef78e92ade961f211ebb0d928982186a27b882acce9e4", size = 869272, upload-time = "2026-02-22T16:33:56.361Z" },
+    { url = "https://files.pythonhosted.org/packages/1a/e3/daa0d663dd07d1b045da67e98ec2c353a43bbe1d1dc6c62908860f845832/markdown_katex_rs-0.1.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:95cfa837d666f0d6ee884cf8976d55e6e5ca7e17dbfe93ea5122287011293ff0", size = 998624, upload-time = "2026-02-22T16:33:57.746Z" },
+    { url = "https://files.pythonhosted.org/packages/82/f3/5ed841d188777977614c7dd2da22f7d55f7afecba0765ff2d0943e0427c0/markdown_katex_rs-0.1.0-cp313-cp313-manylinux_2_34_x86_64.whl", hash = "sha256:c84991ec59d2ccccbef125af8baf4d1414a4438e30342f3cd54845db0514e64a", size = 1085250, upload-time = "2026-02-22T16:33:59.032Z" },
+    { url = "https://files.pythonhosted.org/packages/14/a5/f34c7efe03a3d7beb0b10219cee040ad17879f8bcbc5d55d76b73d5ab995/markdown_katex_rs-0.1.0-cp313-cp313-win_amd64.whl", hash = "sha256:6b6bfde15dd2e596d6418aded606f1b1e6431d48b0840a6fc6c93d782c930fe6", size = 869069, upload-time = "2026-02-22T16:34:00.278Z" },
+    { url = "https://files.pythonhosted.org/packages/76/69/f357cfeffbcb32ffd3351506e713dd74dbc477fef994796abb832cf96cf1/markdown_katex_rs-0.1.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:6d615422d42f78ed2a03006455cddfe7c61bf75abf45f840c654a96d5df69e76", size = 998604, upload-time = "2026-02-22T16:34:01.707Z" },
+    { url = "https://files.pythonhosted.org/packages/6b/a1/6db043738458ee0b69f45170d68727836b86533a3ae034616b882bd2ee79/markdown_katex_rs-0.1.0-cp314-cp314-manylinux_2_34_x86_64.whl", hash = "sha256:c59ca37ed8fd9d1d7538a8f76d36873ca9f3022014d92a488da6de958fdcae9f", size = 1085298, upload-time = "2026-02-22T16:34:02.925Z" },
+    { url = "https://files.pythonhosted.org/packages/10/93/0181df759f86d1c58e9c9202e72e81248e4a6ae0c677444ce62249b5a473/markdown_katex_rs-0.1.0-cp314-cp314-win_amd64.whl", hash = "sha256:a7ddf0681a48dae9c1d6cdd05d61fa13e419b025346d6c1b7c815d5838360db4", size = 869057, upload-time = "2026-02-22T16:34:04.183Z" },
 ]
 
 [[package]]
@@ -361,15 +367,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/74/99/a4cab2acbb884f80e558b0771e97e21e939c5dfb460f488d19df485e8298/rich-14.3.2.tar.gz", hash = "sha256:e712f11c1a562a11843306f5ed999475f09ac31ffb64281f73ab29ffdda8b3b8", size = 230143, upload-time = "2026-02-01T16:20:47.908Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ef/45/615f5babd880b4bd7d405cc0dc348234c5ffb6ed1ea33e152ede08b2072d/rich-14.3.2-py3-none-any.whl", hash = "sha256:08e67c3e90884651da3239ea668222d19bea7b589149d8014a21c633420dbb69", size = 309963, upload-time = "2026-02-01T16:20:46.078Z" },
-]
-
-[[package]]
-name = "setuptools"
-version = "82.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/82/f3/748f4d6f65d1756b9ae577f329c951cda23fb900e4de9f70900ced962085/setuptools-82.0.0.tar.gz", hash = "sha256:22e0a2d69474c6ae4feb01951cb69d515ed23728cf96d05513d36e42b62b37cb", size = 1144893, upload-time = "2026-02-08T15:08:40.206Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e1/c6/76dc613121b793286a3f91621d7b75a2b493e0390ddca50f11993eadf192/setuptools-82.0.0-py3-none-any.whl", hash = "sha256:70b18734b607bd1da571d097d236cfcfacaf01de45717d59e6e04b96877532e0", size = 1003468, upload-time = "2026-02-08T15:08:38.723Z" },
 ]
 
 [[package]]
