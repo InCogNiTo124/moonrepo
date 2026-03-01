@@ -275,7 +275,7 @@ I mean, don't get me wrong, the entire project has barely 250 SLOC. It's not exa
 
 I later made the model build test cases out of my blog to verify that, at the very least, [_I have a use_](https://hannahilea.com/blog/houseplant-programming/) from the library, and then I made it explain to me in simple words how to setup GHA CI so I can push it on PyPI without much hassle, since this usually takes too much effort anyways. And I have to say, I'm glad I did, because I prepared for a struggle with secrets and keys, but instead, I got instructions for setting up [OIDC](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-pypi) with PyPI. I'm not so sure about AGI, but Gemini is superhuman when it comes to GHA CI best practices, if that human is me 😁
 
-All in all, it took me up to 6h, with breaks, to go from exploring the problem space to the push to PyPI. 🐍🦀🎉
+All in all, it took me up to 6h, with breaks, to go from exploring the problem space to the push to PyPI. 🐍🦀🎉 You can explore the codebase at [InCogNiTo124/markdown-katex-rs](https://github.com/InCogNiTo124/markdown-katex-rs).
 
 ## Marking the bench
 Without further ado, let me show you how this GenAI adventure had a clear impact on my latency obsession:
