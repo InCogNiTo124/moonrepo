@@ -98,7 +98,7 @@ def _serialize_xml(write, elem, qnames, namespaces, short_empty_elements, **kwar
 
 ET._serialize_xml = ET._serialize["xml"] = _serialize_xml
 
-LINK = "https://blog.msmetko.xyz/posts/{}"
+LINK = "https://terra-incognita.blog/posts/{}"
 
 
 def subelement(parent, tag, text):
