@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   preview:
@@ -15,6 +16,7 @@ jobs:
       # pulumi actions don't seem to work with uv without this
       # https://github.com/pulumi/actions/issues/1117#issuecomment-2784766954
       - run: uv --project=cosmos sync
+
       - uses: pulumi/actions@main
         with:
           command: up
@@ -28,3 +30,4 @@ jobs:
           ARIES_PUB: ${{ secrets.ARIES_PUB }}
           HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
           PULUMI_SKIP_CONFIRMATIONS: 'true'
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
