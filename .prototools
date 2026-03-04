@@ -2,3 +2,7 @@ moon = "2.0.3"
 bun = "1.3.5"
 rust = "1.93.1"
 uv = "0.10.7"
+wasm-pack = "0.14.0"
+
+[plugins]
+wasm-pack = "source:./wasm-pack.toml"

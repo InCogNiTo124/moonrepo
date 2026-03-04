@@ -1,0 +1,30 @@
+name = "wasm-pack"
+type = "cli"
+
+[resolve]
+git-url = "https://github.com/drager/wasm-pack"
+
+[install]
+download-url = "https://github.com/drager/wasm-pack/releases/download/v{version}/{download_file}"
+
+[install.arch]
+aarch64 = "aarch64"
+x86_64 = "x86_64"
+
+[platform.linux]
+archive-prefix = "wasm-pack-v{version}-{arch}-unknown-linux-musl"
+exe-path = "wasm-pack"
+download-file = "wasm-pack-v{version}-{arch}-unknown-linux-musl.tar.gz"
+
+[platform.macos]
+archive-prefix = "wasm-pack-v{version}-{arch}-apple-darwin"
+exe-path = "wasm-pack"
+download-file = "wasm-pack-v{version}-{arch}-apple-darwin.tar.gz"
+
+[platform.windows]
+archive-prefix = "wasm-pack-v{version}-{arch}-pc-windows-msvc"
+exe-path = "wasm-pack.exe"
+download-file = "wasm-pack-v{version}-{arch}-pc-windows-msvc.tar.gz"
+
+[detect]
+version-files = [ ".wasm-pack-version" ]
