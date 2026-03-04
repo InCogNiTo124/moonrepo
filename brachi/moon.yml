@@ -1,37 +1,29 @@
-# yaml-language-server: $schema=../.moon/cache/schemas/project.json
-
-# Inherit tasks from the `sveltekit` preset
-# https://github.com/moonrepo/moon-configs
 tags:
-  - sveltekit
-  - docker
-
+- sveltekit
+- docker
 layer: application
 project:
-  name: brachi
-  description: "Brachistochrone visualizer"
-
+  description: Brachistochrone visualizer
+  title: brachi
 dependsOn:
-  - brachistochrone-solver
-
+- brachistochrone-solver
 tasks:
   install:
-    command: "bun"
+    command: bun
     args:
-      - "install"
+    - install
     inputs:
-      - "package.json"
-      - "bun.lock"
-
+    - package.json
+    - bun.lock
   build:
-    command: "bun"
+    command: bun
     args:
-      - "run"
-      - "build"
+    - run
+    - build
     deps:
-      - "~:install"
-      - brachistochrone-solver:build
+    - ~:install
+    - brachistochrone-solver:build
     outputs:
-      - "build/**"
+    - build/**
     options:
       merge: replace

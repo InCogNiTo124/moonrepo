@@ -1,43 +1,25 @@
-$schema: 'https://moonrepo.dev/schemas/project.json'
-
-type: application
-language: rust
-tags:
-  - docker
-
-fileGroups:
-  posts:
-    - "posts/*"
-
-project:
-  name: personal-blog-database
-  description: "The server for the personal blog database."
-
+$schema: https://moonrepo.dev/schemas/project.json
 tasks:
   build:
-    command: 'cargo build --release --locked'
+    command: cargo build --release --locked
     outputs:
-      - 'target/x86_64-unknown-linux-musl/release/database'
-
+    - target/x86_64-unknown-linux-musl/release/database
   compile:
-    command: 'uv run compile.py @in(0)' 
+    command: uv run compile.py @in(0)
     inputs:
-      - '@dirs(posts)'
+    - '@dirs(posts)'
     outputs:
-      - 'db.sqlite3'
-      - 'feed.rss'
+    - db.sqlite3
+    - feed.rss
     toolchain: python
-
   docker:
     deps:
-      - compile
-      - build
-
+    - compile
+    - build
   docker-push:
     deps:
-      - compile
-      - build
-
+    - compile
+    - build
   staging:
     script: |
       FRONTEND_LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/personal-blog-frontend' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
@@ -45,6 +27,15 @@ tasks:
       moon generate --force docker-compose-blog $projectSource -- --frontendDockerImage "$FRONTEND_LATEST_IMAGE" --dbDockerImage "$DB_LATEST_IMAGE"
       docker compose -f $projectSource/docker-compose.yaml up && docker compose -f $projectSource/docker-compose.yaml rm -fs && rm $projectSource/docker-compose.yaml
     deps:
-      - docker
-      - personal-blog-frontend:docker
- 
+    - docker
+    - personal-blog-frontend:docker
+language: rust
+tags:
+- docker
+fileGroups:
+  posts:
+  - posts/*
+project:
+  description: The server for the personal blog database.
+  title: personal-blog-database
+layer: application

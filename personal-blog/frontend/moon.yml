@@ -1,46 +1,34 @@
-# yaml-language-server: $schema=../../.moon/cache/schemas/project.json
-
-# Inherit tasks from the `sveltekit` preset
-# https://github.com/moonrepo/moon-configs
 tags:
-  - sveltekit
-  - docker
-
+- sveltekit
+- docker
 layer: application
-
 project:
-  name: personal-blog-frontend
-  description: "Terra Incognita, personal blog"
-
-dependsOn:
-  - personal-reusables
-
+  description: Terra Incognita, personal blog
+  title: personal-blog-frontend
 tasks:
   install:
-    command: "bun"
+    command: bun
     args:
-      - "install"
+    - install
     inputs:
-      - "package.json"
-      - "bun.lock"
-
+    - package.json
+    - bun.lock
   check:
     deps:
-      - "~:install"
-      - personal-reusables:build
+    - ~:install
+    - personal-reusables:build
   build:
     command: bun
     args:
-      - "run"
-      - "build"
+    - run
+    - build
     deps:
-      - "~:install"
-      - personal-reusables:build
+    - ~:install
+    - personal-reusables:build
     outputs:
-      - "build/**"
+    - build/**
     options:
       merge: replace
-
   staging:
     script: |
       FRONTEND_LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/personal-blog-frontend' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
@@ -48,5 +36,5 @@ tasks:
       moon generate --force docker-compose-blog $projectSource -- --frontendDockerImage "$FRONTEND_LATEST_IMAGE" --dbDockerImage "$DB_LATEST_IMAGE"
       docker compose -f $projectSource/docker-compose.yaml up && docker compose -f $projectSource/docker-compose.yaml rm -fs && rm $projectSource/docker-compose.yaml
     deps:
-      - docker
-      - personal-blog-database:docker
+    - docker
+    - personal-blog-database:docker

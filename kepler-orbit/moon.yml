@@ -1,41 +1,32 @@
-# yaml-language-server: $schema=../.moon/cache/schemas/project.json
-
-# Inherit tasks from the `sveltekit` preset
-# https://github.com/moonrepo/moon-configs
 tags:
-  - docker
-
+- docker
 layer: application
 project:
-  name: kepler-orbit
-  description: "Keplerian orbit visualization"
-
+  description: Keplerian orbit visualization
+  title: kepler-orbit
 language: typescript
-
 tasks:
   install:
-    command: "bun"
+    command: bun
     args:
-      - "install"
+    - install
     inputs:
-      - "package.json"
-      - "bun.lock"
-
+    - package.json
+    - bun.lock
   check:
     command: tsc
     args:
-      - "--noEmit"
+    - --noEmit
     deps:
-      - "~:install"
-
+    - ~:install
   build:
     command: bun
     args:
-      - "run"
-      - "build"
+    - run
+    - build
     deps:
-      - "~:install"
+    - ~:install
     outputs:
-      - dist/**
+    - dist/**
     options:
       merge: replace

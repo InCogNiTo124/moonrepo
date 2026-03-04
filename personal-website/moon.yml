@@ -1,41 +1,31 @@
-# yaml-language-server: $schema=../.moon/cache/schemas/project.json
-
-# Inherit tasks from the `sveltekit` preset
-# https://github.com/moonrepo/moon-configs
 tags:
-  - "sveltekit"
-  - "docker"
-
+- sveltekit
+- docker
 layer: application
 project:
-  name: personal-website
-  description: "Personal website"
-
-dependsOn:
-  - personal-reusables
-
+  description: Personal website
+  title: personal-website
 tasks:
   install:
-    command: "bun"
+    command: bun
     args:
-      - "install"
+    - install
     inputs:
-      - "package.json"
-      - "bun.lock"
-
+    - package.json
+    - bun.lock
   check:
     deps:
-      - "~:install"
-      - personal-reusables:build
+    - ~:install
+    - personal-reusables:build
   build:
     command: bun
     args:
-      - "run"
-      - "build"
+    - run
+    - build
     deps:
-      - "~:install"
-      - personal-reusables:build
+    - ~:install
+    - personal-reusables:build
     outputs:
-      - "build/**"
+    - build/**
     options:
       merge: replace

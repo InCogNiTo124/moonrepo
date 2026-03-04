@@ -1,27 +1,35 @@
-name: Pulumi (main)
+name: Pulumi
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
   workflow_dispatch:
 
 jobs:
-  preview:
-    name: Deploy
+  pulumi:
+    name: ${{ github.event_name == 'push' && 'Deploy' || 'Preview' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
     steps:
       - uses: actions/checkout@main
       - uses: astral-sh/setup-uv@main
 
       # pulumi actions don't seem to work with uv without this
       # https://github.com/pulumi/actions/issues/1117#issuecomment-2784766954
-      - run: uv --project=cosmos sync
+      - run: uv --project=cosmos sync 
 
       - uses: pulumi/actions@main
         with:
-          command: up
+          command: ${{ github.event_name == 'push' && 'up' || 'preview' }}
           stack-name: cosmos
-          work-dir: ./cosmos 
+          work-dir: ./cosmos
+          comment-on-pr: ${{ github.event_name == 'pull_request' }}
           comment-on-summary: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
         env:
