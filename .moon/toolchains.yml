@@ -1,0 +1,11 @@
+rust:
+  targets:
+  - x86_64-unknown-linux-musl
+  - wasm32-unknown-unknown
+bun: {}
+unstable_uv: {}
+javascript:
+  packageManager: bun
+  inferTasksFromScripts: true
+  syncPackageManagerField: true
+  syncProjectWorkspaceDependencies: true

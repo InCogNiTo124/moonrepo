@@ -1,30 +1,25 @@
-# yaml-language-server: $schema=../.moon/cache/schemas/project.json
 tags:
-  - "sveltekit"
-
+- sveltekit
 layer: library
 language: typescript
-
-toolchain:
-  default: "bun"
-
 tasks:
   install:
-    command: "bun"
+    command: bun
     args:
-      - "install"
+    - install
     inputs:
-      - "package.json"
-      - "bun.lock"
-
+    - package.json
+    - bun.lock
   build:
     command: bun
     args:
-      - "run"
-      - "build"
+    - run
+    - build
     deps:
-      - "~:install"
+    - ~:install
     outputs:
-      - "dist/**"
+    - dist/**
     options:
       merge: replace
+toolchains:
+  default: bun
