@@ -35,6 +35,7 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           GH_PAT: ${{ secrets.GH_PAT }}
+          ARIES: ${{ secrets.ARIES }}
           ARIES_PUB: ${{ secrets.ARIES_PUB }}
           HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
           PULUMI_SKIP_CONFIRMATIONS: 'true'
