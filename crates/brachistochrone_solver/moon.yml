@@ -5,6 +5,8 @@ tags:
 tasks:
   build:
     command: wasm-pack build
+    env:
+      RUSTUP_TOOLCHAIN: "${RUSTUP_TOOLCHAIN}"
     outputs:
     - pkg/
 project:
