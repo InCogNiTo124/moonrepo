@@ -121,6 +121,17 @@
         {
             "customType": "regex",
             "managerFilePatterns": [
+                "/^\\.github/workflows/ci\\.yml$/"
+            ],
+            "matchStrings": [
+                "RUSTUP_TOOLCHAIN: \"(?<currentValue>[^\"]+)\""
+            ],
+            "depNameTemplate": "rust-lang/rust",
+            "datasourceTemplate": "github-releases"
+        },
+        {
+            "customType": "regex",
+            "managerFilePatterns": [
                 "/^\\.github/workflows/ci-main\\.yml$/"
             ],
             "matchStrings": [

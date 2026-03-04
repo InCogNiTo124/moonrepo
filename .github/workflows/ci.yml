@@ -18,6 +18,8 @@ jobs:
   ci:
     name: "CI"
     runs-on: "ubuntu-latest"
+    env:
+      RUSTUP_TOOLCHAIN: "1.93.1"
     permissions:
       contents: read
       packages: write
@@ -35,20 +37,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Setup wasm-pack"
-        env:
-          WASM_PACK_VERSION: "v0.14.0"
-        run: |
-          curl -LO https://github.com/drager/wasm-pack/releases/download/${{ env.WASM_PACK_VERSION }}/wasm-pack-${{ env.WASM_PACK_VERSION }}-x86_64-unknown-linux-musl.tar.gz
-          tar xvzf wasm-pack-${{ env.WASM_PACK_VERSION }}-x86_64-unknown-linux-musl.tar.gz
-          sudo cp wasm-pack-${{ env.WASM_PACK_VERSION }}-x86_64-unknown-linux-musl/wasm-pack /usr/bin
-
       - uses: "actions/checkout@main"
         with:
           fetch-depth: 0
 
       - uses: "moonrepo/setup-toolchain@v0"
         with:
+          auto-install: true
           auto-setup: true
           cache: false
 

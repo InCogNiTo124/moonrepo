@@ -1,4 +1,5 @@
 rust:
+  version: 1.93.1
   targets:
   - x86_64-unknown-linux-musl
   - wasm32-unknown-unknown
