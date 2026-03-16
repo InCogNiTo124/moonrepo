@@ -1,22 +1,18 @@
-version: '3.8'
-
 services:
   jaja:
     build: .
     image: jaja:latest
     restart: always
-    env_file:
-      - .env
     environment:
-      - PHX_HOST=jaja.localhost
+      - PHX_HOST=0.0.0.0
       - PORT=4000
       - DATABASE_PATH=/app/data/jaja_prod.db
-      - SECRET_KEY_BASE=your_secret_key_base_here_at_least_64_bytes
-      - ADMIN_EMAIL=me@gmail.com
-      - GOOGLE_CLIENT_ID=your_google_client_id
-      - GOOGLE_CLIENT_SECRET=your_google_client_secret
+      - SECRET_KEY_BASE=dummy_secret_key_base_for_local_docker_development_that_is_long_enough
+      - ADMIN_EMAIL
+      - GOOGLE_CLIENT_ID
+      - GOOGLE_CLIENT_SECRET
     volumes:
-      - ./data:/app/data
+      - jaja_data:/app/data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jaja.rule=Host(`jaja.localhost`)"
@@ -24,3 +20,6 @@ services:
       - "traefik.http.routers.jaja.tls.certresolver=myresolver"
     ports:
       - "4000:4000"
+
+volumes:
+  jaja_data:

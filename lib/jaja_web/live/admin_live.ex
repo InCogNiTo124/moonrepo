@@ -62,7 +62,7 @@ defmodule JajaWeb.AdminLive do
           
           <.button
             type="submit"
-            class={["btn w-full", @form.source.valid? && "btn-primary" || "btn-neutral"]}
+            class={"btn w-full #{if @form.source.valid?, do: "btn-primary", else: "btn-neutral"}"}
             disabled={!@form.source.valid?}
           >
             Create Batch

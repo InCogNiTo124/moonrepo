@@ -2,7 +2,6 @@ defmodule JajaWeb.OrderLive do
   use JajaWeb, :live_view
 
   alias Jaja.Shop
-  alias Jaja.Shop.Order
 
   alias JajaWeb.Presence
 
@@ -105,14 +104,14 @@ defmodule JajaWeb.OrderLive do
 
         <%= if @remaining > 0 do %>
           <.form for={@form} phx-change="validate" phx-submit="reserve" class="space-y-4">
-            <.input field={@form[:batch_reference]} type="hidden" value={@batch.unique_reference} />
+            <input type="hidden" name={@form[:batch_reference].name} value={@batch.unique_reference} />
             
             <.input field={@form[:name]} type="text" label="Your Name" required placeholder="John Doe" />
             <.input field={@form[:amount]} type="number" label="Amount" min="1" max={@remaining} required />
 
             <.button
               type="submit"
-              class={["btn w-full", @form.source.valid? && "btn-primary" || "btn-neutral"]}
+              class={"btn w-full #{if @form.source.valid?, do: "btn-primary", else: "btn-neutral"}"}
               disabled={!@form.source.valid?}
             >
               Reserve Now
