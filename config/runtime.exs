@@ -21,16 +21,18 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
-  database_path =
-    System.get_env("DATABASE_PATH") ||
-      raise """
-      environment variable DATABASE_PATH is missing.
-      For example: /etc/jaja/jaja.db
-      """
-
   config :jaja, Jaja.Repo,
-    database: database_path,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5")
+    ssl: [verify: :verify_none],
+    username:
+      System.get_env("DATABASE_USER") || raise("missing DATABASE_USER environment variable"),
+    password:
+      System.get_env("DATABASE_PASSWORD") ||
+        raise("missing DATABASE_PASSWORD environment variable"),
+    hostname: "postgres4a-exoscale-3f1ca88f-2ed3-4886-8817-f8ce726f9357.j.aivencloud.com",
+    port: 21699,
+    database: "jaja",
+    maintenance_database: "defaultdb",
+    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
@@ -44,7 +46,7 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "example.com"
+  host = System.get_env("PHX_HOST") || "jaja.msmetko.xyz"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :jaja, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")

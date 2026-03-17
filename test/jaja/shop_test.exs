@@ -21,7 +21,12 @@ defmodule Jaja.ShopTest do
     end
 
     test "create_batch/1 with valid data creates a batch" do
-      valid_attrs = %{type: "some type", amount: 42, datetime: ~N[2025-11-17 18:12:00], unique_reference: "some unique_reference"}
+      valid_attrs = %{
+        type: "some type",
+        amount: 42,
+        datetime: ~N[2025-11-17 18:12:00],
+        unique_reference: "some unique_reference"
+      }
 
       assert {:ok, %Batch{} = batch} = Shop.create_batch(valid_attrs)
       assert batch.type == "some type"
@@ -36,7 +41,13 @@ defmodule Jaja.ShopTest do
 
     test "update_batch/2 with valid data updates the batch" do
       batch = batch_fixture()
-      update_attrs = %{type: "some updated type", amount: 43, datetime: ~N[2025-11-18 18:12:00], unique_reference: "some updated unique_reference"}
+
+      update_attrs = %{
+        type: "some updated type",
+        amount: 43,
+        datetime: ~N[2025-11-18 18:12:00],
+        unique_reference: "some updated unique_reference"
+      }
 
       assert {:ok, %Batch{} = batch} = Shop.update_batch(batch, update_attrs)
       assert batch.type == "some updated type"
@@ -81,7 +92,12 @@ defmodule Jaja.ShopTest do
     end
 
     test "create_order/1 with valid data creates a order" do
-      valid_attrs = %{name: "some name", amount: 42, datetime: ~N[2025-11-17 18:13:00], batch_reference: "some batch_reference"}
+      valid_attrs = %{
+        name: "some name",
+        amount: 42,
+        datetime: ~N[2025-11-17 18:13:00],
+        batch_reference: "some batch_reference"
+      }
 
       assert {:ok, %Order{} = order} = Shop.create_order(valid_attrs)
       assert order.name == "some name"
@@ -96,7 +112,13 @@ defmodule Jaja.ShopTest do
 
     test "update_order/2 with valid data updates the order" do
       order = order_fixture()
-      update_attrs = %{name: "some updated name", amount: 43, datetime: ~N[2025-11-18 18:13:00], batch_reference: "some updated batch_reference"}
+
+      update_attrs = %{
+        name: "some updated name",
+        amount: 43,
+        datetime: ~N[2025-11-18 18:13:00],
+        batch_reference: "some updated batch_reference"
+      }
 
       assert {:ok, %Order{} = order} = Shop.update_order(order, update_attrs)
       assert order.name == "some updated name"

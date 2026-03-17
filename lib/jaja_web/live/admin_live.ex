@@ -32,6 +32,8 @@ defmodule JajaWeb.AdminLive do
   def handle_event("save", %{"batch" => batch_params}, socket) do
     case Shop.create_batch(batch_params) do
       {:ok, batch} ->
+        batch = Map.put(batch, :orders, [])
+
         {:noreply,
          socket
          |> update(:batches, fn batches -> [batch | batches] end)
@@ -59,7 +61,7 @@ defmodule JajaWeb.AdminLive do
             required
           />
           <.input field={@form[:amount]} type="number" label="Amount" min="1" required />
-          
+
           <.button
             type="submit"
             class={"btn w-full #{if @form.source.valid?, do: "btn-primary", else: "btn-neutral"}"}
@@ -72,31 +74,57 @@ defmodule JajaWeb.AdminLive do
 
       <div class="bg-base-100 p-6 rounded-lg shadow text-base-content">
         <h2 class="text-xl font-semibold mb-4">Active Batches</h2>
-        <div class="overflow-x-auto">
-          <table class="table w-full">
-            <thead>
-              <tr class="text-base-content">
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Date</th>
-                <th>Link</th>
-              </tr>
-            </thead>
-            <tbody>
-              <%= for batch <- @batches do %>
-                <tr>
-                  <td><%= batch.type %></td>
-                  <td><%= batch.amount %></td>
-                  <td><%= batch.datetime %></td>
-                  <td>
-                    <a href={~p"/order/#{batch.unique_reference}"} target="_blank" class="text-blue-600 hover:underline">
-                      <%= url(~p"/order/#{batch.unique_reference}") %>
-                    </a>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
+        <div class="space-y-4">
+          <%= for batch <- @batches do %>
+            <div class="border rounded-lg p-4 bg-base-200">
+              <div class="flex justify-between items-center mb-2">
+                <div>
+                  <span class="font-bold text-lg">{batch.type}</span>
+                  <span class="ml-2 badge badge-neutral">{batch.amount} total qty</span>
+                </div>
+                <div class="text-sm">
+                  <span>{batch.datetime}</span>
+                  <a
+                    href={~p"/order/#{batch.unique_reference}"}
+                    target="_blank"
+                    class="text-blue-600 hover:underline ml-4"
+                  >
+                    Link
+                  </a>
+                </div>
+              </div>
+
+              <details class="bg-base-100 rounded p-2 border">
+                <summary class="cursor-pointer font-semibold select-none">
+                  Orders ({length(batch.orders)})
+                </summary>
+                <%= if is_nil(batch.orders) or batch.orders == [] do %>
+                  <p class="mt-2 text-sm italic opacity-70">No orders yet.</p>
+                <% else %>
+                  <div class="overflow-x-auto mt-2">
+                    <table class="table table-sm w-full">
+                      <thead>
+                        <tr>
+                          <th>Nick</th>
+                          <th>Amount</th>
+                          <th>Time</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <%= for order <- batch.orders do %>
+                          <tr>
+                            <td>{order.name}</td>
+                            <td>{order.amount}</td>
+                            <td>{order.datetime}</td>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
+                  </div>
+                <% end %>
+              </details>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>

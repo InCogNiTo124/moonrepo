@@ -3,7 +3,9 @@ defmodule Jaja.Repo.Migrations.CreateOrders do
 
   def change do
     create table(:orders) do
-      add :batch_reference, references(:batches, column: :unique_reference, type: :string, on_delete: :delete_all)
+      add :batch_reference,
+          references(:batches, column: :unique_reference, type: :string, on_delete: :delete_all)
+
       add :name, :string
       add :amount, :integer
       add :datetime, :naive_datetime

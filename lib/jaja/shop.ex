@@ -19,6 +19,7 @@ defmodule Jaja.Shop do
   """
   def list_batches do
     Repo.all(Batch)
+    |> Repo.preload(:orders)
   end
 
   @doc """
@@ -117,6 +118,10 @@ defmodule Jaja.Shop do
     Repo.all(Order)
   end
 
+  def list_orders_for_batch(batch_reference) do
+    Repo.all(from o in Order, where: o.batch_reference == ^batch_reference)
+  end
+
   @doc """
   Gets a single order.
 
@@ -197,6 +202,7 @@ defmodule Jaja.Shop do
   def change_order(%Order{} = order, attrs \\ %{}) do
     Order.changeset(order, attrs)
   end
+
   def get_batch_by_reference!(reference) do
     Repo.get_by!(Batch, unique_reference: reference)
   end

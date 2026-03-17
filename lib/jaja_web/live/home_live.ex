@@ -21,7 +21,9 @@ defmodule JajaWeb.HomeLive do
         <div class="hero-content text-center">
           <div class="max-w-md">
             <h1 class="text-5xl font-bold">Welcome to Eggshop</h1>
-            <p class="py-6">Fresh produce reserved directly from the source. Check out our active batches below.</p>
+            <p class="py-6">
+              Fresh produce reserved directly from the source. Check out our active batches below.
+            </p>
           </div>
         </div>
       </div>
@@ -38,12 +40,17 @@ defmodule JajaWeb.HomeLive do
             <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
               <div class="card-body">
                 <h2 class="card-title capitalize">
-                  <%= batch.type %>
+                  {batch.type}
                   <div class="badge badge-secondary">NEW</div>
                 </h2>
-                <p>Batch Reference: <span class="font-mono text-xs"><%= batch.unique_reference %></span></p>
+                <p>
+                  Batch Reference: <span class="font-mono text-xs">{batch.unique_reference}</span>
+                </p>
                 <div class="card-actions justify-end mt-4">
-                  <.link navigate={~p"/order/#{batch.unique_reference}"} class="btn btn-primary w-full">
+                  <.link
+                    navigate={~p"/order/#{batch.unique_reference}"}
+                    class="btn btn-primary w-full"
+                  >
                     Reserve Now
                   </.link>
                 </div>

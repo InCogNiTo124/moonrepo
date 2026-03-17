@@ -8,7 +8,9 @@ defmodule Jaja.Shop.Batch do
     field :datetime, :naive_datetime
     field :unique_reference, :string
 
-    has_many :orders, Jaja.Shop.Order, foreign_key: :batch_reference, references: :unique_reference
+    has_many :orders, Jaja.Shop.Order,
+      foreign_key: :batch_reference,
+      references: :unique_reference
 
     timestamps(type: :utc_datetime)
   end

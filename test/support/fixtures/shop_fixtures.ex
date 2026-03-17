@@ -7,7 +7,8 @@ defmodule Jaja.ShopFixtures do
   @doc """
   Generate a unique batch unique_reference.
   """
-  def unique_batch_unique_reference, do: "some unique_reference#{System.unique_integer([:positive])}"
+  def unique_batch_unique_reference,
+    do: "some unique_reference#{System.unique_integer([:positive])}"
 
   @doc """
   Generate a batch.

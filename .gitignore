@@ -39,3 +39,9 @@ npm-debug.log
 *.db
 *.db-*
 
+# postgres ca.pem
+ca.pem 
+
+# Local secrets
+.envrc
+/data/

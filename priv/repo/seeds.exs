@@ -24,6 +24,7 @@ for product <- products do
       %Product{}
       |> Product.changeset(product)
       |> Repo.insert!()
+
     _ ->
       IO.puts("Product #{product.name} already exists.")
   end

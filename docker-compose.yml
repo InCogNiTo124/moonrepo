@@ -6,13 +6,11 @@ services:
     environment:
       - PHX_HOST=0.0.0.0
       - PORT=4000
-      - DATABASE_PATH=/app/data/jaja_prod.db
       - SECRET_KEY_BASE=dummy_secret_key_base_for_local_docker_development_that_is_long_enough
       - ADMIN_EMAIL
       - GOOGLE_CLIENT_ID
       - GOOGLE_CLIENT_SECRET
-    volumes:
-      - jaja_data:/app/data
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jaja.rule=Host(`jaja.localhost`)"
@@ -21,5 +19,17 @@ services:
     ports:
       - "4000:4000"
 
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jaja_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
 volumes:
-  jaja_data:
+  pgdata:
