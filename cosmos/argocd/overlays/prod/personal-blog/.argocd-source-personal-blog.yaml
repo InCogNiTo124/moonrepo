@@ -1,4 +1,4 @@
 kustomize:
   images:
-  - ghcr.io/incognito124/personal-blog-frontend:1774053419
+  - ghcr.io/incognito124/personal-blog-frontend:1774101939
   - ghcr.io/incognito124/personal-blog-database:1774053419
