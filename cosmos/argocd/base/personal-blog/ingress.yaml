@@ -19,3 +19,32 @@ spec:
                 name: personal-blog
                 port:
                   number: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-blog
+spec:
+  redirectRegex:
+    regex: "^https?://blog\\.msmetko\\.xyz.*"
+    replacement: "https://terra-incognita.blog/"
+    permanent: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: blog-redirect
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`blog.msmetko.xyz`)
+      kind: Rule
+      middlewares:
+        - name: redirect-blog
+
+      # unused, but required
+      services:
+        - name: personal-blog
+          port: 80

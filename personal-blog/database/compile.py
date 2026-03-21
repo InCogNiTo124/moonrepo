@@ -125,8 +125,8 @@ class RssBuilder:
             },
         )
         self.channel = ET.SubElement(self.root, "channel")
-        subelement(self.channel, "title", "blog.msmetko.xyz")
-        subelement(self.channel, "link", "https://blog.msmetko.xyz")
+        subelement(self.channel, "title", "Terra Incognita")
+        subelement(self.channel, "link", "https://terra-incognita.blog")
         subelement(
             self.channel,
             "description",
@@ -140,7 +140,7 @@ class RssBuilder:
             self.channel,
             "atom:link",
             {
-                "href": "https://blog.msmetko.xyz/feed",
+                "href": "https://terra-incognita.blog/feed.rss",
                 "rel": "self",
                 "type": "application/rss+xml",
             },
