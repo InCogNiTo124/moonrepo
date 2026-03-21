@@ -11,9 +11,9 @@ tasks:
   staging:
     script: |
       LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/$project' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
-      moon generate --force docker-compose $projectSource -- --dockerImage "$LATEST_IMAGE"
+      moon generate --force --to $projectSource docker-compose -- --dockerImage "$LATEST_IMAGE"
       docker compose -f $projectSource/docker-compose.yaml up && docker compose -f $projectSource/docker-compose.yaml rm -fs
-      rm $projectSource/docker-compose.yaml
+      rm -f $projectSource/docker-compose.yaml
     deps:
     - docker
     preset: server
