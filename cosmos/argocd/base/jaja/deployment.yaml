@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaja
+  labels:
+    app: jaja
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jaja
+  template:
+    metadata:
+      labels:
+        app: jaja
+    spec:
+      containers:
+        - name: jaja
+          image: ghcr.io/incognito124/jaja:1774562912
+          ports:
+            - name: web
+              containerPort: 4000
+          envFrom:
+            - configMapRef:
+                name: jaja-config
+            - secretRef:
+                name: jaja-secret
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 4000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 10

@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jaja
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/InCogNiTo124/moonrepo
+    targetRevision: HEAD
+    path: cosmos/argocd/overlays/prod/jaja
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: jaja
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

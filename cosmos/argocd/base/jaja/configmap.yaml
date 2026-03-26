@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jaja-config
+data:
+  PHX_SERVER: "true"
+  PHX_HOST: "jaja.msmetko.xyz"
+  PORT: "4000"
+  DATABASE_USER: "jaja"
+  POOL_SIZE: "10"
+  ADMIN_EMAIL: "marijansmetko123@gmail.com"
