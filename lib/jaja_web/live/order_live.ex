@@ -60,13 +60,14 @@ defmodule JajaWeb.OrderLive do
           {:noreply,
            socket
            |> push_event("store_name", %{name: order_params["name"]})
+           |> assign(:ordered_amount, String.to_integer(order_params["amount"]))
            |> assign(:reserved, true)}
 
         {:error, changeset} ->
           {:noreply, assign(socket, :form, to_form(changeset))}
       end
     else
-      {:noreply, put_flash(socket, :error, "Not enough stock!")}
+      {:noreply, put_flash(socket, :error, "Nema dovoljno zaliha!")}
     end
   end
 
@@ -84,33 +85,64 @@ defmodule JajaWeb.OrderLive do
     {:noreply, assign(socket, :viewers, viewers)}
   end
 
+  defp translate_type(type) do
+    case String.downcase(type) do
+      "eggs" -> "Jaja"
+      "turkey" -> "Puretina"
+      other -> other
+    end
+  end
+
   def render(assigns) do
     ~H"""
     <div class="mx-auto max-w-md p-6 bg-base-100 rounded-lg shadow-lg mt-10 text-base-content">
       <%= if @reserved do %>
         <div class="text-center">
-          <h2 class="text-2xl font-bold text-success mb-4">Reservation Confirmed!</h2>
-          <p class="mb-4">You have successfully reserved your {@batch.type}.</p>
+          <h2 class="text-2xl font-bold text-success mb-4">Rezervacija potvrđena!</h2>
+          <p class="mb-4">Uspješno ste rezervirali proizvod: {translate_type(@batch.type)}.</p>
           <p class="text-sm text-base-content/70">
-            Please proceed to payment via the link below (if applicable).
+            Molimo izvršite plaćanje putem linkova ispod.
           </p>
-          <!-- Custom message/link placeholder -->
-          <a href="#" class="btn btn-primary mt-4">Complete Purchase</a>
+
+          <% total_eur = @ordered_amount * 3.50 %>
+          <div class="my-6 p-4 bg-base-200 rounded-lg shadow-sm border border-base-300">
+            <p class="text-base font-medium opacity-80 mb-1">Iznos za uplatu:</p>
+            <p class="text-3xl font-extrabold text-primary">
+              {:erlang.float_to_binary(total_eur, decimals: 2)} €
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-3 mt-4">
+            <a
+              href={"https://revolut.me/smetko?currency=EUR&amount=#{total_eur}&note=Smetkova+Jaja"}
+              class="btn btn-primary"
+              target="_blank"
+            >
+              Plati putem Revoluta
+            </a>
+            <a
+              href="https://kekspay.hr/keks?a=kekstag&tag=#marijans525"
+              class="btn bg-[#00DDA2] hover:bg-[#00c592] text-white border-none"
+              target="_blank"
+            >
+              Plati putem Keks Pay-a
+            </a>
+          </div>
         </div>
       <% else %>
-        <h1 class="text-3xl font-bold mb-2">{@batch.type}</h1>
+        <h1 class="text-3xl font-bold mb-2 capitalize">{translate_type(@batch.type)}</h1>
         <p class="text-base-content/70 mb-6">
-          Batch Reference: <span class="font-mono">{@batch.unique_reference}</span>
+          Referenca ponude: <span class="font-mono">{@batch.unique_reference}</span>
         </p>
 
         <div class="mb-8 text-center">
           <div class="text-5xl font-bold text-primary">{@remaining}</div>
           <div class="text-base-content/50 uppercase tracking-wide text-sm font-semibold">
-            Remaining Boxes
+            Preostalo kutija
           </div>
           <div class="mt-2 text-sm text-base-content/60">
             <span class="inline-block w-2 h-2 bg-success rounded-full mr-1"></span>
-            {@viewers} people viewing
+            {@viewers} ljudi pregledava
           </div>
         </div>
 
@@ -121,14 +153,14 @@ defmodule JajaWeb.OrderLive do
             <.input
               field={@form[:name]}
               type="text"
-              label="Your Name"
+              label="Vaše ime"
               required
-              placeholder="John Doe"
+              placeholder="Ivan Horvat"
             />
             <.input
               field={@form[:amount]}
               type="number"
-              label="Amount"
+              label="Broj paketa"
               min="1"
               max={@remaining}
               required
@@ -139,12 +171,12 @@ defmodule JajaWeb.OrderLive do
               class={"btn w-full #{if @form.source.valid?, do: "btn-primary", else: "btn-neutral"}"}
               disabled={!@form.source.valid?}
             >
-              Reserve Now
+              Rezerviraj
             </.button>
           </.form>
         <% else %>
           <div class="bg-error/10 text-error p-4 rounded text-center font-bold">
-            Sold Out!
+            Rasprodano!
           </div>
         <% end %>
       <% end %>

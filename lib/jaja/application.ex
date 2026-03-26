@@ -10,8 +10,6 @@ defmodule Jaja.Application do
     children = [
       JajaWeb.Telemetry,
       Jaja.Repo,
-      {Ecto.Migrator,
-       repos: Application.fetch_env!(:jaja, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:jaja, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Jaja.PubSub},
       # Start a worker by calling: Jaja.Worker.start_link(arg)
@@ -33,10 +31,5 @@ defmodule Jaja.Application do
   def config_change(changed, _new, removed) do
     JajaWeb.Endpoint.config_change(changed, removed)
     :ok
-  end
-
-  defp skip_migrations?() do
-    # By default, sqlite migrations are run when using a release
-    System.get_env("RELEASE_NAME") == nil
   end
 end

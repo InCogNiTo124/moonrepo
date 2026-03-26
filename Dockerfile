@@ -57,8 +57,10 @@ RUN mix release
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
+LABEL org.opencontainers.image.source=https://github.com/incognito124/moonrepo
 
-RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales \
+
+RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # Set the locale

@@ -45,6 +45,14 @@ defmodule JajaWeb.AdminLive do
     end
   end
 
+  defp translate_type(type) do
+    case String.downcase(type) do
+      "eggs" -> "Jaja"
+      "turkey" -> "Puretina"
+      other -> other
+    end
+  end
+
   def render(assigns) do
     ~H"""
     <div class="mx-auto max-w-4xl p-4">
@@ -57,7 +65,7 @@ defmodule JajaWeb.AdminLive do
             field={@form[:type]}
             type="select"
             label="Product Type"
-            options={Enum.map(@products, &{&1.name, &1.slug})}
+            options={Enum.map(@products, &{translate_type(&1.name), &1.slug})}
             required
           />
           <.input field={@form[:amount]} type="number" label="Amount" min="1" required />
@@ -79,7 +87,7 @@ defmodule JajaWeb.AdminLive do
             <div class="border rounded-lg p-4 bg-base-200">
               <div class="flex justify-between items-center mb-2">
                 <div>
-                  <span class="font-bold text-lg">{batch.type}</span>
+                  <span class="font-bold text-lg">{translate_type(batch.type)}</span>
                   <span class="ml-2 badge badge-neutral">{batch.amount} total qty</span>
                 </div>
                 <div class="text-sm">

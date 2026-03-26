@@ -2,13 +2,13 @@ import Config
 
 # Configure your database
 config :jaja, Jaja.Repo,
-  ssl: System.get_env("DEV_DATABASE_SSL") == "true",
-  ssl_opts: [verify: :verify_none],
+  ssl: if(System.get_env("DEV_DATABASE_SSL") == "true", do: [verify: :verify_none], else: false),
   username: System.get_env("DEV_DATABASE_USER") || "postgres",
   password: System.get_env("DEV_DATABASE_PASSWORD") || "postgres",
   hostname: System.get_env("DEV_DATABASE_HOST") || "localhost",
   port: String.to_integer(System.get_env("DEV_DATABASE_PORT") || "5432"),
   database: System.get_env("DEV_DATABASE_NAME") || "jaja_dev",
+  maintenance_database: System.get_env("DEV_MAINTENANCE_DATABASE") || "defaultdb",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10

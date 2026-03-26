@@ -20,19 +20,21 @@ defmodule JajaWeb.HomeLive do
       <div class="hero min-h-[40vh] bg-base-200 rounded-box mb-8">
         <div class="hero-content text-center">
           <div class="max-w-md">
-            <h1 class="text-5xl font-bold">Welcome to Eggshop</h1>
+            <h1 class="text-5xl font-bold">Smetkova jaja</h1>
             <p class="py-6">
-              Fresh produce reserved directly from the source. Check out our active batches below.
+              Svježa domaća jaja direktno s farme. Pogledajte aktivne ponude ispod.
             </p>
           </div>
         </div>
       </div>
 
-      <h2 class="text-3xl font-bold mb-6 text-center">Available Now</h2>
+      <h2 class="text-3xl font-bold mb-6 text-center">Dostupno odmah</h2>
 
       <%= if @batches == [] do %>
         <div class="text-center py-10 bg-base-100 rounded-lg shadow">
-          <p class="text-xl text-base-content/60">No active batches right now. Check back later!</p>
+          <p class="text-xl text-base-content/60">
+            Trenutno nema aktivnih ponuda. Navratite kasnije!
+          </p>
         </div>
       <% else %>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -41,17 +43,17 @@ defmodule JajaWeb.HomeLive do
               <div class="card-body">
                 <h2 class="card-title capitalize">
                   {batch.type}
-                  <div class="badge badge-secondary">NEW</div>
+                  <div class="badge badge-secondary">NOVO</div>
                 </h2>
                 <p>
-                  Batch Reference: <span class="font-mono text-xs">{batch.unique_reference}</span>
+                  Referenca ponude: <span class="font-mono text-xs">{batch.unique_reference}</span>
                 </p>
                 <div class="card-actions justify-end mt-4">
                   <.link
                     navigate={~p"/order/#{batch.unique_reference}"}
                     class="btn btn-primary w-full"
                   >
-                    Reserve Now
+                    Rezerviraj
                   </.link>
                 </div>
               </div>
