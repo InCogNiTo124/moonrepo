@@ -5,8 +5,9 @@ metadata:
   namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/image-list: blog=ghcr.io/incognito124/personal-blog-frontend, blog-db=ghcr.io/incognito124/personal-blog-database
-    argocd-image-updater.argoproj.io/blog.update-strategy: numeric
-    argocd-image-updater.argoproj.io/blog-db.update-strategy: numeric
+    # TODO: Temporary 'alphabetical' workaround. Change this back to 'numeric' when ArgoCD supports it, or by 2286-11-20T17:46:40Z, whichever comes first.
+    argocd-image-updater.argoproj.io/blog.update-strategy: alphabetical
+    argocd-image-updater.argoproj.io/blog-db.update-strategy: alphabetical
     argocd-image-updater.argoproj.io/write-back-method: git
     argocd-image-updater.argoproj.io/git-branch: main
 spec:
