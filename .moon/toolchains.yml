@@ -10,7 +10,7 @@ bun:
 unstable_uv:
   syncArgs:
     - "--frozen"
-    - "--require-hashes"
+    - "--no-build"
 javascript:
   packageManager: bun
   inferTasksFromScripts: true
