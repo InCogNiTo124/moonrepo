@@ -8,3 +8,6 @@ dependencies = [
     "sympy>=1.13.3",
     "tqdm>=4.67.1",
 ]
+
+[tool.uv]
+exclude-newer = "7 days"

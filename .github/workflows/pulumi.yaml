@@ -22,7 +22,7 @@ jobs:
 
       # pulumi actions don't seem to work with uv without this
       # https://github.com/pulumi/actions/issues/1117#issuecomment-2784766954
-      - run: uv --project=cosmos sync 
+      - run: uv --project=cosmos sync --frozen --require-hashes
 
       - uses: pulumi/actions@main
         with:

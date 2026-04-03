@@ -8,6 +8,7 @@
         "enabled": true
     },
     "separateMajorMinor": true,
+    "minimumReleaseAge": "7 days",
     "packageRules": [
         {
             "matchFileNames": [

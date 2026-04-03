@@ -19,7 +19,7 @@ jobs:
     name: "CI"
     runs-on: "ubuntu-latest"
     env:
-      RUSTUP_TOOLCHAIN: "1.94.0"
+      RUSTUP_TOOLCHAIN: "1.94.1"
     permissions:
       contents: read
       packages: write

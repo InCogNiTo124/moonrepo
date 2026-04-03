@@ -14,3 +14,6 @@ dependencies = [
 
 [tool.uv.sources]
 pynvim = { git = "https://github.com/neovim/pynvim.git" }
+
+[tool.uv]
+exclude-newer = "7 days"
