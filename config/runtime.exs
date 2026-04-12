@@ -22,15 +22,15 @@ end
 
 if config_env() == :prod do
   config :jaja, Jaja.Repo,
-    ssl: [verify: :verify_none],
+    ssl: if(System.get_env("DATABASE_SSL") == "false", do: false, else: [verify: :verify_none]),
     username:
       System.get_env("DATABASE_USER") || raise("missing DATABASE_USER environment variable"),
     password:
       System.get_env("DATABASE_PASSWORD") ||
         raise("missing DATABASE_PASSWORD environment variable"),
-    hostname: "postgres4a-exoscale-3f1ca88f-2ed3-4886-8817-f8ce726f9357.j.aivencloud.com",
-    port: 21699,
-    database: "jaja",
+    hostname: System.get_env("DATABASE_HOST") || "postgres4a-exoscale-3f1ca88f-2ed3-4886-8817-f8ce726f9357.j.aivencloud.com",
+    port: String.to_integer(System.get_env("DATABASE_PORT") || "21699"),
+    database: System.get_env("DATABASE_NAME") || "jaja",
     maintenance_database: "defaultdb",
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
@@ -60,6 +60,13 @@ if config_env() == :prod do
       # for details about using IPv6 vs IPv4 and loopback vs public addresses.
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
+    ],
+    check_origin: [
+      "https://" <> host,
+      "https://jaja.localhost",
+      "http://localhost:4000",
+      "http://127.0.0.1:4000",
+      "http://0.0.0.0:4000"
     ],
     secret_key_base: secret_key_base
 

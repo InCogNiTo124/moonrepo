@@ -174,21 +174,6 @@ defmodule Jaja.Shop do
     |> Repo.update()
   end
 
-  @doc """
-  Deletes a order.
-
-  ## Examples
-
-      iex> delete_order(order)
-      {:ok, %Order{}}
-
-      iex> delete_order(order)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_order(%Order{} = order) do
-    Repo.delete(order)
-  end
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking order changes.

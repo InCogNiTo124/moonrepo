@@ -133,11 +133,6 @@ defmodule Jaja.ShopTest do
       assert order == Shop.get_order!(order.id)
     end
 
-    test "delete_order/1 deletes the order" do
-      order = order_fixture()
-      assert {:ok, %Order{}} = Shop.delete_order(order)
-      assert_raise Ecto.NoResultsError, fn -> Shop.get_order!(order.id) end
-    end
 
     test "change_order/1 returns a order changeset" do
       order = order_fixture()
