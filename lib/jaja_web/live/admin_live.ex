@@ -45,6 +45,34 @@ defmodule JajaWeb.AdminLive do
     end
   end
 
+  def handle_event("toggle_status", %{"id" => id, "field" => field}, socket) do
+    order = Shop.get_order!(id)
+    current_val = Map.get(order, String.to_existing_atom(field))
+
+    case Shop.update_order_admin(order, %{field => !current_val}) do
+      {:ok, updated_order} ->
+        # Update the specific order in the socket assigns
+        batches =
+          Enum.map(socket.assigns.batches, fn batch ->
+            if batch.unique_reference == updated_order.batch_reference do
+              updated_orders =
+                Enum.map(batch.orders, fn o ->
+                  if o.id == updated_order.id, do: updated_order, else: o
+                end)
+
+              %{batch | orders: updated_orders}
+            else
+              batch
+            end
+          end)
+
+        {:noreply, assign(socket, batches: batches)}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Failed to update status.")}
+    end
+  end
+
   defp translate_type(type) do
     case String.downcase(type) do
       "eggs" -> "Jaja"
@@ -116,6 +144,8 @@ defmodule JajaWeb.AdminLive do
                           <th>Nick</th>
                           <th>Amount</th>
                           <th>Time</th>
+                          <th>Paid</th>
+                          <th>Delivered</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -124,6 +154,27 @@ defmodule JajaWeb.AdminLive do
                             <td>{order.name}</td>
                             <td>{order.amount}</td>
                             <td>{order.datetime}</td>
+                            <td>
+                              <input
+                                type="checkbox"
+                                class="checkbox checkbox-sm"
+                                checked={order.payment_received}
+                                phx-click="toggle_status"
+                                phx-value-id={order.id}
+                                phx-value-field="payment_received"
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="checkbox"
+                                class="checkbox checkbox-sm"
+                                checked={order.delivered}
+                                disabled={!order.payment_received}
+                                phx-click="toggle_status"
+                                phx-value-id={order.id}
+                                phx-value-field="delivered"
+                              />
+                            </td>
                           </tr>
                         <% end %>
                       </tbody>

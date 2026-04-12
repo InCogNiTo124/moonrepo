@@ -7,6 +7,8 @@ defmodule Jaja.Shop.Order do
     field :name, :string
     field :amount, :integer
     field :datetime, :naive_datetime
+    field :payment_received, :boolean, default: false
+    field :delivered, :boolean, default: false
 
     timestamps(type: :utc_datetime)
   end
@@ -24,5 +26,11 @@ defmodule Jaja.Shop.Order do
       nil -> put_change(changeset, :datetime, NaiveDateTime.local_now())
       _ -> changeset
     end
+  end
+
+  @doc false
+  def admin_changeset(order, attrs) do
+    order
+    |> cast(attrs, [:payment_received, :delivered])
   end
 end

@@ -133,7 +133,6 @@ defmodule Jaja.ShopTest do
       assert order == Shop.get_order!(order.id)
     end
 
-
     test "change_order/1 returns a order changeset" do
       order = order_fixture()
       assert %Ecto.Changeset{} = Shop.change_order(order)

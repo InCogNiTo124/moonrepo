@@ -174,6 +174,14 @@ defmodule Jaja.Shop do
     |> Repo.update()
   end
 
+  @doc """
+  Updates an order's status fields (restricted admin).
+  """
+  def update_order_admin(%Order{} = order, attrs) do
+    order
+    |> Order.admin_changeset(attrs)
+    |> Repo.update()
+  end
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking order changes.
