@@ -39,6 +39,13 @@ defmodule Jaja.Shop do
   def get_batch!(id), do: Repo.get!(Batch, id)
 
   @doc """
+  Gets a single batch and preloads its orders.
+  """
+  def get_batch_with_orders!(id) do
+    Repo.get!(Batch, id) |> Repo.preload(:orders)
+  end
+
+  @doc """
   Creates a batch.
 
   ## Examples
