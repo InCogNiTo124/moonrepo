@@ -50,6 +50,13 @@ jobs:
       - run:
           "moon ${{ github.event.inputs.targets && github.event.inputs.targets || 'ci'}}"
 
+      # NOTE: `.moon/tasks/tag-docker.yml` has `runInCI: false` on the `docker-push` task
+      # to prevent docker images from being pushed on PRs via the `moon ci` command above.
+      # Because of this, we manually run the push step here for active deployment branches.
+      - name: "Push Docker Images"
+        run: moon run :docker-push
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+
       - uses: moonrepo/run-report-action@v1
         if: success() || failure()
         with:
