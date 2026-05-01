@@ -38,6 +38,7 @@ Moon should be smart enough to cache things that did not change.
 ### Known issues
 
 * `libsqlite3-sys` version in `//personal-blog/database` sometimes conflicts with `diesel`, since they release on a different cadence. If this happens, just manually bump the version down, i.e. to the previous version.
+* When updating toolchain versions (e.g., Rust), make sure to align the versions in `.moon/toolchains.yml` and `.github/workflows/ci.yml` (e.g. `RUSTUP_TOOLCHAIN`).
 
 ## 3. Publish
 

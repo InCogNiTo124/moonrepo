@@ -78,10 +78,10 @@
         {
             "customType": "regex",
             "managerFilePatterns": [
-                "/^\\.moon/toolchain\\.yml$/"
+                "/^\\.moon/toolchains\\.yml$/"
             ],
             "matchStrings": [
-                "node:\\n\\s+version: \"(?<currentValue>[^\"]+)\""
+                "node:\\n\\s+version: \"?(?<currentValue>[^\"\\s]+)\"?"
             ],
             "depNameTemplate": "node",
             "datasourceTemplate": "node-version"
@@ -89,10 +89,10 @@
         {
             "customType": "regex",
             "managerFilePatterns": [
-                "/^\\.moon/toolchain\\.yml$/"
+                "/^\\.moon/toolchains\\.yml$/"
             ],
             "matchStrings": [
-                "yarn:\\n\\s+version: \"(?<currentValue>[^\"]+)\""
+                "yarn:\\n\\s+version: \"?(?<currentValue>[^\"\\s]+)\"?"
             ],
             "depNameTemplate": "yarn",
             "datasourceTemplate": "npm"
@@ -100,10 +100,10 @@
         {
             "customType": "regex",
             "managerFilePatterns": [
-                "/^\\.moon/toolchain\\.yml$/"
+                "/^\\.moon/toolchains\\.yml$/"
             ],
             "matchStrings": [
-                "rust:\\n\\s+version: \"(?<currentValue>[^\"]+)\""
+                "rust:\\n\\s+version: \"?(?<currentValue>[^\"\\s]+)\"?"
             ],
             "depNameTemplate": "rust-lang/rust",
             "datasourceTemplate": "github-releases"
@@ -111,10 +111,10 @@
         {
             "customType": "regex",
             "managerFilePatterns": [
-                "/^\\.moon/toolchain\\.yml$/"
+                "/^\\.moon/toolchains\\.yml$/"
             ],
             "matchStrings": [
-                "uv:\\n\\s+version: \"(?<currentValue>[^\"]+)\""
+                "uv:\\n\\s+version: \"?(?<currentValue>[^\"\\s]+)\"?"
             ],
             "depNameTemplate": "astral-sh/uv",
             "datasourceTemplate": "github-releases"
