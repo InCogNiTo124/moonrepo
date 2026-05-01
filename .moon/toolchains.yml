@@ -11,6 +11,7 @@ unstable_uv:
   syncArgs:
     - "--frozen"
     - "--no-build"
+unstable_python: {}
 javascript:
   packageManager: bun
   inferTasksFromScripts: true

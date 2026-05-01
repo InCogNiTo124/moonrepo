@@ -65,9 +65,14 @@ write_files:
         namespace: kube-system
       spec:
         valuesContent: |-
+          experimental:
+            plugins:
+              cow-txt-plugin: {{}}
           additionalArguments:
             - "--log.level=DEBUG"
             - "--accesslog=true"
+            - "--experimental.plugins.cow-txt-plugin.moduleName=github.com/InCogNiTo124/cow-txt-plugin"
+            - "--experimental.plugins.cow-txt-plugin.version=v0.1.3"
           certificatesResolvers:
             letsencrypt:
               acme:
@@ -226,4 +231,4 @@ runcmd:
   - wget https://github.com/derailed/k9s/releases/download/v0.50.16/k9s_Linux_amd64.tar.gz && tar -xzvf k9s_Linux_amd64.tar.gz && mv k9s /usr/local/bin/ && rm k9s_Linux_amd64.tar.gz
   
   # Install k3s (Only after volume is ready)
-  - curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.34.6+k3s1 sh -s - server --default-local-storage-path /data/k3s-storage
+  - curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.35.4+k3s1 sh -s - server --default-local-storage-path /data/k3s-storage

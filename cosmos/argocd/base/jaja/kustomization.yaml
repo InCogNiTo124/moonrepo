@@ -4,4 +4,5 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - middleware-cow.yaml
   - configmap.yaml
