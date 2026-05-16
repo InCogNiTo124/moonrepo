@@ -6,8 +6,6 @@ tasks:
   build:
     command: wasm-pack build
     toolchains: [rust]
-    env:
-      RUSTUP_TOOLCHAIN: "1.94.0"
     outputs:
     - pkg/
 project:
