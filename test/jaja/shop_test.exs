@@ -8,11 +8,11 @@ defmodule Jaja.ShopTest do
 
     import Jaja.ShopFixtures
 
-    @invalid_attrs %{type: nil, amount: nil, datetime: nil, unique_reference: nil}
+    @invalid_attrs %{type: nil, amount: nil, datetime: nil, unique_reference: nil, price: nil}
 
     test "list_batches/0 returns all batches" do
       batch = batch_fixture()
-      assert Shop.list_batches() == [batch]
+      assert Shop.list_batches() == [Repo.preload(batch, :orders)]
     end
 
     test "get_batch!/1 returns the batch with given id" do
@@ -25,7 +25,8 @@ defmodule Jaja.ShopTest do
         type: "some type",
         amount: 42,
         datetime: ~N[2025-11-17 18:12:00],
-        unique_reference: "some unique_reference"
+        unique_reference: "some unique_reference",
+        price: 3.5
       }
 
       assert {:ok, %Batch{} = batch} = Shop.create_batch(valid_attrs)
@@ -33,6 +34,7 @@ defmodule Jaja.ShopTest do
       assert batch.amount == 42
       assert batch.datetime == ~N[2025-11-17 18:12:00]
       assert batch.unique_reference == "some unique_reference"
+      assert batch.price == 3.5
     end
 
     test "create_batch/1 with invalid data returns error changeset" do
@@ -46,7 +48,8 @@ defmodule Jaja.ShopTest do
         type: "some updated type",
         amount: 43,
         datetime: ~N[2025-11-18 18:12:00],
-        unique_reference: "some updated unique_reference"
+        unique_reference: "some updated unique_reference",
+        price: 4.5
       }
 
       assert {:ok, %Batch{} = batch} = Shop.update_batch(batch, update_attrs)
@@ -54,6 +57,7 @@ defmodule Jaja.ShopTest do
       assert batch.amount == 43
       assert batch.datetime == ~N[2025-11-18 18:12:00]
       assert batch.unique_reference == "some updated unique_reference"
+      assert batch.price == 4.5
     end
 
     test "update_batch/2 with invalid data returns error changeset" do
@@ -92,18 +96,19 @@ defmodule Jaja.ShopTest do
     end
 
     test "create_order/1 with valid data creates a order" do
+      batch = batch_fixture()
       valid_attrs = %{
         name: "some name",
         amount: 42,
         datetime: ~N[2025-11-17 18:13:00],
-        batch_reference: "some batch_reference"
+        batch_reference: batch.unique_reference
       }
 
       assert {:ok, %Order{} = order} = Shop.create_order(valid_attrs)
       assert order.name == "some name"
       assert order.amount == 42
       assert order.datetime == ~N[2025-11-17 18:13:00]
-      assert order.batch_reference == "some batch_reference"
+      assert order.batch_reference == batch.unique_reference
     end
 
     test "create_order/1 with invalid data returns error changeset" do
@@ -112,19 +117,20 @@ defmodule Jaja.ShopTest do
 
     test "update_order/2 with valid data updates the order" do
       order = order_fixture()
+      other_batch = batch_fixture()
 
       update_attrs = %{
         name: "some updated name",
         amount: 43,
         datetime: ~N[2025-11-18 18:13:00],
-        batch_reference: "some updated batch_reference"
+        batch_reference: other_batch.unique_reference
       }
 
       assert {:ok, %Order{} = order} = Shop.update_order(order, update_attrs)
       assert order.name == "some updated name"
       assert order.amount == 43
       assert order.datetime == ~N[2025-11-18 18:13:00]
-      assert order.batch_reference == "some updated batch_reference"
+      assert order.batch_reference == other_batch.unique_reference
     end
 
     test "update_order/2 with invalid data returns error changeset" do

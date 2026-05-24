@@ -104,7 +104,8 @@ defmodule JajaWeb.OrderLive do
             Molimo izvršite plaćanje putem linkova ispod.
           </p>
 
-          <% total_eur = @ordered_amount * 3.50 %>
+          <% total_eur = @ordered_amount * @batch.price %>
+          <% total_cents = round(total_eur * 100) %>
           <div class="my-6 p-4 bg-base-200 rounded-lg shadow-sm border border-base-300">
             <p class="text-base font-medium opacity-80 mb-1">Iznos za uplatu:</p>
             <p class="text-3xl font-extrabold text-primary">
@@ -114,7 +115,7 @@ defmodule JajaWeb.OrderLive do
 
           <div class="flex flex-col gap-3 mt-4">
             <a
-              href={"https://revolut.me/smetko?currency=EUR&amount=#{total_eur}&note=Smetkova+Jaja"}
+              href={"https://revolut.me/smetko?currency=EUR&amount=#{total_cents}&note=Smetkova+Jaja"}
               class="btn btn-primary"
               target="_blank"
             >

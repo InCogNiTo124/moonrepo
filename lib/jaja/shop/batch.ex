@@ -7,6 +7,7 @@ defmodule Jaja.Shop.Batch do
     field :amount, :integer
     field :datetime, :naive_datetime
     field :unique_reference, :string
+    field :price, :float
 
     has_many :orders, Jaja.Shop.Order,
       foreign_key: :batch_reference,
@@ -18,8 +19,8 @@ defmodule Jaja.Shop.Batch do
   @doc false
   def changeset(batch, attrs) do
     batch
-    |> cast(attrs, [:type, :amount, :datetime, :unique_reference])
-    |> validate_required([:type, :amount])
+    |> cast(attrs, [:type, :amount, :datetime, :unique_reference, :price])
+    |> validate_required([:type, :amount, :price])
     |> put_datetime()
     |> put_unique_reference()
     |> unique_constraint(:unique_reference)

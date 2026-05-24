@@ -20,7 +20,8 @@ defmodule Jaja.ShopFixtures do
         amount: 42,
         datetime: ~N[2025-11-17 18:12:00],
         type: "some type",
-        unique_reference: unique_batch_unique_reference()
+        unique_reference: unique_batch_unique_reference(),
+        price: 3.5
       })
       |> Jaja.Shop.create_batch()
 
@@ -31,11 +32,18 @@ defmodule Jaja.ShopFixtures do
   Generate a order.
   """
   def order_fixture(attrs \\ %{}) do
+    batch_reference =
+      attrs[:batch_reference] ||
+        (
+          batch = batch_fixture()
+          batch.unique_reference
+        )
+
     {:ok, order} =
       attrs
       |> Enum.into(%{
         amount: 42,
-        batch_reference: "some batch_reference",
+        batch_reference: batch_reference,
         datetime: ~N[2025-11-17 18:13:00],
         name: "some name"
       })

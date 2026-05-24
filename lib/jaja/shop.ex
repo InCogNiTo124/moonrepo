@@ -203,6 +203,16 @@ defmodule Jaja.Shop do
     Order.changeset(order, attrs)
   end
 
+  def get_last_price_for_type(type) do
+    from(b in Batch,
+      where: b.type == ^type,
+      order_by: [desc: b.inserted_at],
+      limit: 1,
+      select: b.price
+    )
+    |> Repo.one()
+  end
+
   def get_batch_by_reference!(reference) do
     Repo.get_by!(Batch, unique_reference: reference)
   end

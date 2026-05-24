@@ -11,7 +11,8 @@ defmodule JajaWeb.AdminLive do
 
     batches = Shop.list_batches()
     products = Shop.list_products()
-    changeset = Shop.change_batch(%Batch{type: "eggs"})
+    last_price = Shop.get_last_price_for_type("eggs")
+    changeset = Shop.change_batch(%Batch{type: "eggs", price: last_price})
 
     {:ok,
      socket
@@ -22,6 +23,24 @@ defmodule JajaWeb.AdminLive do
   end
 
   def handle_event("validate", %{"batch" => batch_params}, socket) do
+    current_type = socket.assigns.form.params["type"]
+    new_type = batch_params["type"]
+
+    batch_params =
+      if new_type != current_type do
+        last_price = Shop.get_last_price_for_type(new_type)
+        current_price = batch_params["price"]
+        prev_type_last_price = current_type && Shop.get_last_price_for_type(current_type)
+
+        if last_price && (current_price == "" || is_nil(current_price) || (prev_type_last_price && current_price == to_string(prev_type_last_price))) do
+          Map.put(batch_params, "price", last_price)
+        else
+          batch_params
+        end
+      else
+        batch_params
+      end
+
     changeset =
       %Batch{}
       |> Shop.change_batch(batch_params)
@@ -34,12 +53,13 @@ defmodule JajaWeb.AdminLive do
     case Shop.create_batch(batch_params) do
       {:ok, batch} ->
         batch = Map.put(batch, :orders, [])
+        last_price = Shop.get_last_price_for_type("eggs")
 
         {:noreply,
          socket
          |> stream_insert(:batches, batch, at: 0)
          |> put_flash(:info, "Batch created successfully")
-         |> assign(:form, to_form(Shop.change_batch(%Batch{type: "eggs"})))}
+         |> assign(:form, to_form(Shop.change_batch(%Batch{type: "eggs", price: last_price})))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :form, to_form(changeset))}
@@ -101,6 +121,7 @@ defmodule JajaWeb.AdminLive do
             required
           />
           <.input field={@form[:amount]} type="number" label="Amount" min="1" required />
+          <.input field={@form[:price]} type="number" step="0.01" label="Price (EUR)" required />
 
           <.button
             type="submit"
@@ -124,6 +145,9 @@ defmodule JajaWeb.AdminLive do
               <div>
                 <span class="font-bold text-lg">{translate_type(batch.type)}</span>
                 <span class="ml-2 badge badge-neutral">{batch.amount} total qty</span>
+                <span class="ml-2 badge badge-outline">
+                  {if batch.price, do: "#{:erlang.float_to_binary(batch.price, decimals: 2)} €", else: "N/A"}
+                </span>
               </div>
               <div class="text-sm">
                 <span>{batch.datetime}</span>
