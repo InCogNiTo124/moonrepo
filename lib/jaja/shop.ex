@@ -7,6 +7,7 @@ defmodule Jaja.Shop do
   alias Jaja.Repo
 
   alias Jaja.Shop.Batch
+  alias Jaja.Shop.Order
 
   @doc """
   Returns the list of batches.
@@ -18,8 +19,10 @@ defmodule Jaja.Shop do
 
   """
   def list_batches do
+    orders_query = from(o in Order, order_by: [asc: o.inserted_at, asc: o.id])
+
     Repo.all(Batch)
-    |> Repo.preload(:orders)
+    |> Repo.preload(orders: orders_query)
   end
 
   @doc """
@@ -42,7 +45,10 @@ defmodule Jaja.Shop do
   Gets a single batch and preloads its orders.
   """
   def get_batch_with_orders!(id) do
-    Repo.get!(Batch, id) |> Repo.preload(:orders)
+    orders_query = from(o in Order, order_by: [asc: o.inserted_at, asc: o.id])
+
+    Repo.get!(Batch, id)
+    |> Repo.preload(orders: orders_query)
   end
 
   @doc """
@@ -110,8 +116,6 @@ defmodule Jaja.Shop do
     Batch.changeset(batch, attrs)
   end
 
-  alias Jaja.Shop.Order
-
   @doc """
   Returns the list of orders.
 
@@ -126,7 +130,11 @@ defmodule Jaja.Shop do
   end
 
   def list_orders_for_batch(batch_reference) do
-    Repo.all(from o in Order, where: o.batch_reference == ^batch_reference)
+    Repo.all(
+      from o in Order,
+        where: o.batch_reference == ^batch_reference,
+        order_by: [asc: o.inserted_at, asc: o.id]
+    )
   end
 
   @doc """

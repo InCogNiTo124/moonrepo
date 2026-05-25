@@ -32,7 +32,9 @@ defmodule JajaWeb.AdminLive do
         current_price = batch_params["price"]
         prev_type_last_price = current_type && Shop.get_last_price_for_type(current_type)
 
-        if last_price && (current_price == "" || is_nil(current_price) || (prev_type_last_price && current_price == to_string(prev_type_last_price))) do
+        if last_price &&
+             (current_price == "" || is_nil(current_price) ||
+                (prev_type_last_price && current_price == to_string(prev_type_last_price))) do
           Map.put(batch_params, "price", last_price)
         else
           batch_params
@@ -146,7 +148,9 @@ defmodule JajaWeb.AdminLive do
                 <span class="font-bold text-lg">{translate_type(batch.type)}</span>
                 <span class="ml-2 badge badge-neutral">{batch.amount} total qty</span>
                 <span class="ml-2 badge badge-outline">
-                  {if batch.price, do: "#{:erlang.float_to_binary(batch.price, decimals: 2)} €", else: "N/A"}
+                  {if batch.price,
+                    do: "#{:erlang.float_to_binary(batch.price, decimals: 2)} €",
+                    else: "N/A"}
                 </span>
               </div>
               <div class="text-sm">

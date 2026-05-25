@@ -76,6 +76,24 @@ defmodule Jaja.ShopTest do
       batch = batch_fixture()
       assert %Ecto.Changeset{} = Shop.change_batch(batch)
     end
+
+    test "list_batches/0 and get_batch_with_orders!/1 preloaded orders are stably sorted" do
+      batch = batch_fixture()
+      order2 = order_fixture(batch_reference: batch.unique_reference, name: "Order 2")
+      order1 = order_fixture(batch_reference: batch.unique_reference, name: "Order 1")
+      order3 = order_fixture(batch_reference: batch.unique_reference, name: "Order 3")
+
+      [retrieved_batch] = Shop.list_batches()
+      assert Enum.map(retrieved_batch.orders, & &1.id) == [order2.id, order1.id, order3.id]
+
+      retrieved_batch_with_orders = Shop.get_batch_with_orders!(batch.id)
+
+      assert Enum.map(retrieved_batch_with_orders.orders, & &1.id) == [
+               order2.id,
+               order1.id,
+               order3.id
+             ]
+    end
   end
 
   describe "orders" do
@@ -97,6 +115,7 @@ defmodule Jaja.ShopTest do
 
     test "create_order/1 with valid data creates a order" do
       batch = batch_fixture()
+
       valid_attrs = %{
         name: "some name",
         amount: 42,
