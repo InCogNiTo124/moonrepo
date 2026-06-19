@@ -1,3 +1,3 @@
 kustomize:
   images:
-  - ghcr.io/incognito124/kepler-orbit:1780521350
+  - ghcr.io/incognito124/kepler-orbit:1781869558
