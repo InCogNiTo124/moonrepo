@@ -101,6 +101,7 @@ write_files:
               entryPoint: metrics
               addEntryPointsLabels: true
               addRoutersLabels: true
+              addServicesLabels: true
 
   # Pre-seed Sealed Secrets Master Key
   - path: /var/lib/rancher/k3s/server/manifests/sealed-secrets-key.yaml
