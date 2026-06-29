@@ -53,7 +53,14 @@ Moon should be smart enough to cache things that did not change.
 * `libsqlite3-sys` version in `//personal-blog/database` sometimes conflicts with `diesel`, since they release on a different cadence. If this happens:
   1. Manually bump the version down in `personal-blog/database/Cargo.toml` (e.g., to `0.36.0`).
   2. Run `cargo update` in the `personal-blog/database` directory to regenerate `Cargo.lock`. (Since cargo tasks are run with `--locked`, the lockfile must be kept in sync manually).
-* When updating toolchain versions (e.g., Rust), make sure to align the versions in `.moon/toolchains.yml` and `.github/workflows/ci.yml` (e.g. `RUSTUP_TOOLCHAIN`).
+* When updating the Rust toolchain version, make sure to update it in **all three places**:
+  1. `.prototools` (the source of truth for proto/moon)
+  2. `.moon/toolchains.yml`
+  3. `.github/workflows/ci.yml` — the `channel` field in the `moonrepo/setup-rust` step (this ensures Rust targets are installed on the correct toolchain, not `stable`)
+* **Bun `file:` dependencies and moon's InstallDeps**: Moon runs `bun install` for all JS projects before any tasks. Projects with `file:` deps on build outputs (e.g., brachi → brachistochrone_solver/pkg, personal-website → personal-reusables) will fail because the output doesn't exist yet. Workarounds:
+  - For wasm packages: a stub `package.json` is created in CI (see `.github/workflows/ci.yml`)
+  - For SvelteKit libraries: use `kit.alias` in `svelte.config.js` pointing to the source (see `personal-website/svelte.config.js`)
+  - Upstream issue: https://github.com/moonrepo/moon/issues/2538
 
 ## 3. Publish
 

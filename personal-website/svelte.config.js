@@ -1,5 +1,6 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import path from 'path';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -8,7 +9,15 @@ const config = {
   preprocess: vitePreprocess(),
 
   kit: {
-    adapter: adapter()
+    adapter: adapter(),
+    // Resolve personal-reusables directly from source, bypassing node_modules.
+    // Bun's file: protocol creates per-file symlinks at install time, so the
+    // dist/ directory never appears in node_modules/personal-reusables/ if it
+    // didn't exist during `bun install` (which runs before personal-reusables:build).
+    // kit.alias syncs to both Vite (build) and TypeScript (svelte-check).
+    alias: {
+      'personal-reusables': path.resolve('../personal-reusables/src/lib/index.ts')
+    }
   }
 };
 
