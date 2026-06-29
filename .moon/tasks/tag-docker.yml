@@ -8,6 +8,8 @@ tasks:
     command: docker buildx build --push --no-cache -t ghcr.io/incognito124/$project:$timestamp -f $projectRoot/Dockerfile .
     deps:
     - build
+    options:
+      runInCI: false
   staging:
     script: |
       LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/$project' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
