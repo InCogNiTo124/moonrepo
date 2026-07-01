@@ -50,7 +50,7 @@ jobs:
       # .moon/toolchains.yml so targets land on the correct toolchain.
       - uses: moonrepo/setup-rust@v1
         with:
-          channel: "1.96.0"
+          channel: "1.96.1"
           targets: x86_64-unknown-linux-musl,wasm32-unknown-unknown
 
       # WORKAROUND: Moon's internal InstallDeps action runs `bun install` for
