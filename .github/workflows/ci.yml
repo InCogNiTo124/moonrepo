@@ -67,12 +67,18 @@ jobs:
       - run:
           "moon ${{ github.event.inputs.targets && github.event.inputs.targets || 'ci'}}"
 
-      # docker-push is disabled in moon ci (runInCI: false in tag-docker.yml)
-      # because GITHUB_TOKEN on PRs has packages:write, which would allow
-      # unintended pushes. We run it explicitly here, gated to main.
+      # docker-push has runInCI: false in tag-docker.yml to prevent moon ci
+      # from pushing images on PRs (GITHUB_TOKEN has packages:write).
+      # However, runInCI: false also blocks `moon run` in CI, so we push
+      # the images that were already built by moon ci's `docker` task.
       - name: Push Docker images
         if: github.ref == 'refs/heads/main'
-        run: moon run :docker-push
+        run: |
+          for IMAGE in $(docker image ls --filter 'reference=ghcr.io/incognito124/*' --format '{{.Repository}}:{{.Tag}}'); do
+            echo "::group::Pushing ${IMAGE}"
+            docker push "$IMAGE"
+            echo "::endgroup::"
+          done
 
       - uses: moonrepo/run-report-action@v1
         if: success() || failure()
