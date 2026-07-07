@@ -1,6 +1,7 @@
 """A Python Pulumi program"""
 
 import os
+import jinja2
 import pulumi_hcloud as hcloud
 import pulumi_command as command
 import pulumi
@@ -33,21 +34,30 @@ def indent(text, spaces):
     return "\n".join(" " * spaces + line for line in text.splitlines())
 
 
-# 2. Template Cloud Init
+# 2. Template Cloud Init (shared with cosmos/local, selected via env=prod|local)
 def create_cloud_init(args):
     vol_id, ss_priv, ss_pub, floating_ip_addr = args
-    with pathlib.Path("cloud-init.yaml").open() as file:
-        template = file.read()
+    jenv = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(pathlib.Path(__file__).parent),
+        trim_blocks=True,
+        lstrip_blocks=True,
+        keep_trailing_newline=True,
+        undefined=jinja2.StrictUndefined,
+    )
 
     # We inject the specific Volume ID for the /dev/disk/by-id path
-    return template.format(
-        volume_id=vol_id,
+    return jenv.get_template("cloud-init.yaml.j2").render(
+        env="prod",
+        data_device=f"/dev/disk/by-id/scsi-0HC_Volume_{vol_id}",
         email="msmetko@msmetko.xyz",
         ca_server=LetsEncryptEnv.PRODUCTION.value,
         gh_pat=os.environ.get("GH_PAT", ""),
         ss_private_key=indent(ss_priv, 10),
         ss_public_cert=indent(ss_pub, 10),
         floating_ip=floating_ip_addr,
+        repo_url="https://github.com/InCogNiTo124/moonrepo",
+        target_revision="HEAD",
+        apps_path="cosmos/argocd/apps",
     )
 
 # Create Static IP

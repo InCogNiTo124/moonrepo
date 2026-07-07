@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - argocd-image-updater.yaml
+  - argocd-ingress.yaml
+  - argocd-sealed-secret.yaml
+  - brachi.yaml
+  - grafana-sealed-secret.yaml
+  - jaja.yaml
+  - kepler-orbit.yaml
+  - kube-prometheus-stack.yaml
+  - monitoring-storage.yaml
+  - personal-blog.yaml
+  - personal-website-prod.yaml
+  - sealed-secrets.yaml

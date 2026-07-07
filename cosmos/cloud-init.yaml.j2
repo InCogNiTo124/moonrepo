@@ -1,5 +1,5 @@
 #cloud-config
-# this file is technically a Python string template that gets rendered as yaml
+# this file is a Jinja2 template that gets rendered as yaml
 write_files:
   - path: /etc/environment
     content: |-
@@ -22,7 +22,7 @@ write_files:
         ethernets:
           eth0:
             addresses:
-              - {floating_ip}/32
+              - {{ floating_ip }}/32
 
   # Create Static PV/PVC for Traefik ACME storage to ensure it uses the persistent volume
   - path: /var/lib/rancher/k3s/server/manifests/traefik-storage.yaml
@@ -54,7 +54,7 @@ write_files:
         resources:
           requests:
             storage: 100Mi
-  
+
   # Configure Traefik to use the persistent volume for ACME with proper permissions
   - path: /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
     content: |
@@ -76,10 +76,10 @@ write_files:
           certificatesResolvers:
             letsencrypt:
               acme:
-                email: "{email}"
+                email: "{{ email }}"
                 storage: "/data/acme.json"
                 tlsChallenge: true
-                caServer: "{ca_server}"
+                caServer: "{{ ca_server }}"
           persistence:
             enabled: true
             existingClaim: traefik-acme-pvc
@@ -116,9 +116,9 @@ write_files:
       type: kubernetes.io/tls
       stringData:
         tls.crt: |
-{ss_public_cert}
+{{ ss_public_cert }}
         tls.key: |
-{ss_private_key}
+{{ ss_private_key }}
 
   # Install ArgoCD via HelmChart
   - path: /var/lib/rancher/k3s/server/manifests/argocd-helm.yaml
@@ -158,9 +158,9 @@ write_files:
       spec:
         project: default
         source:
-          repoURL: https://github.com/InCogNiTo124/moonrepo
-          targetRevision: HEAD
-          path: cosmos/argocd/apps
+          repoURL: {{ repo_url }}
+          targetRevision: {{ target_revision }}
+          path: {{ apps_path }}
         destination:
           server: https://kubernetes.default.svc
           namespace: argocd
@@ -179,38 +179,38 @@ write_files:
         labels:
           argocd.argoproj.io/secret-type: repository
       stringData:
-        url: https://github.com/InCogNiTo124/moonrepo
+        url: {{ repo_url }}
         type: git
-        password: {gh_pat}
+        password: {{ gh_pat }}
         username: git
 
 runcmd:
   # Robust volume mounting logic
   - |
-    DEVICE="/dev/disk/by-id/scsi-0HC_Volume_{volume_id}"
+    DEVICE="{{ data_device }}"
     MOUNT_POINT="/data"
-    
+
     echo "Waiting for device $DEVICE to appear..."
     while [ ! -b "$DEVICE" ]; do
       sleep 1
     done
-    
+
     echo "Device $DEVICE found. Checking filesystem..."
     if ! blkid "$DEVICE"; then
       echo "No filesystem found on $DEVICE. Formatting as ext4..."
       mkfs.ext4 -F "$DEVICE"
     fi
-    
+
     echo "Mounting $DEVICE to $MOUNT_POINT..."
     mkdir -p "$MOUNT_POINT"
     mount -o discard,defaults "$DEVICE" "$MOUNT_POINT"
-    
+
     echo "Adding $DEVICE to /etc/fstab..."
     echo "$DEVICE $MOUNT_POINT ext4 discard,defaults 0 2" >> /etc/fstab
-    
+
     # Apply Floating IP configuration
     netplan apply
-  
+
   # Ensure subdirectories exist on the mounted volume
   - mkdir -p /data/traefik
   - touch /data/traefik/acme.json
@@ -230,6 +230,6 @@ runcmd:
 
   # Install k9s
   - wget https://github.com/derailed/k9s/releases/download/v0.50.16/k9s_Linux_amd64.tar.gz && tar -xzvf k9s_Linux_amd64.tar.gz && mv k9s /usr/local/bin/ && rm k9s_Linux_amd64.tar.gz
-  
+
   # Install k3s (Only after volume is ready)
   - curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.36.2+k3s1 sh -s - server --default-local-storage-path /data/k3s-storage

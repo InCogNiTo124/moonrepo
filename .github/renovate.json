@@ -66,7 +66,7 @@
         {
             "customType": "regex",
             "managerFilePatterns": [
-                "/^cosmos\\/cloud-init\\.yaml$/"
+                "/^cosmos\\/cloud-init\\.yaml\\.j2$/"
             ],
             "matchStrings": [
                 "INSTALL_K3S_VERSION=(?<currentValue>\\S+)"

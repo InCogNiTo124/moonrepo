@@ -5,6 +5,7 @@ description = "Production universe of @InCogNiTo124 (powered by Hetzner and Pulu
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "jinja2>=3.1.6",
     "pulumi>=3.0.0,<4.0.0",
     "pulumi-command>=1.1.3",
     "pulumi-hcloud>=1.31.0",

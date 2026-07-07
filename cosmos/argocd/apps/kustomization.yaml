@@ -1,0 +1,7 @@
+# The prod root-app (bootstrapped by cloud-init) points at cosmos/argocd/apps,
+# so this top-level kustomization must keep rendering the prod variant.
+# The local root-app points directly at overlays/local.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - overlays/prod
