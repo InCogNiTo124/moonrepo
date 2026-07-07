@@ -20,6 +20,7 @@ dependencies = [
     { name = "pulumi" },
     { name = "pulumi-command" },
     { name = "pulumi-hcloud" },
+    { name = "pulumi-libvirt" },
 ]
 
 [package.dev-dependencies]
@@ -33,6 +34,7 @@ requires-dist = [
     { name = "pulumi", specifier = ">=3.0.0,<4.0.0" },
     { name = "pulumi-command", specifier = ">=1.1.3" },
     { name = "pulumi-hcloud", specifier = ">=1.31.0" },
+    { name = "pulumi-libvirt", specifier = ">=0.5.4" },
 ]
 
 [package.metadata.requires-dev]
@@ -387,6 +389,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ed/bf/ca594031d551eaebee5322e540e77dc84f60bf340a7f43e3700b5eb048da/pulumi_hcloud-1.38.0.tar.gz", hash = "sha256:4138fb10e9b5ec4227dfded77f2e74ba7590d75552d4677b3af597285b36de7a", size = 108122, upload-time = "2026-05-29T05:04:21.309Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/31/49/b2d8e9772aba5b074f7d5233b53bffa6a0776bccab1d83dc664e9fe2abce/pulumi_hcloud-1.38.0-py3-none-any.whl", hash = "sha256:9726a4f5a784babbef3d10ff5f537fb924f804095fddac97138beb63dfd83630", size = 202191, upload-time = "2026-05-29T05:04:19.809Z" },
+]
+
+[[package]]
+name = "pulumi-libvirt"
+version = "0.5.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "parver" },
+    { name = "pulumi" },
+    { name = "semver" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cc/0b/6d07868ce000d2f525d590f0886ff267552f7c79b0aa727c54fcbfe63777/pulumi_libvirt-0.5.4.tar.gz", hash = "sha256:a51f4893217b2d0b388ce7c14273b41b276d26a16252f067dc6cc574cb6cfdc6", size = 48194, upload-time = "2025-01-02T17:15:58.823Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/84/bf/4d15b92f387adbb795dd0202eb402b4a6fa0ec9769269dd2e1033b7aa0a7/pulumi_libvirt-0.5.4-py3-none-any.whl", hash = "sha256:c27e31f34ab07c82bd839d50575d96581e140cc38fbd11ff2cf2a22f18fbfe2e", size = 61768, upload-time = "2025-01-02T17:15:55.65Z" },
 ]
 
 [[package]]

@@ -27,7 +27,7 @@ jobs:
       - uses: pulumi/actions@main
         with:
           command: ${{ github.event_name == 'push' && 'up' || 'preview' }}
-          stack-name: cosmos
+          stack-name: prod
           work-dir: ./cosmos
           comment-on-pr: ${{ github.event_name == 'pull_request' }}
           comment-on-summary: true

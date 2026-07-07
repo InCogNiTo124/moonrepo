@@ -1,0 +1,44 @@
+{#
+  PostgreSQL + pgBackRest runcmd entries, included from cloud-init.yaml.j2
+  after the /data mount and before the k3s install (kine's datastore must be
+  up first).
+#}
+  # --- PostgreSQL {{ pg_major }} + pgBackRest ---
+  - install -d -m 755 /usr/share/postgresql-common/pgdg
+  - curl -fsSL --retry 5 --retry-all-errors -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+  - echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+  - apt-get update
+  # major pinned in the package name: a rebuild years from now must not
+  # silently install a newer major against the surviving data dir
+  # (--force-confold keeps the pre-written createcluster.conf & cluster config)
+  - DEBIAN_FRONTEND=noninteractive apt-get install -y -o Dpkg::Options::=--force-confold postgresql-{{ pg_major }} pgbackrest
+  - chown -R postgres:postgres /etc/pgbackrest
+{% if env == "local" %}
+  # the posix repo dir on the backup disk (mounted in an earlier runcmd)
+  - install -d -o postgres -g postgres -m 700 /backups/pgbackrest
+{% endif %}
+  - /opt/cosmos/pg-bootstrap.sh
+  # no-op when the repo already knows this cluster (rebuild); WAL pushes that
+  # raced it just self-heal on the archiver's retry
+  - sudo -u postgres pgbackrest --stanza=cosmos stanza-create
+  # immediate first backup: establishes the full+WAL chain while the DB is
+  # near-empty (seconds); on a rebuild this is just a cheap incremental.
+  # Any successful backup refreshes diff-recency for the monitoring table.
+  - sudo -u postgres pgbackrest --stanza=cosmos backup
+  - sudo -u postgres psql -c "INSERT INTO cosmos.backup_status (type) VALUES ('diff') ON CONFLICT (type) DO UPDATE SET finished_at = now()"
+  - systemctl daemon-reload
+  - systemctl enable --now pgbackrest-full.timer pgbackrest-diff.timer
+
+  # k3s node identity must be deterministic: the datastore remembers the node
+  # password, and a rebuilt server presenting a random one would be rejected
+  - install -d -m 755 /etc/rancher/node
+  - echo -n "{{ k3s_token }}" | sha256sum | cut -c1-32 > /etc/rancher/node/password
+{% if env == "prod" %}
+
+  # user_data now carries real secrets (token, DB passwords): make sure pods
+  # can never read it from the metadata service. raw table: k3s never touches
+  # it, so flannel/kube-proxy ACCEPT rules can't shadow this.
+  - iptables -t raw -I PREROUTING -i cni0 -d 169.254.169.254 -j DROP
+  - DEBIAN_FRONTEND=noninteractive apt-get install -y iptables-persistent
+  - netfilter-persistent save
+{% endif %}

@@ -1,0 +1,104 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+
+patches:
+  # No image updater locally: it writes commits back via the GitHub PAT, and
+  # the local git server is read-only by construction.
+  - target:
+      kind: Application
+      name: argocd-image-updater
+    patch: |-
+      $patch: delete
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: argocd-image-updater
+        namespace: argocd
+
+  # Moonrepo-sourced apps: pull from the host git server, track the `dev`
+  # jj bookmark, and render the local overlay instead of prod.
+  - target:
+      kind: Application
+      name: brachi
+    patch: |-
+      - op: replace
+        path: /spec/source/repoURL
+        value: http://192.168.100.1:8930/moonrepo
+      - op: replace
+        path: /spec/source/targetRevision
+        value: dev
+      - op: replace
+        path: /spec/source/path
+        value: cosmos/argocd/overlays/local/brachi
+  - target:
+      kind: Application
+      name: jaja
+    patch: |-
+      - op: replace
+        path: /spec/source/repoURL
+        value: http://192.168.100.1:8930/moonrepo
+      - op: replace
+        path: /spec/source/targetRevision
+        value: dev
+      - op: replace
+        path: /spec/source/path
+        value: cosmos/argocd/overlays/local/jaja
+  - target:
+      kind: Application
+      name: kepler-orbit
+    patch: |-
+      - op: replace
+        path: /spec/source/repoURL
+        value: http://192.168.100.1:8930/moonrepo
+      - op: replace
+        path: /spec/source/targetRevision
+        value: dev
+      - op: replace
+        path: /spec/source/path
+        value: cosmos/argocd/overlays/local/kepler-orbit
+  - target:
+      kind: Application
+      name: personal-blog
+    patch: |-
+      - op: replace
+        path: /spec/source/repoURL
+        value: http://192.168.100.1:8930/moonrepo
+      - op: replace
+        path: /spec/source/targetRevision
+        value: dev
+      - op: replace
+        path: /spec/source/path
+        value: cosmos/argocd/overlays/local/personal-blog
+  - target:
+      kind: Application
+      name: personal-website-prod
+    patch: |-
+      - op: replace
+        path: /spec/source/repoURL
+        value: http://192.168.100.1:8930/moonrepo
+      - op: replace
+        path: /spec/source/targetRevision
+        value: dev
+      - op: replace
+        path: /spec/source/path
+        value: cosmos/argocd/overlays/local/personal-website
+
+  # Local hostnames (.test resolves to the VM via dnsmasq)
+  - target:
+      kind: Ingress
+      name: argocd-server-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: argo.msmetko.test
+  - target:
+      kind: Application
+      name: kube-prometheus-stack
+    patch: |-
+      - op: add
+        path: /spec/source/helm/parameters
+        value:
+          - name: grafana.ingress.hosts[0]
+            value: grafana.msmetko.test

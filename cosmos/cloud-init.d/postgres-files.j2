@@ -1,0 +1,252 @@
+{#
+  PostgreSQL + pgBackRest write_files entries, included from cloud-init.yaml.j2
+  inside the write_files list. The whole cluster config is owned here (not
+  pg_createcluster) so a rebuilt server can adopt the existing data dir on /data.
+#}
+
+  # Pre-seeded so the postgresql-{{ pg_major }} package never initdbs a cluster
+  # on the ephemeral root disk; ours lives on /data (see pg-bootstrap.sh).
+  - path: /etc/postgresql-common/createcluster.conf
+    content: |
+      create_main_cluster = false
+
+  - path: /etc/postgresql/{{ pg_major }}/main/postgresql.conf
+    content: |
+      data_directory = '/data/postgres/{{ pg_major }}/main'
+      hba_file = '/etc/postgresql/{{ pg_major }}/main/pg_hba.conf'
+      ident_file = '/etc/postgresql/{{ pg_major }}/main/pg_ident.conf'
+      external_pid_file = '/var/run/postgresql/{{ pg_major }}-main.pid'
+      unix_socket_directories = '/var/run/postgresql'
+      cluster_name = '{{ pg_major }}/main'
+      # cni0 (pod network gateway) doesn't exist when PG starts; binding the
+      # wildcard sidesteps the ordering problem. The Hetzner firewall keeps 5432
+      # closed externally and pg_hba rejects anything but loopback + pod CIDR.
+      listen_addresses = '*'
+      max_connections = 100
+      shared_buffers = 512MB
+      password_encryption = scram-sha-256
+      wal_level = replica
+      archive_mode = on
+      archive_command = 'pgbackrest --stanza=cosmos archive-push %p'
+      # bounds data loss to ~5 min even when nothing forces a WAL switch
+      archive_timeout = 300
+
+  - path: /etc/postgresql/{{ pg_major }}/main/pg_hba.conf
+    content: |
+      # No matching line = rejected. kine only ever connects over loopback;
+      # in-cluster apps reach the host through the flannel gateway (10.42.0.1)
+      # with their pod IPs as source, one db/role pair each (see PG_APPS in
+      # cosmos/derive.py).
+      local  all  postgres  peer
+      host   all  all  127.0.0.1/32  scram-sha-256
+      host   all  all  ::1/128  scram-sha-256
+{% for app in pg_apps %}
+      host   {{ app }}  {{ app }}  10.42.0.0/16  scram-sha-256
+{% endfor %}
+
+  - path: /etc/postgresql/{{ pg_major }}/main/pg_ident.conf
+    content: |
+      # (empty; required by pg_ctlcluster)
+
+  - path: /etc/postgresql/{{ pg_major }}/main/start.conf
+    content: |
+      auto
+
+  # Don't let a reboot start PG before /data is mounted
+  - path: /etc/systemd/system/postgresql@.service.d/cosmos.conf
+    content: |
+      [Unit]
+      RequiresMountsFor=/data
+
+  # k3s (written later by its installer) must wait for its datastore
+  - path: /etc/systemd/system/k3s.service.d/cosmos.conf
+    content: |
+      [Unit]
+      After=postgresql@{{ pg_major }}-main.service
+      Wants=postgresql@{{ pg_major }}-main.service
+      RequiresMountsFor=/data
+
+  # chowned to postgres in runcmd once the package has created the user
+  - path: /etc/pgbackrest/pgbackrest.conf
+    permissions: "0600"
+    content: |
+      [global]
+{% if env == "prod" %}
+      repo1-type=s3
+      repo1-path=/pgbackrest
+      repo1-s3-endpoint={{ s3_endpoint }}
+      repo1-s3-bucket={{ s3_bucket }}
+      repo1-s3-region={{ s3_region }}
+      repo1-s3-key={{ s3_access_key }}
+      repo1-s3-key-secret={{ s3_secret_key }}
+      repo1-s3-uri-style=host
+{% else %}
+      # dev: posix repo on the third disk. Dev data is worthless; the repo
+      # exists so the restore drills have something to restore from.
+      repo1-type=posix
+      repo1-path=/backups/pgbackrest
+{% endif %}
+      # client-side encryption: k8s Secrets (incl. the sealed-secrets master
+      # key) live in this database and leave the machine inside these backups
+      repo1-cipher-type=aes-256-cbc
+      repo1-cipher-pass={{ pgbackrest_cipher_pass }}
+      repo1-retention-full=2
+      compress-type=zst
+      process-max=2
+      start-fast=y
+      log-level-console=info
+
+      [cosmos]
+      pg1-path=/data/postgres/{{ pg_major }}/main
+
+  - path: /opt/cosmos/pg-bootstrap.sh
+    permissions: "0700"
+    content: |
+      #!/usr/bin/env bash
+      # Idempotent: initdb on a fresh volume, adopt on a rebuild, then converge
+      # roles/databases. Must complete before k3s installs -- kine lives here.
+      set -euo pipefail
+
+      PG_MAJOR={{ pg_major }}
+      DATADIR="/data/postgres/${PG_MAJOR}/main"
+      BINDIR="/usr/lib/postgresql/${PG_MAJOR}/bin"
+
+      if [ -f "${DATADIR}/PG_VERSION" ]; then
+        found="$(cat "${DATADIR}/PG_VERSION")"
+        if [ "${found}" != "${PG_MAJOR}" ]; then
+          echo "FATAL: ${DATADIR} holds PostgreSQL ${found} but ${PG_MAJOR} is installed." >&2
+          echo "Manual major upgrade required (cosmos/RUNBOOK.md); refusing to continue." >&2
+          exit 1
+        fi
+      else
+        install -d -o postgres -g postgres -m 700 "$(dirname "${DATADIR}")" "${DATADIR}"
+        # builtin locale provider: immune to glibc collation changes on OS upgrades
+        sudo -u postgres "${BINDIR}/initdb" -D "${DATADIR}" \
+          --encoding=UTF8 --locale-provider=builtin --builtin-locale=C.UTF-8 \
+          --auth-host=scram-sha-256 --auth-local=peer
+      fi
+
+      systemctl enable --now "postgresql@${PG_MAJOR}-main"
+      for _ in $(seq 1 60); do
+        sudo -u postgres pg_isready -q && break
+        sleep 1
+      done
+      sudo -u postgres pg_isready
+
+      psql() { sudo -u postgres psql -v ON_ERROR_STOP=1 "$@"; }
+
+      declare -A PASSWORD=(
+{% for role, pw in pg_passwords.items() %}
+        [{{ role }}]='{{ pw }}'
+{% endfor %}
+      )
+      for role in {{ pg_passwords | join(" ") }}; do
+        if ! psql -tAc "SELECT 1 FROM pg_roles WHERE rolname = '${role}'" | grep -q 1; then
+          sudo -u postgres createuser "${role}"
+        fi
+        # ALTER is idempotent and re-syncs passwords with Pulumi config on rebuild
+        psql -c "ALTER ROLE ${role} LOGIN PASSWORD '${PASSWORD[${role}]}'"
+        if ! psql -tAc "SELECT 1 FROM pg_database WHERE datname = '${role}'" | grep -q 1; then
+          sudo -u postgres createdb -O "${role}" "${role}"
+        fi
+      done
+
+      # backup bookkeeping, exposed by postgres_exporter as last-backup age.
+      # Seed rows so the metric exists from birth (alerts can't watch absent
+      # data); on a rebuild the surviving real timestamps win (DO NOTHING).
+      psql -c "CREATE SCHEMA IF NOT EXISTS cosmos"
+      psql -c "CREATE TABLE IF NOT EXISTS cosmos.backup_status (
+        type text PRIMARY KEY, finished_at timestamptz NOT NULL DEFAULT now())"
+      psql -c "INSERT INTO cosmos.backup_status (type) VALUES ('full'), ('diff')
+        ON CONFLICT (type) DO NOTHING"
+
+  - path: /opt/cosmos/pg-restore.sh
+    permissions: "0755"
+    content: |
+      #!/usr/bin/env bash
+      # Disaster recovery: restore the whole cluster from the pgBackRest repo
+      # (latest by default; add e.g. --type=time --target=... for PITR).
+      # ArgoCD self-heal converges any k8s drift newer than the backup.
+      set -euo pipefail
+
+      PG_MAJOR={{ pg_major }}
+      DATADIR="/data/postgres/${PG_MAJOR}/main"
+
+      if [ "${1:-}" != "--yes-destroy-data" ]; then
+        echo "usage: $0 --yes-destroy-data [extra pgbackrest restore options]" >&2
+        exit 64
+      fi
+      shift
+
+      systemctl stop k3s || true
+      systemctl stop "postgresql@${PG_MAJOR}-main" || true
+
+      # After a full-loss rebuild the fresh k3s wrote its own (throwaway)
+      # cluster CA/creds to disk; they're newer than the restored datastore's
+      # bootstrap data and k3s fatally refuses to start. Removing them is
+      # always safe: k3s re-materializes both dirs from the datastore.
+      rm -rf /var/lib/rancher/k3s/server/tls /var/lib/rancher/k3s/server/cred
+
+      if [ -d "${DATADIR}" ]; then
+        mv "${DATADIR}" "${DATADIR}.discarded.$(date +%s)"
+      fi
+      install -d -o postgres -g postgres -m 700 "${DATADIR}"
+
+      sudo -u postgres pgbackrest --stanza=cosmos "$@" restore
+
+      systemctl start "postgresql@${PG_MAJOR}-main"
+      for _ in $(seq 1 300); do
+        sudo -u postgres pg_isready -q && break
+        sleep 1
+      done
+      sudo -u postgres pg_isready
+      systemctl start k3s
+      echo "Restore complete; ArgoCD will now converge any post-backup drift."
+
+  - path: /etc/systemd/system/pgbackrest-full.service
+    content: |
+      [Unit]
+      Description=pgBackRest full backup
+
+      [Service]
+      Type=oneshot
+      User=postgres
+      ExecStart=/usr/bin/pgbackrest --stanza=cosmos --type=full backup
+      ExecStartPost=/usr/bin/psql -d postgres -c "INSERT INTO cosmos.backup_status (type, finished_at) VALUES ('full', now()) ON CONFLICT (type) DO UPDATE SET finished_at = now()"
+
+  - path: /etc/systemd/system/pgbackrest-full.timer
+    content: |
+      [Unit]
+      Description=Weekly pgBackRest full backup
+
+      [Timer]
+      OnCalendar=Sun *-*-* 03:00:00
+      Persistent=true
+      RandomizedDelaySec=15m
+
+      [Install]
+      WantedBy=timers.target
+
+  - path: /etc/systemd/system/pgbackrest-diff.service
+    content: |
+      [Unit]
+      Description=pgBackRest differential backup
+
+      [Service]
+      Type=oneshot
+      User=postgres
+      ExecStart=/usr/bin/pgbackrest --stanza=cosmos --type=diff backup
+      ExecStartPost=/usr/bin/psql -d postgres -c "INSERT INTO cosmos.backup_status (type, finished_at) VALUES ('diff', now()) ON CONFLICT (type) DO UPDATE SET finished_at = now()"
+
+  - path: /etc/systemd/system/pgbackrest-diff.timer
+    content: |
+      [Unit]
+      Description=Daily pgBackRest differential backup
+
+      [Timer]
+      OnCalendar=Mon..Sat *-*-* 03:00:00
+      Persistent=true
+      RandomizedDelaySec=15m
+
+      [Install]
+      WantedBy=timers.target

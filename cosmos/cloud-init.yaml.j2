@@ -1,5 +1,6 @@
 #cloud-config
-# this file is a Jinja2 template that gets rendered as yaml
+# this file is a Jinja2 template that gets rendered as yaml (env = "prod" | "local")
+{% set pg_major = 18 %}
 write_files:
   - path: /etc/environment
     content: |-
@@ -13,6 +14,7 @@ write_files:
           default:
             namespace:
               active: all
+{% if env == "prod" %}
 
   # Configure Floating IP
   - path: /etc/netplan/60-floating-ip.yaml
@@ -23,6 +25,7 @@ write_files:
           eth0:
             addresses:
               - {{ floating_ip }}/32
+{% endif %}
 
   # Create Static PV/PVC for Traefik ACME storage to ensure it uses the persistent volume
   - path: /var/lib/rancher/k3s/server/manifests/traefik-storage.yaml
@@ -181,8 +184,55 @@ write_files:
       stringData:
         url: {{ repo_url }}
         type: git
+{% if env == "prod" %}
         password: {{ gh_pat }}
         username: git
+{% else %}
+        insecure: "true"
+{% endif %}
+{% if env == "local" %}
+
+  # Trust the host-local (insecure, plain-HTTP) container registry
+  - path: /etc/rancher/k3s/registries.yaml
+    content: |
+      mirrors:
+        "{{ registry }}":
+          endpoint:
+            - "http://{{ registry }}"
+
+  # Default TLS certificate (mkcert) served by Traefik for every ingress host.
+  # The letsencrypt resolver is still defined but can never complete its
+  # challenge locally, so Traefik falls back to this default certificate.
+  - path: /var/lib/rancher/k3s/server/manifests/local-default-tls.yaml
+    content: |
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: local-wildcard-tls
+        namespace: kube-system
+      type: kubernetes.io/tls
+      stringData:
+        tls.crt: |
+{{ tls_cert }}
+        tls.key: |
+{{ tls_key }}
+      ---
+      apiVersion: traefik.io/v1alpha1
+      kind: TLSStore
+      metadata:
+        name: default
+        namespace: kube-system
+      spec:
+        defaultCertificate:
+          secretName: local-wildcard-tls
+
+  # SSH access for the host user (Hetzner injects the key itself in prod)
+  - path: /root/.ssh/authorized_keys
+    permissions: "0600"
+    content: |
+      {{ ssh_pub_key }}
+{% endif %}
+{% include "cloud-init.d/postgres-files.j2" %}
 
 runcmd:
   # Robust volume mounting logic
@@ -207,9 +257,31 @@ runcmd:
 
     echo "Adding $DEVICE to /etc/fstab..."
     echo "$DEVICE $MOUNT_POINT ext4 discard,defaults 0 2" >> /etc/fstab
+{% if env == "prod" %}
 
     # Apply Floating IP configuration
     netplan apply
+
+    # netplan apply bounces the link, which can leave DNS dead for a few
+    # seconds -- and every later phase downloads packages. Block (max 3 min)
+    # until name resolution works again.
+    for i in $(seq 1 90); do
+      getent hosts apt.postgresql.org > /dev/null 2>&1 && break
+      sleep 2
+    done
+{% endif %}
+{% if env == "local" %}
+
+  # Backup disk: pgBackRest's posix repo lives here, on its own disk, so the
+  # full-loss drill can wipe /data and still have a repo to restore from
+  - |
+    DEVICE="{{ backup_device }}"
+    while [ ! -b "$DEVICE" ]; do sleep 1; done
+    blkid "$DEVICE" || mkfs.ext4 -F "$DEVICE"
+    mkdir -p /backups
+    mount -o defaults "$DEVICE" /backups
+    echo "$DEVICE /backups ext4 defaults 0 2" >> /etc/fstab
+{% endif %}
 
   # Ensure subdirectories exist on the mounted volume
   - mkdir -p /data/traefik
@@ -231,5 +303,10 @@ runcmd:
   # Install k9s
   - wget https://github.com/derailed/k9s/releases/download/v0.50.16/k9s_Linux_amd64.tar.gz && tar -xzvf k9s_Linux_amd64.tar.gz && mv k9s /usr/local/bin/ && rm k9s_Linux_amd64.tar.gz
 
-  # Install k3s (Only after volume is ready)
-  - curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.36.2+k3s1 sh -s - server --default-local-storage-path /data/k3s-storage
+{% include "cloud-init.d/postgres-runcmd.j2" %}
+
+  # Install k3s (only after volume + datastore are ready).
+  # Pinned K3S_TOKEN + --node-name: with an external datastore the cluster
+  # *resumes* on rebuild -- bootstrap data in Postgres is keyed to the token,
+  # and node identity must stay stable across server replacements.
+  - curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.36.2+k3s1 K3S_TOKEN='{{ k3s_token }}' sh -s - server --datastore-endpoint='postgres://kine:{{ pg_passwords["kine"] }}@127.0.0.1:5432/kine?sslmode=disable' --node-name=cosmos --secrets-encryption --default-local-storage-path /data/k3s-storage

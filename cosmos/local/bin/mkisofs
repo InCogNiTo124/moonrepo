@@ -1,0 +1,4 @@
+#!/bin/sh
+# mkisofs shim: the pulumi-libvirt provider builds cloud-init ISOs with
+# mkisofs, which Manjaro does not package; xorriso emulates it 1:1.
+exec xorriso -as mkisofs "$@"

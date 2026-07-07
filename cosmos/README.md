@@ -10,14 +10,19 @@ This project provisions a robust, single-node Kubernetes cluster on Hetzner Clou
 
 ### Compute & Storage
 - **Server:** Ubuntu 24.04 (Type: `cx33`, Location: `fsn1`).
-    - **Note:** The server is treated as **ephemeral**. It can be destroyed and replaced at any time ("Nuclear Rebuild") without data loss.
+    - **Note:** The server is treated as **ephemeral**. It can be destroyed and replaced at any time ("Nuclear Rebuild"). Since the K3s datastore moved to host PostgreSQL on `/data`, a rebuild **resumes the same cluster** (same CA, same Secrets, same PVs) instead of creating a new one — see `writeups/postgres.md`.
 - **Storage:** 50GB Block Storage Volume (`data-volume`).
     - **Persistence:** This volume survives server destruction.
     - **Mounting:** Mounted to `/data` via a robust `runcmd` loop in `cloud-init`, bypassing standard automount to ensuring availability before K3s starts.
     - **Usage:**
+        - `/data/postgres`: The host PostgreSQL cluster — K3s datastore (via kine) plus one database per app.
         - `/data/k3s-storage`: Backing store for the K3s `local-path` provisioner.
         - `/data/traefik`: Persistent storage for ACME certificates (Host path).
         - `/data/prometheus`, `/data/grafana`, & `/data/alertmanager`: Persistent metrics and dashboards.
+
+### Database & Backups
+- **PostgreSQL (host-level, outside K3s):** one cluster, one database per consumer. K3s talks to it over loopback via its embedded **kine** shim (`--datastore-endpoint`); apps reach it from pods at `10.42.0.1:5432`, each role locked to its own database by `pg_hba`.
+- **Backups:** **pgBackRest** with continuous WAL archiving (RPO ≈ 5 min) + weekly full / daily differential backups to Hetzner Object Storage, client-side encrypted (k8s Secrets live in that database). Restore procedures and drills: `RUNBOOK.md`.
 
 ### Networking
 - **Public IP:** A Static Primary IP is attached to the server.
@@ -40,6 +45,9 @@ This project achieves **Zero-Touch Bootstrap** where passwords and secrets survi
 5.  **Usage:** Application secrets are encrypted locally using `kubeseal` and committed to Git. The controller decrypts them automatically on deploy.
 
 **Result:** Total cluster recovery with identical credentials in minutes.
+
+### The Master Seed
+All homegrown credentials (PG role passwords, the K3s cluster token, the pgBackRest cipher passphrase) are **derived** from a single `cosmos_master_seed` Pulumi secret via HMAC-SHA256 (`derive.py`). Only externally-issued credentials (Hetzner S3 keys) are stored separately. Adding an app database is a one-line change to `PG_APPS` — see `RUNBOOK.md`.
 
 ## 4. GitOps Configuration (Argo CD)
 
@@ -96,7 +104,7 @@ Prometheus, Grafana, and Alertmanager use a **Static HostPath Binding** strategy
 To avoid conflicts with Node Exporter (host port 9100), Traefik metrics are exposed on **port 9101**.
 
 ### Graceful Shutdown
-Pulumi manages the lifecycle via `command.remote`: it triggers `systemctl stop k3s` and `umount /data` before the server is destroyed, ensuring the filesystem on the persistent volume remains clean.
+Pulumi manages the lifecycle via `command.remote`: before the server is destroyed it stops K3s (Postgres' client), the backup timers, then PostgreSQL itself, and finally unmounts `/data` — ensuring both the database and the filesystem on the persistent volume remain clean.
 
 ## TODOs
 
