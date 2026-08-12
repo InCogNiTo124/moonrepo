@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jaja
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  jaja:
+    environment:
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_SSL=false
+      - POOL_SIZE=10
+    depends_on:
+      - db
+    # If starting via this override, we'll try to run migrations before starting the server.
+    command: >
+      sh -c "/app/bin/jaja eval 'Jaja.Release.migrate()' && /app/bin/jaja start"
+
+volumes:
+  pgdata:

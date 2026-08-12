@@ -1,0 +1,51 @@
+$schema: https://moonrepo.dev/schemas/project.json
+tags:
+- docker
+layer: application
+language: elixir
+project:
+  description: Egg reservation website
+  title: jaja
+workspace:
+  inheritedTasks:
+    exclude:
+    # jaja ships its own docker-compose{,.local,.prod-db}.yml. The inherited
+    # staging task generates a compose file from the docker-compose template,
+    # which hardcodes 3000:80 and passes no env, while jaja needs 4000 plus
+    # SECRET_KEY_BASE and DATABASE_*.
+    - staging
+tasks:
+  deps:
+    command: mix deps.get --only prod
+    toolchain: system
+    env:
+      MIX_ENV: prod
+    inputs:
+    - mix.exs
+    - mix.lock
+    - /.prototools
+    options:
+      # mix deps.get is already incremental, and deps/ is ~50MB of source that
+      # would otherwise be tarballed in and out of .moon/cache on every change.
+      cache: false
+  build:
+    # Mirrors the order the old multi-stage Dockerfile used: compile has to run
+    # before assets.deploy, because assets/js/app.js imports
+    # phoenix-colocated/jaja, which the LiveView compiler generates into _build.
+    script: mix compile && mix assets.deploy && mix release --overwrite
+    toolchain: system
+    env:
+      MIX_ENV: prod
+    deps:
+    - ~:deps
+    inputs:
+    - mix.exs
+    - mix.lock
+    - lib/**/*
+    - priv/**/*
+    - config/**/*
+    - assets/**/*
+    - rel/**/*
+    - /.prototools
+    outputs:
+    - _build/prod/rel/jaja/**

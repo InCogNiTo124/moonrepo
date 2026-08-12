@@ -4,5 +4,23 @@ rust = "1.96.1"
 uv = "0.11.32"
 wasm-pack = "0.15.0"
 
+# jaja's release is built with include_erts: false, so the OTP that compiles the
+# bytecode must match the OTP in the runtime image. Keep this in lockstep with
+# ARG OTP_VERSION in jaja/Dockerfile.
+# No proto plugin exists for either tool, so these come via the asdf backend;
+# erlang is built from source on first install.
+#
+# The tool is declared as "erl", not "erlang": proto's asdf backend marks an
+# executable as primary only when its filename equals the tool id, and OTP's
+# bin/ has no file called "erlang" (it ships erl, erlc, escript, …). Declaring
+# it as "erlang" leaves the tool with no primary executable, which breaks every
+# erlang shim and makes `proto activate` fail for *all* tools. shortname keeps
+# resolution pointed at the asdf-erlang plugin.
+"asdf:erl" = "29.0.5"
+"asdf:elixir" = "1.20.3-otp-29"
+
+[tools."asdf:erl"]
+shortname = "erlang"
+
 [plugins]
 wasm-pack = "source:./wasm-pack.toml"

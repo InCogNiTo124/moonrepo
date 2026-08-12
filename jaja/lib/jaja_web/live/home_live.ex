@@ -1,0 +1,64 @@
+defmodule JajaWeb.HomeLive do
+  use JajaWeb, :live_view
+
+  alias Jaja.Shop
+
+  def mount(_params, _session, socket) do
+    if connected?(socket) do
+      # Optional: Subscribe to updates to refresh the list automatically
+      # Phoenix.PubSub.subscribe(Jaja.PubSub, "batches")
+    end
+
+    batches = Shop.list_active_batches()
+
+    {:ok, assign(socket, :batches, batches)}
+  end
+
+  def render(assigns) do
+    ~H"""
+    <div class="mx-auto max-w-4xl p-4 text-base-content">
+      <div class="text-center mb-8 pt-10">
+        <h1 class="text-5xl font-bold">Smetkova jaja</h1>
+        <p class="py-6 max-w-md mx-auto">
+          Svježa domaća jaja direktno s farme. Pogledajte aktivne ponude ispod.
+        </p>
+      </div>
+
+      <h2 class="text-3xl font-bold mb-6 text-center">Dostupno odmah</h2>
+
+      <%= if @batches == [] do %>
+        <div class="text-center py-10 bg-base-100 rounded-lg shadow">
+          <p class="text-xl text-base-content/60">
+            Trenutno nema aktivnih ponuda. Navratite kasnije!
+          </p>
+        </div>
+      <% else %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <%= for batch <- @batches do %>
+            <div class="card bg-base-300 shadow-xl hover:shadow-2xl transition-shadow">
+              <div class="card-body">
+                <h2 class="card-title">
+                  {translate_type(batch.type)}
+                  <div class="badge badge-secondary">NOVO</div>
+                </h2>
+                <p class="text-2xl font-bold text-primary">
+                  {format_price(batch.price)}
+                  <span class="text-sm font-normal text-base-content/60">po kutiji</span>
+                </p>
+                <div class="card-actions justify-end mt-4">
+                  <.link
+                    navigate={~p"/order/#{batch.unique_reference}"}
+                    class="btn btn-primary w-full"
+                  >
+                    Rezerviraj
+                  </.link>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    """
+  end
+end

@@ -1,0 +1,10 @@
+# The docker build context is jaja/ (moon runs the docker task from the project
+# root), and the Dockerfile copies exactly one thing: the release that
+# `moon run jaja:build` produced. Everything else is either irrelevant to the
+# image or actively unwanted in the context - deps/ and _build/ are hundreds of
+# MB, and .envrc holds live Google OAuth and Aiven database credentials.
+#
+# Allowlist rather than denylist, so anything added to the project later is
+# excluded by default.
+*
+!_build/prod/rel/jaja

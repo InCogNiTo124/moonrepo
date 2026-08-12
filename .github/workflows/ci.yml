@@ -21,11 +21,22 @@ jobs:
     permissions:
       contents: read
       packages: write
+    env:
+      # Applies to the OTP source build that setup-toolchain's auto-install
+      # kicks off for jaja's "asdf:erlang" pin.
+      KERL_CONFIGURE_OPTIONS: "--without-wx --without-javac --without-odbc --disable-debug"
     steps:
       - name: Set up musl
         run: |
           sudo apt-get update
           sudo apt-get install -y musl-dev musl-tools
+
+      # jaja pins Erlang via proto's asdf backend, which has no prebuilt and
+      # compiles OTP from source with kerl. These are kerl's build deps; the
+      # configure options drop the parts we never use (wx/javac/odbc) to keep
+      # it to a single pass. Took ~52s locally.
+      - name: Set up Erlang build dependencies
+        run: sudo apt-get install -y build-essential autoconf m4 libncurses-dev libssl-dev
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@master
@@ -43,7 +54,9 @@ jobs:
         with:
           auto-install: true
           auto-setup: true
-          cache: false
+          # Caches ~/.proto, so the source-built OTP survives between runs
+          # instead of being recompiled every time.
+          cache: true
 
       # Proto installs Rust via rustup, but setup-rust defaults to installing
       # targets on 'stable'. Pin the channel to match the version in

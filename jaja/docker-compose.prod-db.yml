@@ -1,0 +1,8 @@
+services:
+  jaja:
+    environment:
+      # Use defaults from runtime.exs which connect to the production database host
+      # The values below will be expected to be set in your shell when running docker-compose
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_USER=${DATABASE_USER}
+      # Make sure the application does not try to connect to a local db by relying on runtime defaults.

@@ -5,6 +5,7 @@ projects:
   - personal-reusables
   - kepler-orbit
   - brachi
+  - jaja
   sources:
     personal-blog-database: ./personal-blog/database
     personal-blog-frontend: ./personal-blog/frontend

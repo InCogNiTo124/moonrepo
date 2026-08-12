@@ -1,0 +1,19 @@
+services:
+  jaja:
+    build: .
+    image: jaja:latest
+    restart: always
+    environment:
+      - PHX_HOST=0.0.0.0
+      - PORT=4000
+      - SECRET_KEY_BASE=dummy_secret_key_base_for_local_docker_development_that_is_long_enough
+      - ADMIN_EMAIL
+      - GOOGLE_CLIENT_ID
+      - GOOGLE_CLIENT_SECRET
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jaja.rule=Host(`jaja.localhost`)"
+      - "traefik.http.routers.jaja.entrypoints=websecure"
+      - "traefik.http.routers.jaja.tls.certresolver=myresolver"
+    ports:
+      - "4000:4000"

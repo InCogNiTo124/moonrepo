@@ -49,6 +49,12 @@
         },
         {
             "matchFileNames": [
+                "jaja/**"
+            ],
+            "groupName": "jaja"
+        },
+        {
+            "matchFileNames": [
                 "cosmos/**"
             ],
             "groupName": "cosmos"
@@ -140,6 +146,32 @@
             ],
             "depNameTemplate": "drager/wasm-pack",
             "datasourceTemplate": "github-releases"
+        },
+        {
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^\\.prototools$/",
+                "/^jaja\\/Dockerfile$/"
+            ],
+            "matchStrings": [
+                "\"asdf:erlang\" = \"(?<currentValue>[^\"]+)\"",
+                "ARG OTP_VERSION=(?<currentValue>\\S+)"
+            ],
+            "depNameTemplate": "erlang/otp",
+            "datasourceTemplate": "github-releases",
+            "extractVersionTemplate": "^OTP-(?<version>.+)$"
+        },
+        {
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^\\.prototools$/"
+            ],
+            "matchStrings": [
+                "\"asdf:elixir\" = \"(?<currentValue>[^\"-]+)-otp-"
+            ],
+            "depNameTemplate": "elixir-lang/elixir",
+            "datasourceTemplate": "github-tags",
+            "extractVersionTemplate": "^v(?<version>.+)$"
         }
     ],
     "customDatasources": {
