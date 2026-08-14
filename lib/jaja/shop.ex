@@ -88,19 +88,33 @@ defmodule Jaja.Shop do
   end
 
   @doc """
-  Deletes a batch.
+  Deletes a batch, provided nobody has ordered from it.
 
   ## Examples
 
       iex> delete_batch(batch)
       {:ok, %Batch{}}
 
-      iex> delete_batch(batch)
-      {:error, %Ecto.Changeset{}}
+      iex> delete_batch(batch_with_orders)
+      {:error, :has_orders}
 
   """
   def delete_batch(%Batch{} = batch) do
-    Repo.delete(batch)
+    if has_orders?(batch) do
+      {:error, :has_orders}
+    else
+      Repo.delete(batch)
+    end
+  end
+
+  @doc """
+  Whether anyone has ordered from this batch.
+
+  Guards deletion: the orders foreign key is `on_delete: :delete_all`, so without
+  this check removing a batch would take its orders down with it silently.
+  """
+  def has_orders?(%Batch{} = batch) do
+    Repo.exists?(from o in Order, where: o.batch_reference == ^batch.unique_reference)
   end
 
   @doc """

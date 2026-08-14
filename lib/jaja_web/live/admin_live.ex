@@ -110,6 +110,27 @@ defmodule JajaWeb.AdminLive do
     end
   end
 
+  def handle_event("delete_batch", %{"id" => id}, socket) do
+    batch = Shop.get_batch_with_orders!(id)
+
+    case Shop.delete_batch(batch) do
+      {:ok, deleted} ->
+        {:noreply,
+         socket
+         |> stream_delete(stream_for(deleted), deleted)
+         |> put_flash(:info, "Batch deleted.")}
+
+      {:error, :has_orders} ->
+        {:noreply,
+         socket
+         |> put_batch_in_stream(batch)
+         |> put_flash(:error, "Batch has orders and cannot be deleted.")}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Failed to delete batch.")}
+    end
+  end
+
   def handle_event("toggle_details", %{"id" => id_str}, socket) do
     id = String.to_integer(id_str)
     open_batches = socket.assigns.open_batches
@@ -290,20 +311,37 @@ defmodule JajaWeb.AdminLive do
           <span class="badge badge-neutral">{@batch.amount} total qty</span>
           <span class="badge badge-ghost">{available(@batch)} available</span>
         </div>
-        <.button
-          type="button"
-          phx-click="toggle_active"
-          phx-value-id={@batch.id}
-          disabled={not @batch.active and available(@batch) <= 0}
-          class={"btn btn-sm #{if @batch.active, do: "btn-outline btn-error", else: "btn-outline btn-success"}"}
-          title={
-            if not @batch.active and available(@batch) <= 0,
-              do: "Sold out — cannot be activated again",
-              else: nil
-          }
-        >
-          {if @batch.active, do: "Deactivate", else: "Activate"}
-        </.button>
+        <div class="flex items-center gap-2">
+          <.button
+            type="button"
+            phx-click="toggle_active"
+            phx-value-id={@batch.id}
+            disabled={not @batch.active and available(@batch) <= 0}
+            class={"btn btn-sm #{if @batch.active, do: "btn-outline btn-error", else: "btn-outline btn-success"}"}
+            title={
+              if not @batch.active and available(@batch) <= 0,
+                do: "Sold out — cannot be activated again",
+                else: nil
+            }
+          >
+            {if @batch.active, do: "Deactivate", else: "Activate"}
+          </.button>
+          <.button
+            type="button"
+            phx-click="delete_batch"
+            phx-value-id={@batch.id}
+            data-confirm={"Delete this batch? #{translate_type(@batch.type)}, #{@batch.amount} qty. This cannot be undone."}
+            disabled={@batch.orders != []}
+            class="btn btn-sm btn-error"
+            title={
+              if @batch.orders != [],
+                do: "Batch has orders and cannot be deleted",
+                else: nil
+            }
+          >
+            Delete
+          </.button>
+        </div>
       </div>
 
       <details
