@@ -116,7 +116,7 @@ defmodule JajaWeb.OrderLive do
 
           <div class="flex flex-col gap-3 mt-4">
             <a
-              href={"https://revolut.me/smetko?currency=EUR&amount=#{total_cents}&note=Smetkova+Jaja"}
+              href={"https://revolut.me/smetko?currency=EUR&amount=#{total_cents}&note=Smetkova%20Jaja"}
               class="btn bg-[#A78BFA] hover:bg-[#8B5CF6] text-[#1F1B2E] border-none"
               target="_blank"
             >
