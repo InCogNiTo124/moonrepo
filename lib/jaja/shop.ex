@@ -166,9 +166,10 @@ defmodule Jaja.Shop do
 
   """
   def create_order(attrs) do
-    %Order{}
-    |> Order.changeset(attrs)
-    |> Repo.insert()
+    with {:ok, order} <- %Order{} |> Order.changeset(attrs) |> Repo.insert() do
+      deactivate_if_sold_out(order.batch_reference)
+      {:ok, order}
+    end
   end
 
   @doc """
@@ -225,6 +226,51 @@ defmodule Jaja.Shop do
     Repo.get_by!(Batch, unique_reference: reference)
   end
 
+  @doc """
+  Units still available on a batch: its amount minus everything ordered from it.
+
+  Can go negative only if orders were created outside the ordering flow.
+  """
+  def available_count(%Batch{} = batch) do
+    batch.amount - count_orders_for_batch(batch.unique_reference)
+  end
+
+  @doc """
+  Marks a batch active.
+
+  Refuses when nothing is left to sell, so a batch that was deactivated by
+  selling out cannot be put back on the shop.
+  """
+  def activate_batch(%Batch{} = batch) do
+    if available_count(batch) > 0 do
+      batch
+      |> Batch.activation_changeset(true)
+      |> Repo.update()
+    else
+      {:error, :sold_out}
+    end
+  end
+
+  @doc """
+  Marks a batch inactive. Always allowed.
+  """
+  def deactivate_batch(%Batch{} = batch) do
+    batch
+    |> Batch.activation_changeset(false)
+    |> Repo.update()
+  end
+
+  # Deactivates a batch once its last unit is ordered.
+  defp deactivate_if_sold_out(batch_reference) do
+    case Repo.get_by(Batch, unique_reference: batch_reference) do
+      %Batch{active: true} = batch ->
+        if available_count(batch) <= 0, do: deactivate_batch(batch)
+
+      _ ->
+        :ok
+    end
+  end
+
   def count_orders_for_batch(batch_reference) do
     from(o in Order, where: o.batch_reference == ^batch_reference)
     |> Repo.aggregate(:sum, :amount)
@@ -252,6 +298,7 @@ defmodule Jaja.Shop do
   def list_active_batches do
     from(b in Batch,
       left_join: o in assoc(b, :orders),
+      where: b.active,
       group_by: b.id,
       having: b.amount > coalesce(sum(o.amount), 0),
       select: b

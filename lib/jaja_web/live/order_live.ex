@@ -48,7 +48,8 @@ defmodule JajaWeb.OrderLive do
 
   def handle_event("reserve", %{"order" => order_params}, socket) do
     # Ensure we don't overbook (simple check, race condition possible but acceptable for this scope)
-    if socket.assigns.remaining >= String.to_integer(order_params["amount"]) do
+    if socket.assigns.batch.active and
+         socket.assigns.remaining >= String.to_integer(order_params["amount"]) do
       case Shop.create_order(order_params) do
         {:ok, _order} ->
           Phoenix.PubSub.broadcast(
@@ -72,9 +73,14 @@ defmodule JajaWeb.OrderLive do
   end
 
   def handle_info({:stock_update}, socket) do
-    orders_count = Shop.count_orders_for_batch(socket.assigns.batch.unique_reference)
-    remaining = socket.assigns.batch.amount - orders_count
-    {:noreply, assign(socket, :remaining, remaining)}
+    # Reload the batch: selling out flips it to inactive, and the page has to follow.
+    batch = Shop.get_batch_by_reference!(socket.assigns.batch.unique_reference)
+    remaining = batch.amount - Shop.count_orders_for_batch(batch.unique_reference)
+
+    {:noreply,
+     socket
+     |> assign(:batch, batch)
+     |> assign(:remaining, remaining)}
   end
 
   def handle_info(%{event: "presence_diff", payload: _diff}, socket) do
@@ -85,17 +91,9 @@ defmodule JajaWeb.OrderLive do
     {:noreply, assign(socket, :viewers, viewers)}
   end
 
-  defp translate_type(type) do
-    case String.downcase(type) do
-      "eggs" -> "Jaja"
-      "turkey" -> "Puretina"
-      other -> other
-    end
-  end
-
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-md p-6 bg-base-100 rounded-lg shadow-lg mt-10 text-base-content">
+    <div class="mx-auto max-w-md p-6 mt-10 text-base-content">
       <%= if @reserved do %>
         <div class="text-center">
           <h2 class="text-2xl font-bold text-success mb-4">Rezervacija potvrđena!</h2>
@@ -111,19 +109,22 @@ defmodule JajaWeb.OrderLive do
             <p class="text-3xl font-extrabold text-primary">
               {:erlang.float_to_binary(total_eur, decimals: 2)} €
             </p>
+            <p class="text-sm text-base-content/60 mt-1">
+              {@ordered_amount} × {format_price(@batch.price)}
+            </p>
           </div>
 
           <div class="flex flex-col gap-3 mt-4">
             <a
               href={"https://revolut.me/smetko?currency=EUR&amount=#{total_cents}&note=Smetkova+Jaja"}
-              class="btn btn-primary"
+              class="btn bg-[#A78BFA] hover:bg-[#8B5CF6] text-[#1F1B2E] border-none"
               target="_blank"
             >
               Plati putem Revoluta
             </a>
             <a
               href="https://kekspay.hr/keks?a=kekstag&tag=#marijans525"
-              class="btn bg-[#00DDA2] hover:bg-[#00c592] text-white border-none"
+              class="btn bg-[#00D986] hover:bg-[#00BF76] text-black border-none"
               target="_blank"
             >
               Plati putem Keks Pay-a
@@ -131,9 +132,9 @@ defmodule JajaWeb.OrderLive do
           </div>
         </div>
       <% else %>
-        <h1 class="text-3xl font-bold mb-2 capitalize">{translate_type(@batch.type)}</h1>
-        <p class="text-base-content/70 mb-6">
-          Referenca ponude: <span class="font-mono">{@batch.unique_reference}</span>
+        <h1 class="text-3xl font-bold mb-2 text-center">{translate_type(@batch.type)}</h1>
+        <p class="text-base-content/70 mb-6 text-center">
+          <span class="text-xl font-bold text-primary">{format_price(@batch.price)}</span> po kutiji
         </p>
 
         <div class="mb-8 text-center">
@@ -147,7 +148,7 @@ defmodule JajaWeb.OrderLive do
           </div>
         </div>
 
-        <%= if @remaining > 0 do %>
+        <%= if @remaining > 0 and @batch.active do %>
           <.form for={@form} phx-change="validate" phx-submit="reserve" class="space-y-4">
             <input type="hidden" name={@form[:batch_reference].name} value={@batch.unique_reference} />
 
@@ -177,7 +178,7 @@ defmodule JajaWeb.OrderLive do
           </.form>
         <% else %>
           <div class="bg-error/10 text-error p-4 rounded text-center font-bold">
-            Rasprodano!
+            {if @remaining > 0, do: "Ponuda je zatvorena!", else: "Rasprodano!"}
           </div>
         <% end %>
       <% end %>

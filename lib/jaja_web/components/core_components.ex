@@ -164,8 +164,8 @@ defmodule JajaWeb.CoreComponents do
   attr :error_class, :string, default: nil, doc: "the input error class to use over defaults"
 
   attr :rest, :global,
-    include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
-                multiple pattern placeholder readonly required rows size step)
+    include: ~w(accept autocomplete capture cols disabled form inputmode list max maxlength min
+                minlength multiple pattern placeholder readonly required rows size step)
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
     errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
@@ -277,6 +277,39 @@ defmodule JajaWeb.CoreComponents do
       {render_slot(@inner_block)}
     </p>
     """
+  end
+
+  @doc """
+  Formats a batch price for display, e.g. `"3.50 €"`.
+
+  Batches created before prices existed have no price, and render as "N/A".
+  """
+  def format_price(nil), do: "N/A"
+
+  def format_price(price) when is_float(price) do
+    "#{:erlang.float_to_binary(price, decimals: 2)} €"
+  end
+
+  @doc """
+  Croatian display name for a product type or slug, e.g. `"eggs"` -> `"Jaja"`.
+
+  Unknown types are returned unchanged.
+  """
+  def translate_type(type) do
+    case String.downcase(type) do
+      "eggs" -> "Jaja"
+      "turkey" -> "Puretina"
+      other -> other
+    end
+  end
+
+  @doc """
+  Formats a naive datetime for display, e.g. `"14.08.2026. 15:23"`.
+  """
+  def format_datetime(nil), do: ""
+
+  def format_datetime(%NaiveDateTime{} = datetime) do
+    Calendar.strftime(datetime, "%d.%m.%Y. %H:%M")
   end
 
   @doc """

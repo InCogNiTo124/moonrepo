@@ -6,10 +6,13 @@ import Config
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :jaja, Jaja.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "jaja_test#{System.get_env("MIX_TEST_PARTITION")}",
+  username: System.get_env("TEST_DATABASE_USER") || "postgres",
+  password: System.get_env("TEST_DATABASE_PASSWORD") || "postgres",
+  hostname: System.get_env("TEST_DATABASE_HOST") || "localhost",
+  port: String.to_integer(System.get_env("TEST_DATABASE_PORT") || "5432"),
+  database:
+    System.get_env("TEST_DATABASE_NAME") || "jaja_test#{System.get_env("MIX_TEST_PARTITION")}",
+  maintenance_database: System.get_env("TEST_MAINTENANCE_DATABASE") || "postgres",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 
