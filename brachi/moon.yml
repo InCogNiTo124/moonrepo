@@ -12,11 +12,6 @@ tasks:
     command: bun
     args:
     - install
-    deps:
-    # brachi's package.json has "wasm": "file:../crates/brachistochrone_solver/pkg"
-    # which requires the wasm-pack output to exist before bun install can resolve it.
-    # See also: the stub workaround in .github/workflows/ci.yml
-    - brachistochrone-solver:build
     inputs:
     - package.json
     - bun.lock

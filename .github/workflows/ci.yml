@@ -53,17 +53,6 @@ jobs:
           channel: "1.96.1"
           targets: x86_64-unknown-linux-musl,wasm32-unknown-unknown
 
-      # WORKAROUND: Moon's internal InstallDeps action runs `bun install` for
-      # ALL JS projects before any user-defined tasks. brachi's package.json has
-      # a file: dep on crates/brachistochrone_solver/pkg (wasm-pack output), but
-      # that directory doesn't exist yet. This stub satisfies bun install until
-      # brachistochrone-solver:build overwrites it with the real package.
-      # See: https://github.com/moonrepo/moon/issues/2538
-      - name: Stub wasm package for bun install
-        run: |
-          mkdir -p crates/brachistochrone_solver/pkg
-          echo '{"name":"brachistochrone_solver","version":"0.0.0"}' > crates/brachistochrone_solver/pkg/package.json
-
       - run:
           "moon ${{ github.event.inputs.targets && github.event.inputs.targets || 'ci'}}"
 
