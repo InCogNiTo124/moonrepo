@@ -15,6 +15,17 @@ tasks:
     inputs:
     - package.json
     - bun.lock
+  check:
+    # svelte-check resolves wasm/* through the kit.alias in svelte.config.js,
+    # so it needs the .d.ts files wasm-pack generates into the solver's pkg/.
+    # Without this it fails on a clean checkout with
+    # "Cannot find module 'wasm/brachistochrone_solver.js'".
+    deps:
+    - brachistochrone-solver:build
+    # pkg/ is generated, so it isn't picked up as a project file. Declare it
+    # explicitly or a cached pass survives the output being deleted.
+    inputs:
+    - /crates/brachistochrone_solver/pkg/**
   build:
     command: bun
     args:
