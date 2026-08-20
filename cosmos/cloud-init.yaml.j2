@@ -309,4 +309,4 @@ runcmd:
   # Pinned K3S_TOKEN + --node-name: with an external datastore the cluster
   # *resumes* on rebuild -- bootstrap data in Postgres is keyed to the token,
   # and node identity must stay stable across server replacements.
-  - curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.36.2+k3s1 K3S_TOKEN='{{ k3s_token }}' sh -s - server --datastore-endpoint='postgres://kine:{{ pg_passwords["kine"] }}@127.0.0.1:5432/kine?sslmode=disable' --node-name=cosmos --secrets-encryption --default-local-storage-path /data/k3s-storage
+  - curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.36.3+k3s1 K3S_TOKEN='{{ k3s_token }}' sh -s - server --datastore-endpoint='postgres://kine:{{ pg_passwords["kine"] }}@127.0.0.1:5432/kine?sslmode=disable' --node-name=cosmos --secrets-encryption --default-local-storage-path /data/k3s-storage
