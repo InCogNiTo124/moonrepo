@@ -1,5 +1,6 @@
 #cloud-config
 # this file is a Jinja2 template that gets rendered as yaml (env = "prod" | "local")
+# this is only for triggering pulumi up
 {% set pg_major = 18 %}
 write_files:
   - path: /etc/environment
