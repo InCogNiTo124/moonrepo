@@ -1,32 +1,40 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
+
+# Pull the production jaja database into the local docker postgres.
+#
+# Prod is no longer Aiven: it is the host-level PostgreSQL on cosmos, which is
+# deliberately unreachable from here -- the Hetzner firewall keeps 5432 closed
+# and pg_hba admits only loopback plus the pod CIDR (see
+# cosmos/cloud-init.d/postgres-files.j2). So the dump is taken *on* the server
+# and streamed down over ssh.
+#
+# Running pg_dump as the postgres system user gets peer auth, so this script
+# needs no database credentials at all -- only ssh access.
+
+SSH_HOST="${COSMOS_SSH_HOST:-cosmos}"
+DUMP="${DUMP_FILE:-/tmp/prod_data.dump}"
+COMPOSE=(docker compose -f docker-compose.yml -f docker-compose.local.yml)
 
 echo "Ensuring local database is up..."
-docker compose -f docker-compose.yml -f docker-compose.local.yml up -d db
+"${COMPOSE[@]}" up -d db
 
 echo "Waiting for postgres to be ready..."
-sleep 3
+until "${COMPOSE[@]}" exec -T db pg_isready -U postgres -q 2>/dev/null; do sleep 1; done
 
-# Prod DB details from runtime.exs
-PROD_HOST="${DATABASE_HOST:-postgres4a-exoscale-3f1ca88f-2ed3-4886-8817-f8ce726f9357.j.aivencloud.com}"
-PROD_PORT="${DATABASE_PORT:-21699}"
-PROD_DB="jaja"
-PROD_USER="${DATABASE_USER}"
-PROD_PASS="${DATABASE_PASSWORD}"
-
-if [ -z "$PROD_USER" ] || [ -z "$PROD_PASS" ]; then
-    echo "Error: DATABASE_USER and DATABASE_PASSWORD must be set to pull prod data."
-    exit 1
-fi
-
-echo "Dumping production database using docker..."
-docker run --rm -v /tmp:/tmp -e PGPASSWORD=$PROD_PASS postgres:17 pg_dump -h $PROD_HOST -p $PROD_PORT -U $PROD_USER -d $PROD_DB -F c -f /tmp/prod_data.dump
+echo "Dumping production database from ${SSH_HOST}..."
+ssh "$SSH_HOST" 'sudo -u postgres pg_dump -Fc jaja' > "$DUMP"
+echo "  $(wc -c < "$DUMP") bytes"
 
 echo "Dropping and recreating local database..."
-docker compose -f docker-compose.yml -f docker-compose.local.yml exec -T db psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS jaja;"
-docker compose -f docker-compose.yml -f docker-compose.local.yml exec -T db psql -U postgres -d postgres -c "CREATE DATABASE jaja;"
+"${COMPOSE[@]}" exec -T db psql -U postgres -d postgres -q -c "DROP DATABASE IF EXISTS jaja;"
+"${COMPOSE[@]}" exec -T db psql -U postgres -d postgres -q -c "CREATE DATABASE jaja;"
 
+# Restore inside the db container so the client major always matches the server
+# it is loading into. Prod objects are owned by the jaja role, which does not
+# exist locally, hence --no-owner/--no-privileges.
 echo "Restoring data to local database..."
-docker run --rm -v /tmp:/tmp --network container:$(docker compose -f docker-compose.yml -f docker-compose.local.yml ps -q db) postgres:17 pg_restore -U postgres -d jaja -h 127.0.0.1 -1 -F c --no-owner --no-privileges /tmp/prod_data.dump || true
+"${COMPOSE[@]}" exec -T db pg_restore -U postgres -d jaja --no-owner --no-privileges < "$DUMP"
 
-echo "Done! You can now run local docker with: docker compose -f docker-compose.yml -f docker-compose.local.yml up"
+echo "Done! Start the app with:"
+echo "  docker compose -f docker-compose.yml -f docker-compose.local.yml up"

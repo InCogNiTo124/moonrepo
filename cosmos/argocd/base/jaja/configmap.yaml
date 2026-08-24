@@ -7,5 +7,13 @@ data:
   PHX_HOST: "jaja.msmetko.xyz"
   PORT: "4000"
   DATABASE_USER: "jaja"
+  DATABASE_NAME: "jaja"
+  # host-level postgres, reached through the flannel gateway; pg_hba only
+  # admits the pod CIDR (see cosmos/cloud-init.d/postgres-files.j2)
+  DATABASE_HOST: "10.42.0.1"
+  DATABASE_PORT: "5432"
+  # the cluster config sets no ssl, so PG defaults to off; without this the
+  # app would try verify_none TLS and fail to connect
+  DATABASE_SSL: "false"
   POOL_SIZE: "10"
   ADMIN_EMAIL: "marijansmetko123@gmail.com"

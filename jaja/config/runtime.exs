@@ -30,10 +30,9 @@ if config_env() == :prod do
         raise("missing DATABASE_PASSWORD environment variable"),
     hostname:
       System.get_env("DATABASE_HOST") ||
-        "postgres4a-exoscale-3f1ca88f-2ed3-4886-8817-f8ce726f9357.j.aivencloud.com",
-    port: String.to_integer(System.get_env("DATABASE_PORT") || "21699"),
+        raise("missing DATABASE_HOST environment variable"),
+    port: String.to_integer(System.get_env("DATABASE_PORT") || "5432"),
     database: System.get_env("DATABASE_NAME") || "jaja",
-    maintenance_database: "defaultdb",
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
