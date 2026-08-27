@@ -18,7 +18,7 @@
     sections = [], 
     noSections = true, 
     lastPage = false, 
-    page = 1, 
+    page, 
     Section,
     emptyList 
   }: Props = $props();
