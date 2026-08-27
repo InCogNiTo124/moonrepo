@@ -61,14 +61,22 @@
     font-style: oblique;
   }
 
+  /* Narrow screens: date on its own line above the tags, which wrap and would
+     otherwise crowd it out of the row. */
   .post-meta {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
 
     font-size: 0.875rem;
 
     padding-top: 1.5rem;
+  }
+
+  .post-meta p {
+    order: -1;
   }
 
   .post-content :global(h2) {
@@ -105,6 +113,18 @@
   }
 
   @media screen and (min-width: 650px) {
+    .post-meta {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0;
+    }
+
+    /* back to DOM order: tags left, date right */
+    .post-meta p {
+      order: 0;
+    }
+
     .post-content :global(.footnote) {
       font-size: 1rem;
     }
