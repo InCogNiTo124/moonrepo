@@ -27,13 +27,15 @@
   width: 100%;
 }
 
+/* min-height, not height: a sticky child is confined to its containing block,
+   so a hard 100vh caps every sticky nav inside at one viewport. */
 #app {
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: start;
   font-size: larger;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 #main {
