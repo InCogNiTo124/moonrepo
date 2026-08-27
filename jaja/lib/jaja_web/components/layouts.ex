@@ -73,6 +73,39 @@ defmodule JajaWeb.Layouts do
   end
 
   @doc """
+  The site header, shown on every page but the front one.
+
+  Carries the shop's name as the way home. Customer-facing pages also get an
+  explicit back button, since arriving from a shared link leaves no history to
+  go back through.
+  """
+  attr :back, :boolean, default: false, doc: "show an explicit back link to the catalogue"
+
+  def brand_header(assigns) do
+    ~H"""
+    <header class="border-b border-base-300 bg-base-200">
+      <%!-- Three columns so the name sits in the middle of the header rather
+           than in the middle of what is left over beside the back button. --%>
+      <div class="mx-auto max-w-7xl px-4 py-3 grid grid-cols-3 items-center gap-3">
+        <div class="justify-self-start">
+          <.link :if={@back} navigate={~p"/"} class="btn btn-sm btn-neutral">
+            <.icon name="hero-arrow-left" class="size-4" />
+            <span class="hidden sm:inline">Natrag na ponude</span>
+          </.link>
+        </div>
+        <.link
+          navigate={~p"/"}
+          class="justify-self-center text-lg font-bold hover:text-primary text-center"
+        >
+          Smetkova jaja
+        </.link>
+        <div></div>
+      </div>
+    </header>
+    """
+  end
+
+  @doc """
   Shows the flash group with standard titles and content.
 
   ## Examples
