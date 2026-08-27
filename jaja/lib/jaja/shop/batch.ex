@@ -8,6 +8,7 @@ defmodule Jaja.Shop.Batch do
     field :datetime, :naive_datetime
     field :unique_reference, :string
     field :price, :float
+    field :video_key, :string
     field :active, :boolean, default: true
 
     has_many :orders, Jaja.Shop.Order,
@@ -20,7 +21,7 @@ defmodule Jaja.Shop.Batch do
   @doc false
   def changeset(batch, attrs) do
     batch
-    |> cast(attrs, [:type, :amount, :datetime, :unique_reference, :price],
+    |> cast(attrs, [:type, :amount, :datetime, :unique_reference, :price, :video_key],
       message: &cast_error_message/2
     )
     |> validate_required([:type, :amount, :price])

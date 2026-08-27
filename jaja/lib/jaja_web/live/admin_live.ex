@@ -20,7 +20,26 @@ defmodule JajaWeb.AdminLive do
      |> stream(:inactive_batches, inactive)
      |> assign(:products, products)
      |> assign(:open_batches, MapSet.new())
-     |> assign(:form, to_form(changeset))}
+     |> assign(:storage_configured?, Jaja.Storage.configured?())
+     # The video is uploaded before the batch exists, so the reference is minted up
+     # front and reused as the batch's unique_reference on save. That keeps the object
+     # key and the batch it belongs to in step.
+     |> assign(:pending_reference, Nanoid.generate())
+     |> assign(:form, to_form(changeset))
+     |> allow_upload(:video,
+       accept: ~w(.mp4 .mov .webm),
+       max_entries: 1,
+       max_file_size: 200_000_000,
+       external: &presign_video_upload/2
+     )}
+  end
+
+  # Hands the browser a presigned PUT url. The key is generated here, so the server
+  # decides where the object lands rather than trusting a client-supplied path.
+  defp presign_video_upload(entry, socket) do
+    key = Jaja.Storage.video_key(socket.assigns.pending_reference, entry.client_name)
+
+    {:ok, %{uploader: "S3", key: key, url: Jaja.Storage.presigned_upload_url(key)}, socket}
   end
 
   def handle_event("validate", %{"batch" => batch_params}, socket) do
@@ -53,6 +72,16 @@ defmodule JajaWeb.AdminLive do
   end
 
   def handle_event("save", %{"batch" => batch_params}, socket) do
+    video_key =
+      socket
+      |> consume_uploaded_entries(:video, fn %{key: key}, _entry -> {:ok, key} end)
+      |> List.first()
+
+    batch_params =
+      batch_params
+      |> Map.put("unique_reference", socket.assigns.pending_reference)
+      |> Map.put("video_key", video_key)
+
     case Shop.create_batch(batch_params) do
       {:ok, batch} ->
         batch = Map.put(batch, :orders, [])
@@ -62,11 +91,16 @@ defmodule JajaWeb.AdminLive do
          socket
          |> stream_insert(:active_batches, batch, at: 0)
          |> put_flash(:info, "Batch created successfully")
+         |> assign(:pending_reference, Nanoid.generate())
          |> assign(:form, to_form(Shop.change_batch(%Batch{type: "eggs", price: last_price})))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :form, to_form(changeset))}
     end
+  end
+
+  def handle_event("cancel_video", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, :video, ref)}
   end
 
   def handle_event("toggle_status", %{"id" => id, "field" => field}, socket) do
@@ -177,6 +211,12 @@ defmodule JajaWeb.AdminLive do
     |> stream_insert(to, batch, at: 0)
   end
 
+  defp upload_error_to_string(:too_large), do: "File is too large (200 MB max)."
+  defp upload_error_to_string(:too_many_files), do: "Only one video per batch."
+  defp upload_error_to_string(:not_accepted), do: "Unsupported format — use mp4, mov or webm."
+  defp upload_error_to_string(:external_client_failure), do: "Upload to storage failed."
+  defp upload_error_to_string(_), do: "Upload failed."
+
   defp stream_for(%{active: true}), do: :active_batches
   defp stream_for(%{active: false}), do: :inactive_batches
 
@@ -235,6 +275,37 @@ defmodule JajaWeb.AdminLive do
               placeholder="3.50"
               required
             />
+
+            <div :if={@storage_configured?} class="fieldset mb-2">
+              <span class="label mb-1">Video (optional)</span>
+              <.live_file_input upload={@uploads.video} class="w-full file-input" />
+
+              <div :for={entry <- @uploads.video.entries} class="mt-2">
+                <div class="flex items-center gap-2">
+                  <progress
+                    class="progress progress-primary w-full"
+                    value={entry.progress}
+                    max="100"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-xs btn-ghost"
+                    phx-click="cancel_video"
+                    phx-value-ref={entry.ref}
+                    aria-label="Remove video"
+                  >
+                    &times;
+                  </button>
+                </div>
+                <p :for={err <- upload_errors(@uploads.video, entry)} class="text-sm text-error">
+                  {upload_error_to_string(err)}
+                </p>
+              </div>
+
+              <p :for={err <- upload_errors(@uploads.video)} class="text-sm text-error">
+                {upload_error_to_string(err)}
+              </p>
+            </div>
 
             <.button
               type="submit"

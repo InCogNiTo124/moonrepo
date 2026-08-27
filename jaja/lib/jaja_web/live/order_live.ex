@@ -31,6 +31,7 @@ defmodule JajaWeb.OrderLive do
     {:ok,
      socket
      |> assign(:batch, batch)
+     |> assign(:video_url, Jaja.Storage.public_url(batch.video_key))
      |> assign(:remaining, remaining)
      |> assign(:viewers, viewers)
      |> assign(:reserved, false)
@@ -136,6 +137,15 @@ defmodule JajaWeb.OrderLive do
         <p class="text-base-content/70 mb-6 text-center">
           <span class="text-xl font-bold text-primary">{format_price(@batch.price)}</span> po kutiji
         </p>
+
+        <video
+          :if={@video_url}
+          src={@video_url}
+          class="w-full rounded-lg mb-6"
+          controls
+          playsinline
+          preload="metadata"
+        ></video>
 
         <div class="mb-8 text-center">
           <div class="text-5xl font-bold text-primary">{@remaining}</div>
