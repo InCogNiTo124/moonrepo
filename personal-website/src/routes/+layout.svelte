@@ -33,4 +33,5 @@
 
 <svelte:head>
   <link rel="icon" type="image/x-icon" href={favicon} />
+  <link rel="manifest" href="/manifest.webmanifest" />
 </svelte:head>
