@@ -25,11 +25,34 @@ import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/jaja"
 import topbar from "../vendor/topbar"
 
+// Uploads the file straight to the bucket with the presigned PUT url the server
+// handed us in entry.meta, so video bytes never travel through the Phoenix app.
+const Uploaders = {}
+Uploaders.S3 = function (entries, onViewError) {
+  entries.forEach(entry => {
+    const xhr = new XMLHttpRequest()
+    onViewError(() => xhr.abort())
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? entry.progress(100) : entry.error())
+    xhr.onerror = () => entry.error()
+    xhr.upload.addEventListener("progress", event => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100)
+        // 100 is reserved for onload, otherwise the entry completes before the PUT does
+        if (percent < 100) { entry.progress(percent) }
+      }
+    })
+    xhr.open("PUT", entry.meta.url, true)
+    xhr.setRequestHeader("Content-Type", entry.client_type)
+    xhr.send(entry.file)
+  })
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
   hooks: {...colocatedHooks},
+  uploaders: Uploaders,
 })
 
 // Show progress bar on live navigation and form submits
