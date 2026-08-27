@@ -1,4 +1,15 @@
-<div>
+<script lang="ts">
+  let height = $state(0);
+
+  // The nav sticks directly below this header. Publish the measured height
+  // instead of hardcoding an offset -- the title wraps on narrow screens and
+  // the font-size changes at 650px.
+  $effect(() => {
+    document.documentElement.style.setProperty('--blog-header-height', `${height}px`);
+  });
+</script>
+
+<div bind:clientHeight={height}>
   <a href="/">msmetko's blog</a>
   <p class="subtitle">A healthy dose of Dunning-Kruger</p>
 </div>

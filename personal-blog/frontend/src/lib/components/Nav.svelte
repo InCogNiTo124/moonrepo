@@ -53,9 +53,12 @@
     justify-content: space-between;
     font-weight: bold;
     position: sticky;
-    top: 0px;
+    /* pins below the sticky site title, whose height Header.svelte publishes */
+    top: var(--blog-header-height, 0px);
     padding: 20px;
     border-bottom: 1px solid var(--main-red);
+    background-color: var(--background-color);
+    z-index: 4;
   }
 
   #nav {
@@ -68,7 +71,8 @@
 
   @media screen and (min-width: 650px) {
     #top {
-      height: 100%;
+      /* content-height, not stretched: a full-height sidebar can never stick */
+      align-self: flex-start;
       padding-top: 100px;
       flex-direction: column;
       justify-content: start;
