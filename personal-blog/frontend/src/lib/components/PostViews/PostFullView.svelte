@@ -39,6 +39,15 @@
 </div>
 
 <style scoped lang="css">
+  /* Match the front page's gutter: there #main's 10px is topped up by
+     .section (15px) + its inner div (5px), putting text 30px from the edge.
+     A post only gets #main's 10px, so add the missing 20px.
+     Unconditional: #content is 720px from 650px up, but it's a shrinkable flex
+     item, so at tablet widths it still fills the screen and needs the gutter. */
+  .post {
+    padding: 0 20px;
+  }
+
   .post-title {
     padding: 2rem 0;
     width: 100%;
