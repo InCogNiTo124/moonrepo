@@ -1,6 +1,7 @@
 defmodule JajaWeb.OrderLive do
   use JajaWeb, :live_view
 
+  alias Jaja.PaymentChannel
   alias Jaja.Shop
 
   alias JajaWeb.Presence
@@ -58,10 +59,24 @@ defmodule JajaWeb.OrderLive do
             {:stock_update}
           )
 
+          ordered_amount = String.to_integer(order_params["amount"])
+          total_cents = round(ordered_amount * socket.assigns.batch.price * 100)
+          revolut_url = PaymentChannel.revolut_url(total_cents)
+          keks_url = PaymentChannel.keks_url()
+
+          # QR codes are built once here rather than on every render; the confirmed
+          # page re-renders on stock and presence updates but the total never changes.
           {:noreply,
            socket
            |> push_event("store_name", %{name: order_params["name"]})
-           |> assign(:ordered_amount, String.to_integer(order_params["amount"]))
+           |> assign(:ordered_amount, ordered_amount)
+           |> assign(:revolut_url, revolut_url)
+           |> assign(:keks_url, keks_url)
+           |> assign(
+             :revolut_qr,
+             PaymentChannel.qr_svg(revolut_url, logo: "/images/revolut-logo.svg")
+           )
+           |> assign(:keks_qr, PaymentChannel.qr_svg(keks_url, logo: "/images/keks-logo.svg"))
            |> assign(:reserved, true)}
 
         {:error, changeset} ->
@@ -93,17 +108,19 @@ defmodule JajaWeb.OrderLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-md p-6 mt-10 text-base-content">
+    <div class={[
+      "mx-auto max-w-md p-6 mt-10 text-base-content",
+      @reserved && "pointer-fine:max-w-xl"
+    ]}>
       <%= if @reserved do %>
         <div class="text-center">
           <h2 class="text-2xl font-bold text-success mb-4">Rezervacija potvrđena!</h2>
           <p class="mb-4">Uspješno ste rezervirali proizvod: {translate_type(@batch.type)}.</p>
-          <p class="text-sm text-base-content/70">
+          <p id="payment-hint-links" class="text-sm text-base-content/70 pointer-fine:hidden">
             Molimo izvršite plaćanje putem linkova ispod.
           </p>
 
           <% total_eur = @ordered_amount * @batch.price %>
-          <% total_cents = round(total_eur * 100) %>
           <div class="my-6 p-4 bg-base-200 rounded-lg shadow-sm border border-base-300">
             <p class="text-base font-medium opacity-80 mb-1">Iznos za uplatu:</p>
             <p class="text-3xl font-extrabold text-primary">
@@ -114,21 +131,53 @@ defmodule JajaWeb.OrderLive do
             </p>
           </div>
 
-          <div class="flex flex-col gap-3 mt-4">
+          <p id="payment-hint-qr" class="text-sm text-base-content/70 hidden pointer-fine:block">
+            Skenirajte QR kod mobitelom ili kliknite na njega kako biste izvršili plaćanje.
+          </p>
+
+          <%!-- Phones: deep links into the apps. Hidden where a mouse is the primary input. --%>
+          <div id="payment-links" class="flex flex-col gap-3 mt-4 pointer-fine:hidden">
             <a
-              href={"https://revolut.me/smetko?currency=EUR&amount=#{total_cents}&note=Smetkova%20Jaja"}
+              href={@revolut_url}
               class="btn bg-[#A78BFA] hover:bg-[#8B5CF6] text-[#1F1B2E] border-none"
               target="_blank"
             >
               Plati putem Revoluta
             </a>
             <a
-              href="https://kekspay.hr/keks?a=kekstag&tag=#marijans525"
+              href={@keks_url}
               class="btn bg-[#00D986] hover:bg-[#00BF76] text-black border-none"
               target="_blank"
             >
               Plati putem Keks Pay-a
             </a>
+          </div>
+
+          <%!-- PCs: the same links as QR codes to scan with a phone. Still clickable,
+               revolut.me can take a card payment in a desktop browser. --%>
+          <div id="payment-qr" class="hidden pointer-fine:flex justify-center gap-16 mt-4">
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-sm font-semibold">Revolut</span>
+              <a
+                href={@revolut_url}
+                target="_blank"
+                aria-label="QR kod za Revolut"
+                class="block w-52 p-2 bg-white rounded-lg [&>svg]:w-full [&>svg]:h-auto"
+              >
+                {raw(@revolut_qr)}
+              </a>
+            </div>
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-sm font-semibold">Keks Pay</span>
+              <a
+                href={@keks_url}
+                target="_blank"
+                aria-label="QR kod za Keks Pay"
+                class="block w-52 p-2 bg-white rounded-lg [&>svg]:w-full [&>svg]:h-auto"
+              >
+                {raw(@keks_qr)}
+              </a>
+            </div>
           </div>
         </div>
       <% else %>
