@@ -4,6 +4,7 @@ defmodule Jaja.Shop.Order do
 
   schema "orders" do
     field :batch_reference, :string
+    field :reference, :string
     field :name, :string
     field :amount, :integer
     field :datetime, :naive_datetime
@@ -19,6 +20,17 @@ defmodule Jaja.Shop.Order do
     |> cast(attrs, [:batch_reference, :name, :amount, :datetime])
     |> validate_required([:batch_reference, :name, :amount])
     |> put_datetime()
+    |> put_reference()
+    |> unique_constraint(:reference)
+  end
+
+  # Server-minted and never cast from params: it is the only key to the
+  # customer's confirmation page.
+  defp put_reference(changeset) do
+    case get_field(changeset, :reference) do
+      nil -> put_change(changeset, :reference, Nanoid.generate())
+      _ -> changeset
+    end
   end
 
   defp put_datetime(changeset) do

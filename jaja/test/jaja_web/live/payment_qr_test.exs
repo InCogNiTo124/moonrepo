@@ -17,12 +17,13 @@ defmodule JajaWeb.PaymentQrTest do
   defp reserve(conn, batch) do
     {:ok, view, _html} = live(conn, ~p"/order/#{batch.unique_reference}")
 
-    html =
+    {:ok, view, html} =
       view
       |> form("form", order: %{name: "Ana", amount: "2"})
       |> render_submit()
+      |> follow_redirect(conn)
 
-    assert html =~ "Rezervacija potvrđena!"
+    assert html =~ "Rezervacija potvrđena, Ana!"
     {view, html}
   end
 
@@ -52,8 +53,8 @@ defmodule JajaWeb.PaymentQrTest do
 
     qr_row = view |> element("#payment-qr") |> render()
 
-    assert qr_row =~ ~s(href="/images/revolut-logo.svg")
-    assert qr_row =~ ~s(href="/images/keks-logo.svg")
+    assert qr_row =~ ~s(href="/images/revolut-logo.png")
+    assert qr_row =~ ~s(href="/images/keks-logo.png")
   end
 
   test "the buttons stay for phones and hide on fine-pointer devices", %{conn: conn, batch: batch} do

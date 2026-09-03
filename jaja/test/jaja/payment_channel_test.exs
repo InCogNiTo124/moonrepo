@@ -27,16 +27,16 @@ defmodule Jaja.PaymentChannelTest do
 
     test "stays small, phones carry it in the DOM without ever showing it" do
       svg =
-        PaymentChannel.qr_svg(PaymentChannel.revolut_url(600), logo: "/images/revolut-logo.svg")
+        PaymentChannel.qr_svg(PaymentChannel.revolut_url(600), logo: "/images/revolut-logo.png")
 
       assert byte_size(svg) < 10_000
     end
 
     test "places a logo in a white cut-out in the middle when given one" do
-      svg = PaymentChannel.qr_svg("https://example.com", logo: "/images/revolut-logo.svg")
+      svg = PaymentChannel.qr_svg("https://example.com", logo: "/images/revolut-logo.png")
 
       assert svg =~ ~s(<rect x=")
-      assert svg =~ ~s(<image href="/images/revolut-logo.svg")
+      assert svg =~ ~s(<image href="/images/revolut-logo.png")
     end
 
     test "has no cut-out without a logo" do

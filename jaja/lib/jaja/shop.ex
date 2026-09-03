@@ -168,6 +168,15 @@ defmodule Jaja.Shop do
   def get_order!(id), do: Repo.get!(Order, id)
 
   @doc """
+  Gets a single order by the public reference handed to the customer.
+
+  Raises `Ecto.NoResultsError` if no order carries it.
+  """
+  def get_order_by_reference!(reference) do
+    Repo.get_by!(Order, reference: reference)
+  end
+
+  @doc """
   Creates a order.
 
   ## Examples
