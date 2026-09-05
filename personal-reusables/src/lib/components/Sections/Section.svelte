@@ -51,7 +51,12 @@
 	}
 
 	.section h3 {
-		width: max-content;
+		/* fit-content, not max-content: hug the title so the underline stops at
+		   the text, but clamp to the available width so long titles wrap
+		   instead of running off the screen. */
+		width: fit-content;
+		max-width: 100%;
+		overflow-wrap: break-word;
 	}
 
 	.section h3 div {
