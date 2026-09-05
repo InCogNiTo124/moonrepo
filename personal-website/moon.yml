@@ -13,6 +13,14 @@ tasks:
     inputs:
     - package.json
     - bun.lock
+    deps:
+    # bun copies the `file:` dependency on personal-reusables into
+    # node_modules, and that package's exports all point into dist/. So dist/
+    # has to exist *before* install runs: on a clean checkout it does not, and
+    # every `personal-reusables` import fails to resolve. Declaring the dep on
+    # check/build alone is not enough, because moon is free to run install in
+    # parallel with the library build.
+    - personal-reusables:build
   check:
     deps:
     - ~:install
