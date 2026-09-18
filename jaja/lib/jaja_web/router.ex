@@ -20,6 +20,7 @@ defmodule JajaWeb.Router do
 
     live "/", HomeLive
     live "/order/:reference", OrderLive
+    live "/reservation/:reference", ReservationLive
   end
 
   scope "/auth", JajaWeb do
