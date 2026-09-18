@@ -20,15 +20,6 @@ tasks:
     deps:
     - compile
     - build
-  staging:
-    script: |
-      FRONTEND_LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/personal-blog-frontend' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
-      DB_LATEST_IMAGE=$(docker image ls --filter 'reference=ghcr.io/incognito124/personal-blog-database' --format "{{.Repository}}:{{.Tag}}" | sort -r | head -n 1)
-      moon generate --force --to $projectSource docker-compose-blog -- --frontendDockerImage "$FRONTEND_LATEST_IMAGE" --dbDockerImage "$DB_LATEST_IMAGE"
-      docker compose -f $projectSource/docker-compose.yaml up && docker compose -f $projectSource/docker-compose.yaml rm -fs && rm $projectSource/docker-compose.yaml
-    deps:
-    - docker
-    - personal-blog-frontend:docker
 language: rust
 tags:
 - docker
@@ -39,3 +30,12 @@ project:
   description: The server for the personal blog database.
   title: personal-blog-database
 layer: application
+workspace:
+  inheritedTasks:
+    exclude:
+    # The blog is staged as a whole from personal-blog-frontend:staging, which
+    # depends on this project's docker task. Keeping a mirror-image staging
+    # task here (depending on personal-blog-frontend:docker) makes the two
+    # projects depend on each other; moon 2.5+ validates that as a cycle
+    # instead of silently dropping one edge.
+    - staging

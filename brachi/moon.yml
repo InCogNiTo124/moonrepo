@@ -21,6 +21,7 @@ tasks:
     # Without this it fails on a clean checkout with
     # "Cannot find module 'wasm/brachistochrone_solver.js'".
     deps:
+    - ~:install
     - brachistochrone-solver:build
     # pkg/ is generated, so it isn't picked up as a project file. Declare it
     # explicitly or a cached pass survives the output being deleted.
