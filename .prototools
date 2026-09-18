@@ -17,7 +17,7 @@ wasm-pack = "0.15.0"
 # erlang shim and makes `proto activate` fail for *all* tools. shortname keeps
 # resolution pointed at the asdf-erlang plugin.
 "asdf:erl" = "29.0.5"
-"asdf:elixir" = "1.20.3-otp-29"
+"asdf:elixir" = "1.20.4-otp-29"
 
 [tools."asdf:erl"]
 shortname = "erlang"
