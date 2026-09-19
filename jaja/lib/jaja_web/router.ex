@@ -51,5 +51,12 @@ defmodule JajaWeb.Router do
       live_dashboard "/dashboard", metrics: JajaWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+
+    scope "/dev", JajaWeb do
+      pipe_through :browser
+
+      get "/login", DevLoginController, :new
+      post "/login", DevLoginController, :create
+    end
   end
 end
