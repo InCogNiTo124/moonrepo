@@ -13,7 +13,8 @@
 </script>
 
 <SectionGroup
-  sections={posts.map((post) => ({ post, id: post.slug }))}
+  sections={posts.map((post) => ({ post }))}
+  key={({ post }) => post.slug}
   noSections={noPosts}
   {lastPage}
   {page}

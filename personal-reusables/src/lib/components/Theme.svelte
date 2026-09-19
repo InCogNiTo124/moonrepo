@@ -1,25 +1,12 @@
-<script>
-	import { onMount } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import Cookies from 'js-cookie';
-
-	import { LIGHT, DARK, COOKIE_KEY_THEME, dark, light, theme } from 'personal-reusables';
-
-	let val = $state(LIGHT);
-	onMount(() => {
-		val = Cookies.get(COOKIE_KEY_THEME) || LIGHT;
-	});
-
-	function toggleTheme() {
-		if (browser) {
-			val = val === LIGHT ? DARK : LIGHT;
-			theme.set(val);
-		}
-	}
+<script lang="ts">
+	import { LIGHT } from '../utils.js';
+	import { theme } from '../stores/theme_store.js';
+	import dark from '../images/dark.png';
+	import light from '../images/light.png';
 </script>
 
-<button onclick={toggleTheme} type="button" class="theme-toggle">
-	<img src={val === LIGHT ? dark : light} alt="Toggle theme" />
+<button onclick={theme.toggle} type="button" class="theme-toggle">
+	<img src={$theme === LIGHT ? dark : light} alt="Toggle theme" />
 </button>
 
 <style scoped>

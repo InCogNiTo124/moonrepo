@@ -1,9 +1,9 @@
 <script lang="ts">
   import axios from "axios";
-  import { REPO_API } from "personal-reusables";
-  import SectionGroup from "$lib/components/SectionGroup.svelte";
+  import { SectionGroup, type TSection } from "personal-reusables";
+  import { REPO_API } from "$lib/constants";
 
-  let projects: TSection[] = [];
+  let projects: TSection[] = $state([]);
   axios
     .get(REPO_API)
     .then((res: TGitHubProjectResponse) => {

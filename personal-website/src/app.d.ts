@@ -9,14 +9,7 @@ declare namespace App {
   // interface Stuff {}
 }
 
-type TSection = {
-  title: string;
-  texts: string[];
-  url?: string;
-  urlTarget?: string;
-};
-
-type TProject = TSection & {
+type TProject = import('personal-reusables').TSection & {
   updated: string;
 };
 

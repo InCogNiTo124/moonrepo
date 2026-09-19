@@ -1,34 +1,19 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import Cookies from 'js-cookie';
-	import { BLANK, LIGHT, COOKIE_KEY_THEME } from 'personal-reusables';
-	import { theme } from 'personal-reusables';
+	import type { Snippet } from 'svelte';
+	import { BLANK } from '../../utils.js';
+	import { theme } from '../../stores/theme_store.js';
 
 	interface Props {
 		url?: string;
 		urlTarget?: string;
 		title: string;
-		body?: import('svelte').Snippet;
+		body?: Snippet;
 	}
 
-	let props: Props = $props();
-	let { url = '', urlTarget = BLANK, title, body } = props;
-
-	let themeValue = $state(LIGHT);
-
-	onMount(() => {
-		if (browser) {
-			theme.subscribe((newval) => {
-				themeValue = newval;
-			});
-
-			themeValue = Cookies.get(COOKIE_KEY_THEME) || LIGHT;
-		}
-	});
+	let { url = '', urlTarget = BLANK, title, body }: Props = $props();
 </script>
 
-<div class="section {themeValue}">
+<div class="section {$theme}">
 	<h3>
 		{#if url}
 			<a href={url} target={urlTarget} data-sveltekit-prefetch>

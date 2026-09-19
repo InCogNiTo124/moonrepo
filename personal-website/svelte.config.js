@@ -10,13 +10,22 @@ const config = {
 
   kit: {
     adapter: adapter(),
-    // Resolve personal-reusables directly from source, bypassing node_modules.
-    // Bun's file: protocol creates per-file symlinks at install time, so the
-    // dist/ directory never appears in node_modules/personal-reusables/ if it
-    // didn't exist during `bun install` (which runs before personal-reusables:build).
-    // kit.alias syncs to both Vite (build) and TypeScript (svelte-check).
+    // personal-reusables is a source-only library: compile it straight from
+    // src/lib. kit.alias reaches both Vite (build) and TypeScript
+    // (svelte-check).
     alias: {
       'personal-reusables': path.resolve('../personal-reusables/src/lib/index.ts')
+    },
+    typescript: {
+      // The lib's sources would otherwise type-check against the svelte in
+      // personal-reusables/node_modules, and its Snippet/Component types
+      // are unrelated to ours as soon as the two lockfiles drift apart.
+      // Types only: at runtime vite-plugin-svelte already dedupes svelte.
+      config(tsconfig) {
+        tsconfig.compilerOptions.paths ??= {};
+        tsconfig.compilerOptions.paths['svelte'] = ['../node_modules/svelte'];
+        tsconfig.compilerOptions.paths['svelte/*'] = ['../node_modules/svelte/*'];
+      }
     }
   }
 };

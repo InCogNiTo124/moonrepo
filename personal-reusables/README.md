@@ -1,56 +1,48 @@
 # Personal Reusables
 
-This is a shared [Svelte](https://svelte.dev/) library containing reusable
-components, stores, assets, and utility functions used across the `moonrepo`
-workspace projects (for now `personal-website` and `personal-blog-frontend`).
+The [Svelte](https://svelte.dev/) UI kit shared by `personal-website` and
+`personal-blog-frontend`.
 
-## Architecture
+## What belongs here
 
-This project is a SvelteKit library packaged using
-[`@sveltejs/package`](https://kit.svelte.dev/docs/packaging).
+Only what **both** sites use. Anything with a single consumer (a site's photo
+and favicons, personal links, blog-only components like `Tags`) lives in that
+site instead.
 
-- **Components**: Located in `src/lib/components/`. Includes structural elements
-  like `Section`, `SectionGroup`, and UI controls like `Theme`, `Loader`,
-  `Tags`, and `Pager`.
-- **Stores**: Shared state, such as `theme_store` for managing light/dark mode.
-- **Assets**: Shared static assets like favicons and theme icons.
-- **Styles**: Global CSS variables and styles in `src/lib/assets/_styles.css`.
-- **Preview App**: The `src/routes/` directory contains a test application to
-  preview components during development.
+- **Shell**: `AppShell` (page skeleton + theme bootstrap) and `Nav` (sidebar
+  with theme toggle, active-link highlighting, and optional hamburger `menu`).
+- **Sections**: `Section`, `TextSection`, `SectionGroup`, plus `Loader` and
+  `Pager`. The `TSection` type describes a `TextSection`.
+- **Theme**: the `theme` store (`theme.init()`, `theme.toggle()`) and the
+  `Theme` toggle button.
+- **Styles**: global CSS, CSS variables and the Lato font faces, pulled in by
+  importing anything from the package.
+- **Constants**: `BLANK`, `SELF`, `TARGET_BLANK`, `INLINE_CLASS`.
 
-## Prerequisites
+`src/lib/index.ts` is the full public surface.
 
-- [Bun](https://bun.sh) (Runtime & Package Manager)
-- [moon](https://moonrepo.dev) (Task Runner)
+## How it is consumed
 
-## Usage in Other Projects
-
-This library is essentially a local npm package. Other projects in the workspace
-reference it via file dependency or path aliases.
-
-Projects import components directly:
+It is source-only: there is no build step and no `dist/`. Each site aliases
+`personal-reusables` to `src/lib/index.ts` in its `svelte.config.js`
+(`kit.alias`, which covers both Vite and svelte-check) and compiles the
+sources itself, so `$app/*` imports work here as they would in the site.
 
 ```svelte
 <script>
-  import { Section, Theme, theme } from 'personal-reusables';
+  import { AppShell, Nav, SectionGroup } from 'personal-reusables';
 </script>
 ```
 
-And ensuring the styles are loaded (often via the layout):
+The sites also remap `svelte` types to their own install
+(`kit.typescript.config`), so the lib is type-checked against the same svelte
+the site compiles it with, even when the lockfiles drift.
 
-```javascript
-import "personal-reusables/dist/style.css"; // Path may vary depending on packaging
-```
-
-_(Note: Refer to `src/lib/index.ts` for strictly exported members)_
-
-## Building
-
-To package the library for consumption by other applications:
+## Tasks
 
 ```bash
-moon run personal-reusables:build
+moon run personal-reusables:check
 ```
 
-This will run `svelte-package` and output the generated type definitions and
-JavaScript files to the `dist/` directory.
+The sites' `check` and `build` depend on this task and list `src/**` as
+inputs, so a change here re-checks and rebuilds both of them.

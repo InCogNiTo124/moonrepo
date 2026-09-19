@@ -33,3 +33,19 @@ table {
     border-collapse: collapse;
     width: 100%;
 }
+
+/* Post body rules, moved out of personal-reusables' shared global.css. */
+.post hr {
+    margin: 15px 0;
+    border-top: 1px solid var(--main-red);
+    background-image: none;
+}
+
+.post-content a {
+    color: var(--main-red);
+    text-decoration: underline;
+}
+
+.emojione {
+    height: 1.5rem;
+}

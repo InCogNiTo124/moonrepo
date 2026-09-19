@@ -13,10 +13,10 @@ The project is structured as a static SvelteKit application using
   - `/`: Home page
   - `/ilpc`: ILPC related content
   - `/projects`: Portfolio/Projects listing
-- **Components**: Custom components are located in `src/lib/components/`.
-- **Dependencies**: This project depends on `personal-reusables` for shared
-  logic or assets, which is managed via the moon workspace.
-- **Style**: The site uses custom styles located in `static/_styles.css`.
+- **Shared UI**: the shell, nav, sections, theme and global styles come from
+  `personal-reusables`, compiled from source (see its README).
+- **Site-only**: `src/lib/components/` (Header), `src/lib/assets/` (photo and
+  favicons) and `src/lib/constants.ts` (personal links).
 
 ## Prerequisites
 
@@ -53,8 +53,7 @@ To build the static site (output to `build/`):
 moon run personal-website:build
 ```
 
-This task ensures that the dependency `personal-reusables:build` is executed
-first.
+This task type-checks `personal-reusables` first.
 
 ## Staging (Docker)
 

@@ -13,18 +13,18 @@ tasks:
     inputs:
     - package.json
     - bun.lock
-    deps:
-    # bun copies the `file:` dependency on personal-reusables into
-    # node_modules, and that package's exports all point into dist/. So dist/
-    # has to exist *before* install runs: on a clean checkout it does not, and
-    # every `personal-reusables` import fails to resolve. Declaring the dep on
-    # check/build alone is not enough, because moon is free to run install in
-    # parallel with the library build.
-    - personal-reusables:build
   check:
     deps:
     - ~:install
-    - personal-reusables:build
+    # Type-check the lib first: it is compiled from source (see the alias in
+    # svelte.config.js), so its errors are this project's errors too.
+    - personal-reusables:check
+    options:
+      mergeInputs: append
+    inputs:
+    # A dep's hash does not feed into this task's hash, so list the lib's
+    # sources explicitly or edits to them would hit a stale cache.
+    - /personal-reusables/src/**/*
   build:
     command: bun
     args:
@@ -32,7 +32,10 @@ tasks:
     - build
     deps:
     - ~:install
-    - personal-reusables:build
+    - personal-reusables:check
+    inputs:
+    - '@group(svelte)'
+    - /personal-reusables/src/**/*
     outputs:
     - build/**
     options:

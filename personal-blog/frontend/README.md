@@ -56,7 +56,7 @@ To create the production build:
 moon run personal-blog-frontend:build
 ```
 
-This task ensures that `personal-reusables:build` is executed first. The output
+This task type-checks `personal-reusables` first. The output
 is a standalone Bun server located in the `build/` directory.
 
 To run the built server:

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { smetko } from 'personal-reusables';
+  import smetko from '$lib/assets/android-chrome-512x512.png';
 </script>
 
 <div class="header">

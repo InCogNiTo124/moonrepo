@@ -2,6 +2,15 @@ tags:
 - sveltekit
 layer: library
 language: typescript
+workspace:
+  inheritedTasks:
+    # Source-only library: the sites compile src/lib themselves, so there is
+    # nothing to build, serve or preview here. `check` is the one real task,
+    # and the sites depend on it.
+    exclude:
+    - build
+    - dev
+    - preview
 tasks:
   install:
     command: bun
@@ -11,24 +20,7 @@ tasks:
     - package.json
     - bun.lock
   check:
-    # Components import this package by its own name ('personal-reusables'),
-    # which bun resolves through package.json exports into dist/. So dist/ has
-    # to exist before svelte-check runs, or every self-import fails with
-    # "Cannot find module 'personal-reusables'" on a clean checkout. Going via
-    # build also serialises it after install, whose postinstall runs the same
-    # `svelte-kit sync` the check script does and races it otherwise.
-    deps:
-    - ~:build
-  build:
-    command: bun
-    args:
-    - run
-    - build
     deps:
     - ~:install
-    outputs:
-    - dist/**
-    options:
-      merge: replace
 toolchains:
   default: bun

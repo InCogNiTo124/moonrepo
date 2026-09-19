@@ -1,6 +1,10 @@
 <script lang="ts">
-  import { TARGET_BLANK, INLINE_CLASS } from 'personal-reusables';
-  import SectionGroup from '$lib/components/SectionGroup.svelte';
+  import {
+    SectionGroup,
+    TARGET_BLANK,
+    INLINE_CLASS,
+    type TSection,
+  } from 'personal-reusables';
 
   let sections: TSection[] = [
     {

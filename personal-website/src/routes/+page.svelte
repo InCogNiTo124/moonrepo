@@ -1,12 +1,12 @@
 <script lang="ts">
   import dayjs from 'dayjs';
-  import SectionGroup from '$lib/components/SectionGroup.svelte';
   import {
-    FER_LINK_EN,
+    SectionGroup,
     TARGET_BLANK,
     INLINE_CLASS,
-    BIRTHDATE,
+    type TSection,
   } from 'personal-reusables';
+  import { FER_LINK_EN, BIRTHDATE } from '$lib/constants';
 
   const age: number = dayjs().diff(dayjs(BIRTHDATE), 'y');
 

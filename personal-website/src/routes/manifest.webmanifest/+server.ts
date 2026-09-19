@@ -1,8 +1,9 @@
-import { icon192, icon512 } from 'personal-reusables';
+import icon192 from '$lib/assets/android-chrome-192x192.png';
+import icon512 from '$lib/assets/android-chrome-512x512.png';
 
 /**
  * Served as a route rather than a file in static/ so the icons resolve to the
- * hashed URLs Vite emits for personal-reusables' assets, instead of needing a
+ * hashed URLs Vite emits for the $lib/assets icons, instead of needing a
  * second copy of the PNGs in this project's static/ directory.
  */
 export const prerender = true;
