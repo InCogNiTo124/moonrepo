@@ -1,2 +1,5 @@
 feed.rss
 docker-compose.yaml
+# build output and local dev db
+target/
+*.sqlite3
