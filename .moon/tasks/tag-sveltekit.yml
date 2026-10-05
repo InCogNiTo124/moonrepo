@@ -1,3 +1,22 @@
 extends: https://raw.githubusercontent.com/moonrepo/moon-configs/master/javascript/sveltekit/tasks.yml
 inheritedBy:
   tag: sveltekit
+fileGroups:
+  # Every project's tsconfig.json extends this, so it is a source too.
+  sources:
+  - /config/tsconfig.sveltekit.json
+tasks:
+  install:
+    command: bun install
+    inputs:
+    - package.json
+    - bun.lock
+  check:
+    # The upstream task runs a bare `svelte-check`, which skips both of these.
+    # `svelte-kit sync` regenerates .svelte-kit/ (gitignored, so a cached
+    # install can leave it stale). --tsgo-experimental-api type-checks with
+    # TypeScript 7 from @typescript/native; the plain `typescript` dep stays on
+    # 6 because svelte2tsx and svelte-check still load its JS API.
+    script: svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --tsgo-experimental-api
+    deps:
+    - ~:install

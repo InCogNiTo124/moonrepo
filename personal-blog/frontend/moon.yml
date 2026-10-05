@@ -6,21 +6,11 @@ project:
   description: Terra Incognita, personal blog
   title: personal-blog-frontend
 tasks:
-  install:
-    command: bun
-    args:
-    - install
-    inputs:
-    - package.json
-    - bun.lock
   check:
     deps:
-    - ~:install
     # Type-check the lib first: it is compiled from source (see the alias in
     # svelte.config.js), so its errors are this project's errors too.
     - personal-reusables:check
-    options:
-      mergeInputs: append
     inputs:
     # A dep's hash does not feed into this task's hash, so list the lib's
     # sources explicitly or edits to them would hit a stale cache.
@@ -32,9 +22,11 @@ tasks:
     - build
     deps:
     - ~:install
-    - personal-reusables:check
+    # Vite strips types without checking them. ~:check covers the lib too.
+    - ~:check
     inputs:
     - '@group(svelte)'
+    - '@group(sources)'
     - /personal-reusables/src/**/*
     outputs:
     - build/**

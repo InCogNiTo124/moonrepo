@@ -11,16 +11,5 @@ workspace:
     - build
     - dev
     - preview
-tasks:
-  install:
-    command: bun
-    args:
-    - install
-    inputs:
-    - package.json
-    - bun.lock
-  check:
-    deps:
-    - ~:install
 toolchains:
   default: bun
