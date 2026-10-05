@@ -45,3 +45,10 @@ ca.pem
 # Local secrets
 .envrc
 /data/
+
+# Most of files under priv/ are generated build output
+# (phx.digest fingerprint copies, .gz siblings, esbuild assets)
+# unless explicitly tracked. Hand-authored sources already tracked
+# (favicon.ico, robots.txt, images/*) are immune to this rule.
+# Add NEW sources with:  jj file track --include-ignored <path>
+/priv/*

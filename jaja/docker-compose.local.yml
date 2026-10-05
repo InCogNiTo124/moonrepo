@@ -9,7 +9,10 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      # postgres:18 images store data under /var/lib/postgresql/<major>/data
+      # and refuse to start if a volume is attached at the old
+      # /var/lib/postgresql/data path; mount the parent instead.
+      - pgdata:/var/lib/postgresql
 
   jaja:
     environment:
