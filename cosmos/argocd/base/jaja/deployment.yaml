@@ -17,6 +17,19 @@ spec:
       containers:
         - name: jaja
           image: ghcr.io/incognito124/jaja:1774562912
+          # Run pending migrations before serving, like docker-compose.local.yml
+          # does. The release ships its priv/repo/migrations, and without this
+          # a rollout whose image carries a new migration 500s with
+          # undefined_column until someone execs in and runs Jaja.Release.migrate()
+          # by hand. env -u PHX_SERVER: with it set, the throwaway eval node
+          # boots the Endpoint, binds :4000 and serves traffic it will drop when
+          # the node halts; unset, it just connects to the DB. `exec` so the
+          # server stays PID 1 and gets SIGTERM.
+          command: ["/bin/sh", "-c"]
+          args:
+            - >-
+              env -u PHX_SERVER /app/bin/jaja eval "Jaja.Release.migrate()" &&
+              exec /app/bin/jaja start
           ports:
             - name: web
               containerPort: 4000
@@ -25,15 +38,22 @@ spec:
                 name: jaja-config
             - secretRef:
                 name: jaja-secret
+          # startupProbe absorbs the migrate-then-serve startup: :4000 is only
+          # bound once migrations finish, so a slow migration no longer gets
+          # the pod killed by liveness mid-flight (old initialDelaySeconds: 15).
+          startupProbe:
+            httpGet:
+              path: /
+              port: 4000
+            periodSeconds: 5
+            failureThreshold: 24
           livenessProbe:
             httpGet:
               path: /
               port: 4000
-            initialDelaySeconds: 15
             periodSeconds: 20
           readinessProbe:
             httpGet:
               path: /
               port: 4000
-            initialDelaySeconds: 10
             periodSeconds: 10
