@@ -54,6 +54,13 @@
             "groupName": "jaja"
         },
         {
+            "matchPackageNames": [
+                "erlang/otp",
+                "hexpm/erlang"
+            ],
+            "groupName": "jaja"
+        },
+        {
             "matchFileNames": [
                 "cosmos/**"
             ],
@@ -154,12 +161,25 @@
                 "/^jaja\\/Dockerfile$/"
             ],
             "matchStrings": [
-                "\"asdf:erlang\" = \"(?<currentValue>[^\"]+)\"",
+                "\"asdf:erl\" = \"(?<currentValue>[^\"]+)\"",
                 "ARG OTP_VERSION=(?<currentValue>\\S+)"
             ],
             "depNameTemplate": "erlang/otp",
             "datasourceTemplate": "github-releases",
             "extractVersionTemplate": "^OTP-(?<version>.+)$"
+        },
+        {
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^jaja\\/Dockerfile$/"
+            ],
+            "matchStrings": [
+                "ARG DEBIAN_VERSION=(?<currentValue>\\S+)"
+            ],
+            "depNameTemplate": "hexpm/erlang",
+            "datasourceTemplate": "docker",
+            "extractVersionTemplate": "^[0-9.]+-debian-(?<version>trixie-[0-9]+)-slim$",
+            "versioningTemplate": "regex:^(?<compatibility>trixie)-(?<major>\\d+)$"
         },
         {
             "customType": "regex",

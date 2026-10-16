@@ -10,8 +10,8 @@
 # .prototools.
 #
 # https://hub.docker.com/r/hexpm/erlang/tags
-ARG OTP_VERSION=29.0.5
-ARG DEBIAN_VERSION=trixie-20260803
+ARG OTP_VERSION=29.1.2
+ARG DEBIAN_VERSION=trixie-20261005
 
 ARG RUNNER_IMAGE="hexpm/erlang:${OTP_VERSION}-debian-${DEBIAN_VERSION}-slim"
 
