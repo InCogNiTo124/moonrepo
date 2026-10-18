@@ -6,7 +6,7 @@
     INLINE_CLASS,
     type TSection,
   } from 'personal-reusables';
-  import { FER_LINK_EN, BIRTHDATE } from '$lib/constants';
+  import { FER_LINK_EN, BIRTHDATE } from '#lib/constants.js';
 
   const age: number = dayjs().diff(dayjs(BIRTHDATE), 'y');
 
