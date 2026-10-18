@@ -1,8 +1,8 @@
-import { env } from '$env/dynamic/private';
+import { BLOG_DB } from '$app/env/private';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ fetch }) => {
-	const blog_db = env.BLOG_DB;
+	const blog_db = BLOG_DB;
 	const response = await fetch(`http://${blog_db}/feed.rss`);
 	const xml = await response.text();
 

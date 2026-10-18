@@ -1,6 +1,6 @@
 <script lang="ts">
   import { INLINE_CLASS } from 'personal-reusables';
-  import Tags from '$lib/components/Tags.svelte';
+  import Tags from '#lib/components/Tags.svelte';
   import DisqusSnippet from './DisqusSnippet.svelte';
 
   interface Props {

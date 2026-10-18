@@ -1,5 +1,5 @@
 <script lang="ts">
-  import PostFullView from '$lib/components/PostViews/PostFullView.svelte';
+  import PostFullView from '#lib/components/PostViews/PostFullView.svelte';
 
   interface Props {
     data: {

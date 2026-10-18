@@ -23,4 +23,4 @@ COPY ./build ./build
 USER bun
 EXPOSE 3000/tcp
 ENV BLOG_DB="blog-db:80"
-ENTRYPOINT [ "bun", "run", "/app/build/" ]
+ENTRYPOINT [ "bun", "./build" ]

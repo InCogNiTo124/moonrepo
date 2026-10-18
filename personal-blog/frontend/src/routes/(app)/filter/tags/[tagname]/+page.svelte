@@ -1,5 +1,5 @@
 <script lang="ts">
-  import PostListViewGroup from '$lib/components/PostViews/PostListViewGroup.svelte';
+  import PostListViewGroup from '#lib/components/PostViews/PostListViewGroup.svelte';
 
   interface Props {
     data: {

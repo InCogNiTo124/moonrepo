@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/private';
+import { BLOG_DB } from '$app/env/private';
 
 interface Arguments {
   params: {
@@ -10,7 +10,7 @@ interface Arguments {
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ params }: Arguments): Promise<Response> {
   const { slug, image } = params;
-  const blog_db = env.BLOG_DB;
+  const blog_db = BLOG_DB;
   const response = await fetch(`http://${blog_db}/post/${encodeURIComponent(slug)}/${encodeURIComponent(image)}`);
   return new Response(response.body, {
     headers: {
