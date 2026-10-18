@@ -5,7 +5,6 @@
     "": {
       "name": "personal-website",
       "dependencies": {
-        "@sveltejs/adapter-static": "^4.0.0",
         "axios": "^1.13.2",
         "dayjs": "^1.11.19",
         "js-cookie": "^3.0.5",
