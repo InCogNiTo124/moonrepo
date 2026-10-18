@@ -1,5 +1,5 @@
-import icon192 from '$lib/assets/android-chrome-192x192.png';
-import icon512 from '$lib/assets/android-chrome-512x512.png';
+import icon192 from '#lib/assets/android-chrome-192x192.png';
+import icon512 from '#lib/assets/android-chrome-512x512.png';
 
 /**
  * Served as a route rather than a file in static/ so the icons resolve to the

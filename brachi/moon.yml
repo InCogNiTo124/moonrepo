@@ -9,7 +9,7 @@ dependsOn:
 - brachistochrone-solver
 tasks:
   check:
-    # svelte-check resolves wasm/* through the kit.alias in svelte.config.js,
+    # svelte-check resolves wasm/* through the alias in vite.config.ts,
     # so it needs the .d.ts files wasm-pack generates into the solver's pkg/.
     # Without this it fails on a clean checkout with
     # "Cannot find module 'wasm/brachistochrone_solver.js'".

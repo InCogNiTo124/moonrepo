@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Canvas from "$lib/Canvas.svelte";
+  import Canvas from "#lib/Canvas.svelte";
   let canvasComponent: Canvas | null = null;
 </script>
 

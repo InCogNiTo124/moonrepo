@@ -9,7 +9,7 @@ tasks:
   check:
     deps:
     # Type-check the lib first: it is compiled from source (see the alias in
-    # svelte.config.js), so its errors are this project's errors too.
+    # vite.config.ts), so its errors are this project's errors too.
     - personal-reusables:check
     inputs:
     # A dep's hash does not feed into this task's hash, so list the lib's

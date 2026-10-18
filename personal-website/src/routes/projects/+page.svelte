@@ -1,7 +1,7 @@
 <script lang="ts">
   import axios from "axios";
   import { SectionGroup, type TSection } from "personal-reusables";
-  import { REPO_API } from "$lib/constants";
+  import { REPO_API } from "#lib/constants.js";
 
   let projects: TSection[] = $state([]);
   axios

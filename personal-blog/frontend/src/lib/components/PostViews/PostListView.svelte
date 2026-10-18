@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Section, SELF } from 'personal-reusables';
-  import Tags from '$lib/components/Tags.svelte';
+  import Tags from '#lib/components/Tags.svelte';
 
   interface Props {
     post: Post;

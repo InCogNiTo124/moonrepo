@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { AppShell, BLANK, Nav } from 'personal-reusables';
-  import Header from '$lib/components/Header.svelte';
-  import favicon from '$lib/assets/favicon.ico';
+  import Header from '#lib/components/Header.svelte';
+  import favicon from '#lib/assets/favicon.ico';
 
   let { children }: { children?: Snippet } = $props();
 </script>

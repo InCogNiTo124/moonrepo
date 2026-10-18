@@ -1,5 +1,5 @@
 <script lang="ts">
-  import PostListView from '$lib/components/PostViews/PostListView.svelte';
+  import PostListView from '#lib/components/PostViews/PostListView.svelte';
   import { SectionGroup } from 'personal-reusables';
 
   interface Props {
