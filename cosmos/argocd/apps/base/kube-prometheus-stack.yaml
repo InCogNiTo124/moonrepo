@@ -45,7 +45,7 @@ spec:
                   folder: ''
                   type: file
                   disableDeletion: false
-                  editable: true
+                  editable: false
                   options:
                     path: /var/lib/grafana/dashboards/default
           dashboards:
@@ -53,10 +53,6 @@ spec:
               traefik-official:
                 gnetId: 17347
                 revision: 9
-                datasource: Prometheus
-              traefik-v2:
-                gnetId: 11462
-                revision: 1
                 datasource: Prometheus
 
         prometheus:
