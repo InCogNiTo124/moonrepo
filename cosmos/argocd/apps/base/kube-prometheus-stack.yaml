@@ -52,7 +52,7 @@ spec:
             default:
               traefik-official:
                 gnetId: 17347
-                revision: 1
+                revision: 9
                 datasource: Prometheus
               traefik-v2:
                 gnetId: 11462
