@@ -91,6 +91,7 @@ spec:
               endpoints:
                 - port: metrics
                   interval: 15s
+                  honorLabels: true
 
         # Disable Alertmanager Ingress for now (access via port-forward if needed)
         alertmanager:
