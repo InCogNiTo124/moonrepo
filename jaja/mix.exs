@@ -84,7 +84,7 @@ defmodule Jaja.MixProject do
       {:bandit, "~> 1.5"},
       {:nanoid, "~> 2.1.0"},
       {:eqrcode, "~> 0.2.1"},
-      {:ueberauth, "~> 0.10"},
+      {:ueberauth, "~> 0.11"},
       {:ueberauth_google, "~> 0.10"}
     ]
   end
