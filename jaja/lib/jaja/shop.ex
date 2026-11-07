@@ -283,6 +283,26 @@ defmodule Jaja.Shop do
     |> Repo.update()
   end
 
+  @doc """
+  Attaches or replaces the video key on an existing batch.
+  """
+  def set_batch_video(%Batch{} = batch, video_key) do
+    batch
+    |> Batch.video_changeset(video_key)
+    |> Repo.update()
+  end
+
+  @doc """
+  Returns batches that have an attached video, newest first (`datetime` desc, `id` desc).
+  """
+  def list_batches_with_videos do
+    from(b in Batch,
+      where: not is_nil(b.video_key) and b.video_key != "",
+      order_by: [desc: b.datetime, desc: b.id]
+    )
+    |> Repo.all()
+  end
+
   # Deactivates a batch once its last unit is ordered.
   defp deactivate_if_sold_out(batch_reference) do
     case Repo.get_by(Batch, unique_reference: batch_reference) do

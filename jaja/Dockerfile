@@ -20,7 +20,7 @@ LABEL org.opencontainers.image.source=https://github.com/incognito124/moonrepo
 
 # The erlang image already provides openssl, libstdc++ and ca-certificates;
 # locales is the only thing missing for the LANG settings below.
-RUN apt-get update -y && apt-get install -y locales \
+RUN apt-get update -y && apt-get install -y --no-install-recommends locales ffmpeg \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # Set the locale

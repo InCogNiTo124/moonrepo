@@ -17,3 +17,5 @@ data:
   DATABASE_SSL: "false"
   POOL_SIZE: "10"
   ADMIN_EMAIL: "marijansmetko123@gmail.com"
+  S3_BUCKET: "jaja-videos"
+  S3_REGION: "fsn1"

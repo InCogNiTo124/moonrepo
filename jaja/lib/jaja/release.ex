@@ -5,7 +5,19 @@ defmodule Jaja.Release do
     load_app()
 
     for repo <- repos() do
-      {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
+      {:ok, _, _} =
+        Ecto.Migrator.with_repo(repo, fn repo ->
+          Ecto.Migrator.run(repo, :up, all: true)
+          seed()
+        end)
+    end
+  end
+
+  defp seed do
+    seed_script = Application.app_dir(@app, "priv/repo/seeds.exs")
+
+    if File.exists?(seed_script) do
+      Code.eval_file(seed_script)
     end
   end
 

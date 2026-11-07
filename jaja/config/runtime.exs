@@ -124,3 +124,12 @@ if config_env() == :prod do
     client_id: System.get_env("GOOGLE_CLIENT_ID"),
     client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
 end
+
+# Hetzner Object Storage, used for batch videos. Read in every environment so the
+# bucket can be exercised in development; without these the upload UI stays hidden.
+config :jaja, Jaja.Storage,
+  bucket: System.get_env("S3_BUCKET"),
+  region: System.get_env("S3_REGION") || "fsn1",
+  host: System.get_env("S3_HOST"),
+  access_key_id: System.get_env("S3_ACCESS_KEY_ID"),
+  secret_access_key: System.get_env("S3_SECRET_ACCESS_KEY")

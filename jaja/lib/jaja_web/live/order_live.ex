@@ -112,7 +112,13 @@ defmodule JajaWeb.OrderLive do
       </div>
 
       <%= if @remaining > 0 and @batch.active do %>
-        <.form for={@form} phx-change="validate" phx-submit="reserve" class="space-y-4">
+        <.form
+          id="order-form"
+          for={@form}
+          phx-change="validate"
+          phx-submit="reserve"
+          class="space-y-4"
+        >
           <input type="hidden" name={@form[:batch_reference].name} value={@batch.unique_reference} />
 
           <.input

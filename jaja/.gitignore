@@ -52,3 +52,4 @@ ca.pem
 # (favicon.ico, robots.txt, images/*) are immune to this rule.
 # Add NEW sources with:  jj file track --include-ignored <path>
 /priv/*
+/.idea/

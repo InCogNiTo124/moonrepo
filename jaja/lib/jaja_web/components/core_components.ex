@@ -313,6 +313,15 @@ defmodule JajaWeb.CoreComponents do
   end
 
   @doc """
+  Formats a naive datetime as a date only, e.g. `"14.08.2026."`.
+  """
+  def format_date(nil), do: ""
+
+  def format_date(%NaiveDateTime{} = datetime) do
+    Calendar.strftime(datetime, "%d.%m.%Y.")
+  end
+
+  @doc """
   Renders a header with title.
   """
   slot :inner_block, required: true

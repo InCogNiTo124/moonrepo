@@ -5,13 +5,18 @@ defmodule JajaWeb.Plugs.RequireAdmin do
   def init(default), do: default
 
   def call(conn, _opts) do
-    if get_session(conn, :admin_user) do
-      conn
-    else
-      conn
-      |> put_flash(:error, "You must be logged in to access this page.")
-      |> redirect(to: "/auth/google")
-      |> halt()
+    cond do
+      get_session(conn, :admin_user) ->
+        conn
+
+      Application.get_env(:jaja, :dev_routes, false) ->
+        put_session(conn, :admin_user, "dev@localhost")
+
+      true ->
+        conn
+        |> put_flash(:error, "You must be logged in to access this page.")
+        |> redirect(to: "/auth/google")
+        |> halt()
     end
   end
 end

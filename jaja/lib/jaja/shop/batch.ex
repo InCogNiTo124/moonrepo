@@ -8,6 +8,7 @@ defmodule Jaja.Shop.Batch do
     field :datetime, :naive_datetime
     field :unique_reference, :string
     field :price, :float
+    field :video_key, :string
     field :active, :boolean, default: true
 
     has_many :orders, Jaja.Shop.Order,
@@ -20,7 +21,7 @@ defmodule Jaja.Shop.Batch do
   @doc false
   def changeset(batch, attrs) do
     batch
-    |> cast(attrs, [:type, :amount, :datetime, :unique_reference, :price],
+    |> cast(attrs, [:type, :amount, :datetime, :unique_reference, :price, :video_key],
       message: &cast_error_message/2
     )
     |> validate_required([:type, :amount, :price])
@@ -39,6 +40,13 @@ defmodule Jaja.Shop.Batch do
   """
   def activation_changeset(batch, active) when is_boolean(active) do
     change(batch, active: active)
+  end
+
+  @doc """
+  Changeset for attaching or replacing the batch's video key.
+  """
+  def video_changeset(batch, video_key) when is_binary(video_key) and video_key != "" do
+    change(batch, video_key: video_key)
   end
 
   # Replaces Ecto's generic "is invalid" for values that fail to cast to the field type.
