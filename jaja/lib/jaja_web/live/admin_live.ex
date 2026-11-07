@@ -160,27 +160,15 @@ defmodule JajaWeb.AdminLive do
         cancel_upload(acc, :existing_video, entry.ref)
       end)
 
-    {:noreply,
-     socket
-     |> assign(:editing_video_batch, batch)
-     |> put_batch_in_stream(batch)}
+    {:noreply, assign(socket, :editing_video_batch, batch)}
   end
 
   def handle_event("cancel_edit_batch_video", _params, socket) do
-    old_batch = socket.assigns.editing_video_batch
-
     socket =
       Enum.reduce(socket.assigns.uploads.existing_video.entries, socket, fn entry, acc ->
         cancel_upload(acc, :existing_video, entry.ref)
       end)
       |> assign(:editing_video_batch, nil)
-
-    socket =
-      if old_batch do
-        put_batch_in_stream(socket, Shop.get_batch_with_orders!(old_batch.id))
-      else
-        socket
-      end
 
     {:noreply, socket}
   end
@@ -417,8 +405,6 @@ defmodule JajaWeb.AdminLive do
                 batch={batch}
                 open_batches={@open_batches}
                 storage_configured?={@storage_configured?}
-                editing_video?={@editing_video_batch != nil and @editing_video_batch.id == batch.id}
-                existing_video_upload={@uploads.existing_video}
               />
             </div>
           </div>
@@ -435,12 +421,56 @@ defmodule JajaWeb.AdminLive do
                 batch={batch}
                 open_batches={@open_batches}
                 storage_configured?={@storage_configured?}
-                editing_video?={@editing_video_batch != nil and @editing_video_batch.id == batch.id}
-                existing_video_upload={@uploads.existing_video}
               />
             </div>
           </div>
         </div>
+      </div>
+
+      <div :if={@editing_video_batch} class="modal modal-open">
+        <div class="modal-box bg-base-200 text-base-content">
+          <div class="flex items-center justify-between gap-2 mb-4">
+            <h3 class="font-bold text-lg">
+              {if @editing_video_batch.video_key,
+                do: "Replace batch video",
+                else: "Upload batch video"}
+            </h3>
+            <button
+              type="button"
+              phx-click="cancel_edit_batch_video"
+              class="btn btn-sm btn-circle btn-ghost"
+            >
+              &times;
+            </button>
+          </div>
+          <p class="text-sm text-base-content/70 mb-4">
+            {translate_type(@editing_video_batch.type)} &middot; {format_datetime(
+              @editing_video_batch.datetime
+            )}
+          </p>
+          <form
+            id={"batch-video-form-#{@editing_video_batch.id}"}
+            phx-change="validate_existing_video"
+            class="space-y-3"
+          >
+            <.live_file_input upload={@uploads.existing_video} class="w-full file-input" />
+
+            <div :for={entry <- @uploads.existing_video.entries} class="mt-2">
+              <progress class="progress progress-primary w-full" value={entry.progress} max="100" />
+              <p
+                :for={err <- upload_errors(@uploads.existing_video, entry)}
+                class="text-sm text-error"
+              >
+                {upload_error_to_string(err)}
+              </p>
+            </div>
+
+            <p :for={err <- upload_errors(@uploads.existing_video)} class="text-sm text-error">
+              {upload_error_to_string(err)}
+            </p>
+          </form>
+        </div>
+        <div class="modal-backdrop bg-black/50" phx-click="cancel_edit_batch_video"></div>
       </div>
     </div>
     """
@@ -450,8 +480,6 @@ defmodule JajaWeb.AdminLive do
   attr :batch, Jaja.Shop.Batch, required: true
   attr :open_batches, :any, required: true, doc: "MapSet of batch ids whose order list is open"
   attr :storage_configured?, :boolean, default: false
-  attr :editing_video?, :boolean, default: false
-  attr :existing_video_upload, :any, default: nil
 
   defp batch_card(assigns) do
     ~H"""
@@ -473,7 +501,7 @@ defmodule JajaWeb.AdminLive do
         </div>
         <div class="flex items-center gap-2">
           <button
-            :if={@storage_configured? and not @editing_video?}
+            :if={@storage_configured?}
             type="button"
             phx-click="edit_batch_video"
             phx-value-id={@batch.id}
@@ -485,39 +513,6 @@ defmodule JajaWeb.AdminLive do
             View
           </a>
         </div>
-      </div>
-
-      <div :if={@editing_video?} class="my-3 p-3 rounded bg-base-100 border">
-        <form
-          id={"batch-video-form-#{@batch.id}"}
-          phx-change="validate_existing_video"
-          class="space-y-2"
-        >
-          <div class="flex items-center justify-between gap-2">
-            <span class="text-sm font-semibold">
-              {if @batch.video_key, do: "Replace batch video", else: "Upload batch video"}
-            </span>
-            <button
-              type="button"
-              phx-click="cancel_edit_batch_video"
-              class="btn btn-xs btn-ghost"
-            >
-              Cancel
-            </button>
-          </div>
-          <.live_file_input upload={@existing_video_upload} class="w-full file-input file-input-sm" />
-
-          <div :for={entry <- @existing_video_upload.entries} class="mt-2">
-            <progress class="progress progress-primary w-full" value={entry.progress} max="100" />
-            <p :for={err <- upload_errors(@existing_video_upload, entry)} class="text-sm text-error">
-              {upload_error_to_string(err)}
-            </p>
-          </div>
-
-          <p :for={err <- upload_errors(@existing_video_upload)} class="text-sm text-error">
-            {upload_error_to_string(err)}
-          </p>
-        </form>
       </div>
 
       <div class="flex justify-between items-center gap-4 mb-2">
