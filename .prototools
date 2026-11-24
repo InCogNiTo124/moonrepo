@@ -1,7 +1,7 @@
 moon = "2.6.5"
 bun = "1.4.4"
 rust = "1.99.1"
-uv = "0.13.7"
+uv = "0.13.9"
 wasm-pack = "0.15.0"
 
 # jaja's release is built with include_erts: false, so the OTP that compiles the
