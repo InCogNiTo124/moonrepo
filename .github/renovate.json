@@ -65,11 +65,20 @@
                 "cosmos/**"
             ],
             "groupName": "cosmos"
+        },
+        {
+            // Paused 2026-11: pinned 65.2.0 while latest is 93.x (~28 majors,
+            // Prometheus 3 + Grafana 12 jump). Rehearse on Terra Incognita,
+            // then delete this rule to resume updates.
+            "matchPackageNames": [
+                "kube-prometheus-stack"
+            ],
+            "enabled": false
         }
     ],
-    "flux": {
+    "argocd": {
         "managerFilePatterns": [
-            "/^cosmos/clusters/prod/.+\\.ya?ml$/"
+            "/^cosmos\\/argocd\\/apps\\/.+\\.ya?ml$/"
         ]
     },
     "pyenv": {
