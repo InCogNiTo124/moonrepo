@@ -40,11 +40,37 @@ in `PG_APPS`. The dev stack uses the fixed seed `cosmos-local-seed`.
 
 ## Rebuild semantics ("nuclear rebuild" = resume)
 
-`pulumi up` after any change to the server replaces it (`delete_before_replace`):
-old server stops k3s → backup timers → Postgres, unmounts `/data`; new server
-remounts `/data`, reinstalls PG (same pinned major, latest minor), finds the
-existing data dir, and k3s re-adopts the existing datastore via the derived
-token — the *same* cluster resumes: same CA, same Secrets, same PVs.
+The server is rebuilt **in place** (Hetzner's rebuild action, `rebuild.py`): it
+keeps its id, IPs, type and the attached volume and only gets a fresh root
+disk, so a rebuild never depends on Hetzner having a free `cx33`. The script
+stops k3s and its pods → backups → Postgres, unmounts `/data`, rebuilds, then
+waits for cloud-init to finish without errors and for the k3s node. The fresh disk remounts `/data`, reinstalls PG
+(same pinned major, latest minor), finds the existing data dir, and k3s
+re-adopts the existing datastore via the derived token — the *same* cluster
+resumes: same CA, same Secrets, same PVs.
+
+Two ways to trigger it:
+
+- **CI, when cloud-init changes.** `pulumi up` rebuilds only if the rendered
+  cloud-init or the image changed. Any other push leaves the server alone.
+  `GH_PAT` is left out of that comparison, so rotating the token does not
+  rebuild anything by itself.
+- **By hand, when nothing changed** (or when the server cannot be stopped
+  cleanly):
+  ```bash
+  ./force-rebuild.sh
+  ```
+  Needs the full prod environment in `.envrc`: `HCLOUD_TOKEN`, `ARIES`,
+  `ARIES_PUB`, `GH_PAT`, `PULUMI_ACCESS_TOKEN`, `PULUMI_CONFIG_PASSPHRASE`.
+  The server boots with the `GH_PAT` of whoever ran the rebuild.
+
+A failed run is safe to repeat: a server that already booted from the wanted
+cloud-init and image is only verified, not rebuilt again (unless forced). If
+the run failed after stopping services, prod stays down until the next run.
+
+Still a real replace (new server, needs capacity): changing `location` or the
+`ARIES` ssh key. Check the PR preview for `replace` on the server before
+merging.
 
 - Never skip more than one Kubernetes minor between rebuilds.
 - After an Ubuntu major bump nothing special is needed (initdb used the
@@ -66,7 +92,9 @@ All commands as root on the server. `pg-restore.sh` refuses to run without
 ```
 
 **Full loss (server AND volume gone):**
-1. `uv run pulumi up` — fresh volume, fresh (empty) PG, cluster boots new.
+1. `uv run pulumi up` (CI, or locally with the full `.envrc`) — fresh server
+   and volume, fresh (empty) PG, cluster boots new. The server boots straight
+   from the current cloud-init, so `rebuild-server` only verifies it.
 2. `/opt/cosmos/pg-restore.sh --yes-destroy-data` — pulls the repo state back
    (prod: object storage; dev: the backup disk); k3s restarts against the
    restored datastore.
@@ -84,12 +112,16 @@ DBs are megabytes — dump/restore beats `pg_upgrade` surgery here:
 1. On the old server: `sudo -u postgres pg_dumpall > /data/pg_dumpall.sql`
 2. Bump the major once in `cloud-init.yaml.j2` (`{% set pg_major = NN %}`).
 3. Deploy. The bootstrap tripwire sees the old-major data dir and **halts
-   cloud-init** — this is expected: SSH in, `mv /data/postgres/<old> /data/postgres/<old>.pre-upgrade`,
+   cloud-init** — this is expected, and so is the deploy failing at
+   `rebuild-server` (it waits for a clean cloud-init): SSH in,
+   `mv /data/postgres/<old> /data/postgres/<old>.pre-upgrade`,
    re-run `cloud-init` modules or reboot (fresh initdb on the new major runs).
 4. `sudo -u postgres psql -f /data/pg_dumpall.sql postgres`, then re-run
    `/opt/cosmos/pg-bootstrap.sh` (re-syncs passwords).
 5. `sudo -u postgres pgbackrest --stanza=cosmos stanza-upgrade`, then a fresh
    full backup: `systemctl start pgbackrest-full.service`.
+6. Re-run the deploy: `rebuild-server` sees the server already on the new
+   cloud-init and only verifies it.
 
 ## Drills (do these, they're the whole point)
 
@@ -98,7 +130,7 @@ DBs are megabytes — dump/restore beats `pg_upgrade` surgery here:
 | Rebuild-resume (`pulumi destroy` VM, keep data disk → `up`) | local twin | after any cloud-init change |
 | In-place restore | local twin | monthly-ish |
 | Full-loss restore (VM + data disk wiped) | local twin | quarterly-ish |
-| Rebuild-resume (replace server, keep volume) | staging/prod | before + after first cutover |
+| Rebuild-resume (`./force-rebuild.sh`, keep volume) | prod | on a cadence, by hand |
 
 ## Rotation
 
@@ -107,3 +139,6 @@ passwords, k3s token changes → datastore bootstrap re-keys) + re-seal every
 app SealedSecret that embeds a derived password + `stanza-create` against a
 fresh repo path (old backups stay readable with the old cipher pass only).
 Rotate S3 keys freely — config change + rebuild, nothing else depends on them.
+Rotate `GH_PAT` = new token in the CI secret and `.envrc`, then
+`./force-rebuild.sh` (or wait for the next cloud-init change): the token is
+kept out of the rebuild trigger on purpose.

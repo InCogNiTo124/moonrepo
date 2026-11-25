@@ -12,6 +12,7 @@ keeps a local posix pgBackRest repo on a third disk -- dev data is worthless,
 but the restore drills need a repo to restore from.
 """
 
+import hashlib
 import os
 import pathlib
 from enum import Enum
@@ -23,6 +24,7 @@ import pulumi_hcloud as hcloud
 import pulumi_libvirt as libvirt
 
 from derive import PG_APPS, derive, pg_passwords
+from rebuild import STOP_SERVICES
 
 STACK = pulumi.get_stack()
 COSMOS = pathlib.Path(__file__).resolve().parent
@@ -53,6 +55,18 @@ def render_cloud_init(**env_specific):
         pg_apps=PG_APPS,
         **env_specific,
     )
+
+
+def require_env(name):
+    """A missing variable must stop the run, not render into cloud-init as an
+    empty string (GH_PAT) or surface halfway through a rebuild (ARIES)."""
+    try:
+        return os.environ[name]
+    except KeyError as err:
+        raise pulumi.RunError(
+            f"{name} is not set. The prod stack needs HCLOUD_TOKEN, ARIES,"
+            " ARIES_PUB and GH_PAT (CI secrets; locally cosmos/.envrc)."
+        ) from err
 
 
 def read_key(path):
@@ -197,9 +211,16 @@ if STACK == "dev":
     pulumi.export("kubeconfig", f"ssh root@{VM_IP} cat /etc/rancher/k3s/k3s.yaml")
 
 elif STACK == "prod":
+    SERVER_IMAGE = "ubuntu-24.04"
+
+    require_env("HCLOUD_TOKEN")  # read by the hcloud provider and rebuild.py
+    GH_PAT = require_env("GH_PAT")
+    ARIES = require_env("ARIES")
+    ARIES_PUB = require_env("ARIES_PUB")
+
     # 1. Create Volume (Independent)
-    # We disable automount here/in attachment because we handle it via
-    # cloud-init 'mounts'
+    # We disable automount here/in attachment because cloud-init mounts it
+    # itself (the runcmd mount loop in cloud-init.yaml.j2)
     volume = hcloud.Volume(
         "data-volume",
         size=50,
@@ -230,13 +251,13 @@ elif STACK == "prod":
     # Create Static IP
     floating_ip = hcloud.FloatingIp.get(resource_name="terra-incognita", id="63752554")
 
-    def create_cloud_init(args):
+    def create_cloud_init(args, gh_pat):
         # We inject the specific Volume ID for the /dev/disk/by-id path
         return render_cloud_init(
             env="prod",
             data_device=f"/dev/disk/by-id/scsi-0HC_Volume_{args['vol_id']}",
             ca_server=LetsEncryptEnv.PRODUCTION.value,
-            gh_pat=os.environ.get("GH_PAT", ""),
+            gh_pat=gh_pat,
             ss_private_key=indent(args["ss_priv"], 10),
             ss_public_cert=indent(args["ss_pub"], 10),
             floating_ip=args["floating_ip_addr"],
@@ -253,7 +274,7 @@ elif STACK == "prod":
             s3_secret_key=args["s3_secret_key"],
         )
 
-    cloud_init_data = pulumi.Output.all(
+    cloud_init_inputs = pulumi.Output.all(
         vol_id=volume.id,
         ss_priv=ss_private_key,
         ss_pub=ss_public_cert,
@@ -261,9 +282,12 @@ elif STACK == "prod":
         seed=master_seed,
         s3_access_key=s3_access_key,
         s3_secret_key=s3_secret_key,
-    ).apply(create_cloud_init)
+    )
+    cloud_init_data = cloud_init_inputs.apply(
+        lambda args: create_cloud_init(args, GH_PAT)
+    )
 
-    ssh_key = hcloud.SshKey("ARIES", public_key=os.environ.get("ARIES_PUB"))
+    ssh_key = hcloud.SshKey("ARIES", public_key=ARIES_PUB)
 
     # Create Firewall
     firewall = hcloud.Firewall(
@@ -296,6 +320,13 @@ elif STACK == "prod":
     )
 
     # 3. Define server
+    # user_data and image only apply when the server is first created. After
+    # that they are ignored here and delivered by the rebuild-server resource
+    # below, which reinstalls this same server instead of replacing it: a
+    # replacement has to win a new cx33 from Hetzner, and on 2026-08-20 there
+    # was none.
+    # delete_before_replace now only fires on deliberate changes (location,
+    # ssh key); it keeps the graceful shutdown order below for those.
     cosmos_server = hcloud.Server(
         "cosmos",
         location="fsn1",
@@ -303,9 +334,12 @@ elif STACK == "prod":
         firewall_ids=[firewall.id],
         ssh_keys=[ssh_key.id],
         server_type="cx33",
-        image="ubuntu-24.04",
+        image=SERVER_IMAGE,
         user_data=cloud_init_data,
-        opts=pulumi.ResourceOptions(delete_before_replace=True),
+        opts=pulumi.ResourceOptions(
+            delete_before_replace=True,
+            ignore_changes=["userData", "image"],
+        ),
     )
 
     _ = hcloud.FloatingIpAssignment(
@@ -315,7 +349,7 @@ elif STACK == "prod":
     )
 
     # 4. Attach Volume
-    # automount=False because we used 'mounts' in cloud-init
+    # automount=False because cloud-init mounts it itself (runcmd mount loop)
     volume_attachment = hcloud.VolumeAttachment(
         "data-volume-attachment",
         server_id=cosmos_server.id,
@@ -326,7 +360,7 @@ elif STACK == "prod":
     connection = command.remote.ConnectionArgs(
         host=cosmos_server.ipv4_address,
         user="root",
-        private_key=os.environ.get("ARIES"),
+        private_key=ARIES,
     )
 
     # Lifecycle Management:
@@ -344,12 +378,55 @@ elif STACK == "prod":
         opts=pulumi.ResourceOptions(depends_on=[volume_attachment]),
     )
 
-    # 2. Graceful shutdown of services (k3s first -- it is Postgres' client)
+    # 2. Graceful shutdown of services: the same sequence rebuild.py runs, so
+    # a real replace stops pods and syncs too. Fails (and so aborts the
+    # replace) if Postgres will not stop.
+    # Do not rename or remove these two resources: deleting them from the
+    # stack runs their delete hooks against the live server.
     shutdown_k3s = command.remote.Command(
         "shutdown-k3s",
         connection=connection,
-        delete="systemctl stop k3s; systemctl stop pgbackrest-full.timer pgbackrest-diff.timer; systemctl stop 'postgresql@*'",
+        delete=STOP_SERVICES,
         opts=pulumi.ResourceOptions(depends_on=[unmount_volume]),
+    )
+
+    # 3. In-place rebuild (see rebuild.py)
+    # Replaced -- and so re-run -- only when a trigger changes: new cloud-init,
+    # new image, or a new server. A deploy that touches none of them leaves the
+    # server alone. `./force-rebuild.sh` replaces it by hand when nothing
+    # changed.
+    # The hash leaves GH_PAT out: the token differs between machines and gets
+    # rotated, and neither should make an unrelated push rebuild prod. A new
+    # token reaches the server with the next rebuild.
+    # update="true" matters: without it the provider re-runs `create` whenever
+    # any other input changes (stdin does, with GH_PAT).
+    # replace_on_changes is spelled out because the provider's docs say a
+    # trigger runs `update` when one is set, while its SDK replaces
+    # (pulumi/pulumi-command#855); if that is ever "fixed" towards the docs, a
+    # cloud-init change would silently run `true`.
+    cloud_init_sha = pulumi.Output.unsecret(
+        cloud_init_inputs.apply(
+            lambda args: hashlib.sha256(
+                create_cloud_init(args, "<GH_PAT>").encode()
+            ).hexdigest()
+        )
+    )
+    command.local.Command(
+        "rebuild-server",
+        create="uv run --no-sync python rebuild.py",
+        update="true",
+        stdin=cloud_init_data,
+        environment={
+            "COSMOS_SERVER_ID": cosmos_server.id,
+            "COSMOS_SERVER_IP": cosmos_server.ipv4_address,
+            "COSMOS_IMAGE": SERVER_IMAGE,
+        },
+        triggers=[cloud_init_sha, SERVER_IMAGE, cosmos_server.id],
+        add_previous_output_in_env=False,
+        opts=pulumi.ResourceOptions(
+            depends_on=[shutdown_k3s],
+            replace_on_changes=["triggers[*]"],
+        ),
     )
 
     pulumi.export("ip", cosmos_server.ipv4_address)

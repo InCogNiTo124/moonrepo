@@ -10,7 +10,7 @@ This project provisions a robust, single-node Kubernetes cluster on Hetzner Clou
 
 ### Compute & Storage
 - **Server:** Ubuntu 24.04 (Type: `cx33`, Location: `fsn1`).
-    - **Note:** The server is treated as **ephemeral**. It can be destroyed and replaced at any time ("Nuclear Rebuild"). Since the K3s datastore moved to host PostgreSQL on `/data`, a rebuild **resumes the same cluster** (same CA, same Secrets, same PVs) instead of creating a new one — see `writeups/postgres.md`.
+    - **Note:** The server's root disk is treated as **ephemeral**. It can be wiped at any time ("Nuclear Rebuild"): the server is rebuilt in place rather than replaced, so a rebuild never waits on Hetzner capacity — see `RUNBOOK.md`. Since the K3s datastore moved to host PostgreSQL on `/data`, a rebuild **resumes the same cluster** (same CA, same Secrets, same PVs) instead of creating a new one — see `writeups/postgres.md`.
 - **Storage:** 50GB Block Storage Volume (`data-volume`).
     - **Persistence:** This volume survives server destruction.
     - **Mounting:** Mounted to `/data` via a robust `runcmd` loop in `cloud-init`, bypassing standard automount to ensuring availability before K3s starts.
@@ -39,7 +39,7 @@ This project achieves **Zero-Touch Bootstrap** where passwords and secrets survi
 
 ### The "Bootstrapped Sealed Secrets" Strategy
 1.  **Master Key:** A single RSA key pair is generated locally and stored in the `keys/` directory.
-2.  **Encryption:** During `pulumi up`, `__main__.py` reads these keys and injects them into `cloud-init.yaml` as **Pulumi Secrets** (encrypted at rest in the state).
+2.  **Encryption:** During `pulumi up`, `__main__.py` reads these keys (prod: from the encrypted stack config; dev: from `keys/`) and injects them into the rendered `cloud-init.yaml.j2` as **Pulumi Secrets** (encrypted at rest in the state).
 3.  **Pre-seeding:** `cloud-init` writes the key to a Kubernetes Secret (`sealed-secrets-key`) in the `kube-system` namespace *before* K3s fully starts.
 4.  **Adoption:** The **Bitnami Sealed Secrets Controller** starts up, detects the existing key, and adopts it.
 5.  **Usage:** Application secrets are encrypted locally using `kubeseal` and committed to Git. The controller decrypts them automatically on deploy.
@@ -61,13 +61,14 @@ All homegrown credentials (PG role passwords, the K3s cluster token, the pgBackR
 
 ## 5. Prerequisites
 
-Ensure the following environment variables are set:
+Ensure the following environment variables are set (CI secrets; locally `cosmos/.envrc`). The prod stack refuses to run without the first four:
 
-- `HCLOUD_TOKEN`: Hetzner Cloud API token.
+- `HCLOUD_TOKEN`: Hetzner Cloud API token (Pulumi provider and `rebuild.py`).
 - `ARIES_PUB`: Public SSH key for the server.
-- `ARIES`: Private SSH key (used by Pulumi for remote commands).
-- `GH_PAT`: GitHub Personal Access Token (with repo scope).
-- `PULUMI_CONFIG_PASSPHRASE`: Local Pulumi encryption passphrase.
+- `ARIES`: Private SSH key (remote commands and `rebuild.py`).
+- `GH_PAT`: GitHub Personal Access Token (with repo scope), rendered into cloud-init.
+- `PULUMI_ACCESS_TOKEN`: Pulumi Cloud token (the state backend).
+- `PULUMI_CONFIG_PASSPHRASE`: Pulumi config encryption passphrase.
 
 ## 6. Usage
 
@@ -76,9 +77,9 @@ Ensure the following environment variables are set:
    uv sync
    ```
 
-2. **Deploy:**
+2. **Deploy:** prod deploys run in CI on every push to `main` (`.github/workflows/pulumi.yaml`); the server itself is only rebuilt when cloud-init or the image changed. To rebuild it by hand:
    ```bash
-   pulumi up
+   ./force-rebuild.sh
    ```
 
 3. **Access:**
@@ -104,7 +105,7 @@ Prometheus, Grafana, and Alertmanager use a **Static HostPath Binding** strategy
 To avoid conflicts with Node Exporter (host port 9100), Traefik metrics are exposed on **port 9101**.
 
 ### Graceful Shutdown
-Pulumi manages the lifecycle via `command.remote`: before the server is destroyed it stops K3s (Postgres' client), the backup timers, then PostgreSQL itself, and finally unmounts `/data` — ensuring both the database and the filesystem on the persistent volume remain clean.
+Before the root disk is wiped (`rebuild.py`) or the server destroyed (`command.remote`), K3s (Postgres' client) is stopped first, then the backup timers, then PostgreSQL itself, and finally `/data` is unmounted — ensuring both the database and the filesystem on the persistent volume remain clean.
 
 ## TODOs
 
