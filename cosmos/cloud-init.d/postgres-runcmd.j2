@@ -17,7 +17,9 @@
   # the posix repo dir on the backup disk (mounted in an earlier runcmd)
   - install -d -o postgres -g postgres -m 700 /backups/pgbackrest
 {% endif %}
-  - /opt/cosmos/pg-bootstrap.sh
+  # `|| exit 1` ends the whole runcmd script: without Postgres the k3s install
+  # further down never finishes starting and hides the real error for good
+  - /opt/cosmos/pg-bootstrap.sh || exit 1
   # no-op when the repo already knows this cluster (rebuild); WAL pushes that
   # raced it just self-heal on the archiver's retry
   - sudo -u postgres pgbackrest --stanza=cosmos stanza-create

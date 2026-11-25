@@ -118,6 +118,15 @@
           echo "Manual major upgrade required (cosmos/RUNBOOK.md); refusing to continue." >&2
           exit 1
         fi
+        # The postgres uid is whatever the package picked on *this* disk (108
+        # via adduser until 2026-11, 988 via sysusers after); the data dir
+        # still carries the uid of the disk it was created on. On a mismatch
+        # the cluster refuses to start ("owned by user id N which does not
+        # exist"), so the surviving data follows the name, not the number.
+        if [ "$(stat -c %u:%g "${DATADIR}")" != "$(id -u postgres):$(id -g postgres)" ]; then
+          echo "re-owning $(dirname "${DATADIR}") from $(stat -c %u:%g "${DATADIR}") to postgres"
+          chown -R postgres:postgres "$(dirname "${DATADIR}")"
+        fi
       else
         install -d -o postgres -g postgres -m 700 "$(dirname "${DATADIR}")" "${DATADIR}"
         # builtin locale provider: immune to glibc collation changes on OS upgrades
@@ -126,6 +135,8 @@
           --auth-host=scram-sha-256 --auth-local=peer
       fi
 
+      # the package's own start attempt fails before the re-own above
+      systemctl reset-failed "postgresql@${PG_MAJOR}-main" 2>/dev/null || true
       systemctl enable --now "postgresql@${PG_MAJOR}-main"
       for _ in $(seq 1 60); do
         sudo -u postgres pg_isready -q && break
